@@ -50,14 +50,16 @@ public class MainActivity extends Activity {
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(true ){
-                    mp.reset();
+
+                    if (true) {
+                        mp.reset();
+                    }
+                    if (!editText.getText().toString().equals("") && editText != null && editText.getText().length() != 0) {
+                        myUpdateOperation(Integer.parseInt(editText.getText().toString()));
+                        mp.start();
+                    } else
+                        Toast.makeText(getApplicationContext(), "enter any no", Toast.LENGTH_SHORT).show();
                 }
-                if(!editText.getText().toString().equals("") && editText!=null && editText.getText().length()!=0 ){
-                    myUpdateOperation(Integer.parseInt(editText.getText().toString()));
-                mp.start();
-                }else Toast.makeText(getApplicationContext(),"nope",Toast.LENGTH_SHORT).show();
-            }
 
         });
 
@@ -65,8 +67,21 @@ public class MainActivity extends Activity {
         pause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(mp.isPlaying()){
+                if(pause.getText().toString().equals("pause")){
                 mp.pause();
+                pause.setText("resume");}
+                else if(pause.getText().toString().equals("resume")){
+                    //int a=mp.getDuration();
+                    /*int b=mp.getCurrentPosition();
+                    mp.seekTo(b);*/
+                    mp.start();
+                    pause.setText("pause");
+                }
             }
+            else Toast.makeText(getApplicationContext(),"no song playing",Toast.LENGTH_SHORT).show();
+            }
+
         });
 
 
