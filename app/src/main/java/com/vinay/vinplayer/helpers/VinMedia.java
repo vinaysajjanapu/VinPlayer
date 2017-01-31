@@ -42,6 +42,20 @@ public class VinMedia {
         this.context=context;
     }
 
+    public static VinMedia getInstance() {
+        VinMedia localInstance = Instance;
+        if (localInstance == null) {
+            synchronized (VinMedia.class) {
+                localInstance = Instance;
+                if (localInstance == null) {
+                    Instance = localInstance = new VinMedia(getInstance().context);
+                }
+            }
+        }
+        return localInstance;
+    }
+
+
     public void VinMediaInitialize(){
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
