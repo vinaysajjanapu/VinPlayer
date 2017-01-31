@@ -14,6 +14,7 @@ import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,6 +43,19 @@ public class VinMedia {
         this.context=context;
     }
 
+    public static VinMedia getInstance() {
+        VinMedia localInstance = Instance;
+        if (localInstance == null) {
+            synchronized (VinMedia.class) {
+                localInstance = Instance;
+                if (localInstance == null) {
+                    Instance = localInstance = new VinMedia(getInstance().context);
+                }
+            }
+        }
+        return localInstance;
+    }
+
     public void VinMediaInitialize(){
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -66,14 +80,34 @@ public class VinMedia {
                 {
                     String data = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.DATA));
                     // Add code to get more column here
-                    String id=cur.getString(cur.getColumnIndex(MediaStore.Audio.Media._ID));
-                    // Save to your list here
+                    String id = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media._ID));
+                    String album = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.ALBUM));
+                    String album_id = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+                    String artist = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+                    String artist_id = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID));
+                    String date_added = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED));
+                    String duration = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.DURATION));
+                    String size = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.SIZE));
+                    String title = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.TITLE));
+                    String track = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.TRACK));
+                    String year = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.YEAR));
 
-                    // textView.append(data+"\n");
+                    // Save to your list here
 
                     HashMap<String,String> h=new HashMap<>();
                     h.put("data",data);
                     h.put("id",id);
+                    h.put("album",album);
+                    h.put("album_id",album_id);
+                    h.put("artist",artist);
+                    h.put("artist_id",artist_id);
+                    h.put("date_added",date_added);
+                    h.put("duration",duration);
+                    h.put("size",size);
+                    h.put("title",title);
+                    h.put("track",track);
+                    h.put("year",year);
+
                     songsList.add(h);
                 }
             }
@@ -117,6 +151,7 @@ public class VinMedia {
     public boolean isPlaying(){
         return mediaPlayer.isPlaying();
     }
+
 
 
 
