@@ -25,6 +25,8 @@ public class VinMediaLists {
     private String selection;
     private String sortOrder;
     private Uri uri;
+    public static ArrayList<HashMap<String,String>> allSongs;
+
 
     public VinMediaLists(Context context){
         this.context=context;
@@ -76,13 +78,13 @@ public class VinMediaLists {
                     h.put("track",track);
                     h.put("year",year);
                     h.put("bookmark",bookmark);
-                    h.put("audio_progress","0");
                     allSongsList.add(h);
                 }
             }
         }
 
         cur.close();
+        allSongs=allSongsList;
         return allSongsList;
     }
 
@@ -91,9 +93,9 @@ public class VinMediaLists {
     public ArrayList<HashMap<String, String>> getListByKey(String key, String value){
 
         ArrayList<HashMap<String,String>> list = new ArrayList<>();
-        for(int itr =0;itr<getAllSongsList().size();itr++){
-            if (getAllSongsList().get(itr).get(key).equals(value)){
-                list.add(getAllSongsList().get(itr));
+        for(int itr =0;itr<allSongs.size();itr++){
+            if (allSongs.get(itr).get(key).equals(value)){
+                list.add(allSongs.get(itr));
             }
         }
         return list;
