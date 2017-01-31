@@ -24,42 +24,49 @@ import java.util.HashMap;
 public class MainActivity extends Activity {
 
     //TextView textView;
-    ArrayList<HashMap<String,String>> songs;
+    ArrayList<HashMap<String, String>> songs;
 
-    Button start,pause,stop;
+    Button start, pause, stop;
     MediaPlayer mp;
     ImageView imageView;
     EditText editText;
+    VinMedia vinMedia;
+    int index = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-       // textView= (TextView) findViewById(R.id.tv);
-        songs= new ArrayList<>();
+        vinMedia = new VinMedia(this);
+
+        // textView= (TextView) findViewById(R.id.tv);
+
 
         start = (Button) findViewById(R.id.button1);
         pause = (Button) findViewById(R.id.button2);
         stop = (Button) findViewById(R.id.button3);
-        imageView= (ImageView) findViewById(R.id.image);
-        editText= (EditText) findViewById(R.id.num);
+        imageView = (ImageView) findViewById(R.id.image);
+        editText = (EditText) findViewById(R.id.num);
 
-        mp = new MediaPlayer();
+//        mp = new MediaPlayer();
 
 
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                    if (true) {
-                        mp.reset();
-                    }
-                    if (!editText.getText().toString().equals("") && editText != null && editText.getText().length() != 0) {
-                        myUpdateOperation(Integer.parseInt(editText.getText().toString()));
-                        mp.start();
-                    } else
-                        Toast.makeText(getApplicationContext(), "enter any no", Toast.LENGTH_SHORT).show();
+                if (true) {
+                    vinMedia.resetPlayer();
                 }
+                if (!editText.getText().toString().equals("") && editText != null && editText.getText().length() != 0) {
+                    index = Integer.parseInt(editText.getText().toString());
+                    setAlbumArt();
+                    vinMedia.setMediaSource(index);
+                    vinMedia.startMusic();
+
+                } else
+                    Toast.makeText(getApplicationContext(), "enter any no", Toast.LENGTH_SHORT).show();
+            }
 
         });
 
@@ -67,19 +74,16 @@ public class MainActivity extends Activity {
         pause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mp.isPlaying()){
-                if(pause.getText().toString().equals("pause")){
-                mp.pause();
-                pause.setText("resume");}
-                else if(pause.getText().toString().equals("resume")){
-                    //int a=mp.getDuration();
-                    /*int b=mp.getCurrentPosition();
-                    mp.seekTo(b);*/
-                    mp.start();
+                if (vinMedia.isPlaying()) {
+
+                    setAlbumArt();
+                    vinMedia.pauseMusic();
+                    pause.setText("resume");
+
+                } else {
+                    vinMedia.resumeMusic();
                     pause.setText("pause");
                 }
-            }
-            else Toast.makeText(getApplicationContext(),"no song playing",Toast.LENGTH_SHORT).show();
             }
 
         });
@@ -88,7 +92,7 @@ public class MainActivity extends Activity {
         stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mp.stop();
+                vinMedia.stopMusic();
             }
         });
 
@@ -97,84 +101,14 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-
-        //grantUriPermission("com.vinay.vinplayer",uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        ContentResolver cr = getContentResolver();
-
-
-        String selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
-        String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
-        Cursor cur = cr.query(uri, null, selection, null, sortOrder);
-        int count = 0;
-
-        if(cur != null)
-        {
-            count = cur.getCount();
-
-            if(count > 0)
-            {
-                while(cur.moveToNext())
-                {
-                    String data = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.DATA));
-                    // Add code to get more column here
-                String id=cur.getString(cur.getColumnIndex(MediaStore.Audio.Media._ID));
-                    // Save to your list here
-
-                   // textView.append(data+"\n");
-
-                    HashMap<String,String> h=new HashMap<>();
-                    h.put("data",data);
-                    h.put("id",id);
-                    songs.add(h);
-                }
-
-            }
-        }
-
-        cur.close();
-
-       //myUpdateOperation(5);
+        vinMedia.VinMediaInitialize();
+        songs = VinMedia.songsList;
+        //myUpdateOperation(5);
 
     }
 
-    private void myUpdateOperation(int i) {
-
-        try{
-            mp.setDataSource(songs.get(i%songs.size()).get("data"));
-            mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mp.prepare();
-            getAlbumart(i%songs.size());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void setAlbumArt() {
+        imageView.setImageBitmap(vinMedia.getAlbumart(index%songs.size())); //associated cover art in bitmap
+        imageView.setAdjustViewBounds(true);
     }
-
-
-    public void getAlbumart(int album_id)
-    {
-        android.media.MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        mmr.setDataSource(songs.get(album_id).get("data"));
-
-        byte [] data = mmr.getEmbeddedPicture();
-        //coverart is an Imageview object
-
-        // convert the byte array to a bitmap
-        if(data != null)
-        {
-            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-            imageView.setImageBitmap(bitmap); //associated cover art in bitmap
-            imageView.setAdjustViewBounds(true);
-            //imageView.setLayoutParams(new .LayoutParams(500, 500));
-        }
-        else
-        {
-            imageView.setImageResource(android.R.drawable.ic_menu_gallery); //any default cover resourse folder
-            imageView.setAdjustViewBounds(true);
-            //imageView.setLayoutParams(new LinearLayout.LayoutParams(500,500 ));
-        }
-    }
-
-
-
 }
