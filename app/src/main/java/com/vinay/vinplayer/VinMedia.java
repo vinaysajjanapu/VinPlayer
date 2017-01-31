@@ -149,7 +149,10 @@ public class VinMedia {
         mediaPlayer.reset();
     }
     public boolean isPlaying(){
+
         return mediaPlayer.isPlaying();
+
+
     }
 
 
