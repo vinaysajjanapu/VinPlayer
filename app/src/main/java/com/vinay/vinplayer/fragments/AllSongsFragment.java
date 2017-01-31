@@ -2,7 +2,6 @@ package com.vinay.vinplayer.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,13 +11,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.vinay.vinplayer.R;
-import com.vinay.vinplayer.adapters.MyItemRecyclerViewAdapter;
+import com.vinay.vinplayer.adapters.AllSongsAdapter;
 
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ItemFragment extends Fragment {
+public class AllSongsFragment extends Fragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -27,13 +26,13 @@ public class ItemFragment extends Fragment {
     static ArrayList<HashMap<String,String>> allsongs;
     private OnListFragmentInteractionListener mListener;
 
-    public ItemFragment() {
+    public AllSongsFragment() {
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static ItemFragment newInstance(int columnCount, ArrayList<HashMap<String,String>> arrayList) {
-        ItemFragment fragment = new ItemFragment();
+    public static AllSongsFragment newInstance(int columnCount, ArrayList<HashMap<String,String>> arrayList) {
+        AllSongsFragment fragment = new AllSongsFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         allsongs=arrayList;
@@ -65,7 +64,7 @@ public class ItemFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyItemRecyclerViewAdapter(getContext(),allsongs, mListener));
+            recyclerView.setAdapter(new AllSongsAdapter(getContext(),allsongs, mListener));
         }
         return view;
     }

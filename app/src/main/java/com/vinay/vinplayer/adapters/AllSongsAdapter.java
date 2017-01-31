@@ -8,8 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.vinay.vinplayer.R;
-import com.vinay.vinplayer.VinMedia;
-import com.vinay.vinplayer.fragments.ItemFragment.OnListFragmentInteractionListener;
+import com.vinay.vinplayer.fragments.AllSongsFragment.OnListFragmentInteractionListener;
 
 
 
@@ -18,13 +17,13 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecyclerViewAdapter.ViewHolder> {
+public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHolder> {
 
     private final List<HashMap<String,String>> mValues;
     private final OnListFragmentInteractionListener mListener;
     Context context;
 
-    public MyItemRecyclerViewAdapter(Context context,List<HashMap<String,String>> items, OnListFragmentInteractionListener listener) {
+    public AllSongsAdapter(Context context, List<HashMap<String,String>> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
         this.context=context;
@@ -41,8 +40,8 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 
         holder.mItem = mValues.get(position);
-        holder.songname.setText(mValues.get(position).get("id"));
-        holder.ArtisName_duration.setText(mValues.get(position).get("id"));
+        holder.songname.setText(mValues.get(position).get("album"));
+        holder.ArtisName_duration.setText(mValues.get(position).get("artist"));
         //holder.circleImageView.setImageBitmap();
 
         holder.mView.setOnClickListener(new View.OnClickListener() {

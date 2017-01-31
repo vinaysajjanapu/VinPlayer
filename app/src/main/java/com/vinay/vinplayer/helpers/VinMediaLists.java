@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import com.vinay.vinplayer.R;
 
@@ -95,26 +96,28 @@ public class VinMediaLists {
         ArrayList<HashMap<String,String>> list = new ArrayList<>();
         for(int itr =0;itr<allSongs.size();itr++){
             if (allSongs.get(itr).get(key).equals(value)){
+                Log.d("matched",allSongs.get(itr).get(key));
                 list.add(allSongs.get(itr));
             }
         }
         return list;
     }
 
-    public ArrayList<HashMap<String, String>> getAlbumSongsList(String album_id){
-        return getListByKey("album_id",album_id);
+    public ArrayList<HashMap<String, String>> getAlbumSongsList(String album){
+        return getListByKey("album",album);
     }
 
     public ArrayList<HashMap<String, String>> getArtistSongsList(String artist_key){
-        return getListByKey("artist_id",artist_key);
+        return getListByKey("artist_key",artist_key);
     }
 
 
     public ArrayList<HashMap<String, String>> getAlbumsList(){
         ArrayList<HashMap<String,String>> list = new ArrayList<>();
+        uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         selection = MediaStore.Audio.Albums.NUMBER_OF_SONGS + "!= 0";
         sortOrder = MediaStore.Audio.AlbumColumns.ALBUM + " ASC";
-        Cursor cur = contentResolver.query(uri, null, selection, null, sortOrder);
+        Cursor cur = contentResolver.query(uri, null, null, null, sortOrder);
         int count = 0;
         if(cur != null)
         {

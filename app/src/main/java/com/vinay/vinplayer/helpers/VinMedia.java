@@ -53,6 +53,7 @@ public class VinMedia {
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         vinMediaLists = new VinMediaLists(context);
         currentList = vinMediaLists.getAllSongsList();
+        currentList = vinMediaLists.getAlbumSongsList(VinMediaLists.allSongs.get(11).get("album"));
     }
 
     private void setMediaSource(){

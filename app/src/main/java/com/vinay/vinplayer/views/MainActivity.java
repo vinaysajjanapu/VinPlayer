@@ -13,7 +13,8 @@ import android.widget.Toast;
 
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.VinMedia;
-import com.vinay.vinplayer.fragments.ItemFragment;
+import com.vinay.vinplayer.fragments.AlbumsFragment;
+import com.vinay.vinplayer.fragments.AllSongsFragment;
 import com.vinay.vinplayer.helpers.VinMediaLists;
 
 
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements ItemFragment.OnListFragmentInteractionListener{
+public class MainActivity extends AppCompatActivity implements AllSongsFragment.OnListFragmentInteractionListener,AlbumsFragment.OnAlbumFragmentInteractionListner{
 
     ArrayList<HashMap<String, String>> songs;
 
@@ -35,6 +36,12 @@ public class MainActivity extends AppCompatActivity implements ItemFragment.OnLi
     VinMediaLists vinMediaLists ;
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        vm = null;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -42,13 +49,14 @@ public class MainActivity extends AppCompatActivity implements ItemFragment.OnLi
         start = (Button) findViewById(R.id.button1);
         pause = (Button) findViewById(R.id.button2);
         stop = (Button) findViewById(R.id.button3);
+
         vm = new VinMedia(this);
         vm.VinMediaInitialize();
         vinMediaLists=new VinMediaLists(this);
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
-        mFragmentList.add(ItemFragment.newInstance(1, vinMediaLists
-                .getAlbumSongsList(VinMediaLists.allSongs.get(5).get("album_id"))));
+        mFragmentList.add(AllSongsFragment.newInstance(1, VinMedia.currentList));
+        mFragmentList.add(AlbumsFragment.newInstance(1, vinMediaLists.getAlbumsList()));
 
         titles.add("all songs");
 
@@ -107,6 +115,13 @@ public class MainActivity extends AppCompatActivity implements ItemFragment.OnLi
         }
 
         vm.startMusic(p);
+    }
+
+    @Override
+    public void OnAlbumFragmentInteraction(int pos) {
+
+
+        mFragmentList.add(AllSongsFragment.newInstance(1, vinMediaLists.getAlbumSongsList((vinMediaLists.getAlbumsList().get(pos).get("album"))) ));
     }
 
 
