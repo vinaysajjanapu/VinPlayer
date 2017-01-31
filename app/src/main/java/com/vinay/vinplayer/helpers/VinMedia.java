@@ -14,10 +14,14 @@ import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
+
+import com.vinay.vinplayer.helpers.VinMediaLists;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * This class is to control the playback of music
@@ -27,77 +31,33 @@ import java.util.HashMap;
 public class VinMedia {
 
 
-    public static ArrayList<HashMap<String,String>> songsList;
+    public static ArrayList<HashMap<String,String>> currentList;
     private static volatile VinMedia Instance = null;
     private Context context;
-    private String selection;
-    private String sortOrder;
     private Cursor cur;
     private MediaPlayer mediaPlayer;
     public static boolean isPlaying = false;
     int pausePosition;
-
+    private int position;
+    public HashMap<String,String> currentSongDetails;
+    private static Uri uri;
+    private ContentResolver contentResolver;
+    VinMediaLists vinMediaLists;
 
     public VinMedia(Context context){
         this.context=context;
     }
 
-    public static VinMedia getInstance() {
-        VinMedia localInstance = Instance;
-        if (localInstance == null) {
-            synchronized (VinMedia.class) {
-                localInstance = Instance;
-                if (localInstance == null) {
-                    Instance = localInstance = new VinMedia(getInstance().context);
-                }
-            }
-        }
-        return localInstance;
-    }
-
-
     public void VinMediaInitialize(){
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
-        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        songsList = new ArrayList<>();
-
-        //grantUriPermission("com.vinay.vinplayer",uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        ContentResolver cr = context.getContentResolver();
-
-        selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
-        sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
-        cur = cr.query(uri, null, selection, null, sortOrder);
-        int count = 0;
-        if(cur != null)
-        {
-            count = cur.getCount();
-
-            if(count > 0)
-            {
-                while(cur.moveToNext())
-                {
-                    String data = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.DATA));
-                    // Add code to get more column here
-                    String id=cur.getString(cur.getColumnIndex(MediaStore.Audio.Media._ID));
-                    // Save to your list here
-
-                    // textView.append(data+"\n");
-
-                    HashMap<String,String> h=new HashMap<>();
-                    h.put("data",data);
-                    h.put("id",id);
-                    songsList.add(h);
-                }
-            }
-        }
-
-        cur.close();
+        vinMediaLists = new VinMediaLists(context);
+        currentList = vinMediaLists.getAllSongsList();
     }
-    public void setMediaSource(int i){
+
+    private void setMediaSource(){
         try {
-            mediaPlayer.setDataSource(songsList.get(i%songsList.size()).get("data"));
+            mediaPlayer.setDataSource(currentList.get(position % currentList.size()).get("data"));
             mediaPlayer.prepare();
 
         } catch (IOException e) {
@@ -105,7 +65,9 @@ public class VinMedia {
         }
     }
 
-    public void startMusic(){
+    public void startMusic(int index){
+        this.position  = index;
+        setMediaSource();
         mediaPlayer.start();
         isPlaying = true;
     }
@@ -123,33 +85,21 @@ public class VinMedia {
 
     public void stopMusic(){
         mediaPlayer.stop();
+        resetPlayer();
         isPlaying = false;
     }
+
     public void resetPlayer(){
         mediaPlayer.reset();
     }
+
     public boolean isPlaying(){
-
         return mediaPlayer.isPlaying();
-
-
     }
 
 
-
-    public Bitmap getAlbumart(int album_id)
-    {
-        android.media.MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        mmr.setDataSource(songsList.get(album_id).get("data"));
-
-        byte [] data = mmr.getEmbeddedPicture();
-        if(data != null) {
-            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-            return bitmap;
-        }else {
-            return BitmapFactory.decodeResource(context.getResources(),R.mipmap.ic_launcher);
-        }
+    public HashMap<String, String> getCurrentSongDetails(){
+        currentSongDetails = currentList.get(position);
+        return currentSongDetails;
     }
-
-
 }
