@@ -116,7 +116,8 @@ public class VinMediaLists {
         ArrayList<HashMap<String,String>> list = new ArrayList<>();
         uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         selection = MediaStore.Audio.Albums.NUMBER_OF_SONGS + "!= 0";
-        sortOrder = MediaStore.Audio.AlbumColumns.ALBUM + " ASC";
+        sortOrder = MediaStore.Audio.Albums.DEFAULT_SORT_ORDER;
+        if(contentResolver==null){ contentResolver = context.getContentResolver();}
         Cursor cur = contentResolver.query(uri, null, null, null, sortOrder);
         int count = 0;
         if(cur != null)
@@ -125,22 +126,26 @@ public class VinMediaLists {
             if(count > 0)
             {
                 while(cur.moveToNext())
+
                 {
-                    String album = cur.getString(cur.getColumnIndex(MediaStore.Audio.AlbumColumns.ALBUM));
-                    String album_id = cur.getString(cur.getColumnIndex(MediaStore.Audio.AlbumColumns.ALBUM_ID));
-                    String no_of_songs = cur.getString(cur.getColumnIndex(MediaStore.Audio.AlbumColumns.NUMBER_OF_SONGS));
-                    String album_art = cur.getString(cur.getColumnIndex(MediaStore.Audio.AlbumColumns.ALBUM_ART));
+                    String album = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.AlbumColumns.ALBUM));
+
+                    String album_id = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.AlbumColumns.ALBUM_ID));
+                    //String no_of_songs = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.AlbumColumns.NUMBER_OF_SONGS));
+//                    String album_art = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.AlbumColumns.ALBUM_ART));
 
                     HashMap<String,String> h=new HashMap<>();
                     h.put("album",album);
                     h.put("album_id",album_id);
-                    h.put("no_of_songs",no_of_songs);
-                    h.put("album_art",album_art);
+                    //h.put("no_of_songs",no_of_songs);
+  //                  h.put("album_art",album_art);
                     list.add(h);
                 }
             }
         }
         cur.close();
+
+
         return list;
     }
 

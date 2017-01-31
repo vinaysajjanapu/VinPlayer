@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements AllSongsFragment.
     List<Fragment> mFragmentList = new ArrayList<>();
     List<String> titles=new ArrayList<>();
     VinMediaLists vinMediaLists ;
+    ViewPagerAdapter adapter;
 
     @Override
     protected void onDestroy() {
@@ -55,12 +56,15 @@ public class MainActivity extends AppCompatActivity implements AllSongsFragment.
         vinMediaLists=new VinMediaLists(this);
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
+
         mFragmentList.add(AllSongsFragment.newInstance(1, VinMedia.currentList));
         mFragmentList.add(AlbumsFragment.newInstance(1, vinMediaLists.getAlbumsList()));
 
         titles.add("all songs");
+        titles.add("dddd");
+        titles.add("dddd");
 
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         viewPager.setAdapter(adapter);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -122,6 +126,10 @@ public class MainActivity extends AppCompatActivity implements AllSongsFragment.
 
 
         mFragmentList.add(AllSongsFragment.newInstance(1, vinMediaLists.getAlbumSongsList((vinMediaLists.getAlbumsList().get(pos).get("album"))) ));
+
+        adapter = new ViewPagerAdapter(getSupportFragmentManager());
+
+        viewPager.setAdapter(adapter);
     }
 
 
