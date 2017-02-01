@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,38 +17,22 @@ import java.util.HashMap;
 
 public class AlbumsFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
-    private int mColumnCount = 2;
     private OnAlbumFragmentInteractionListner mListener;
     private static ArrayList<HashMap<String,String>> albumsList;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public AlbumsFragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static AlbumsFragment newInstance(int columnCount, ArrayList<HashMap<String,String>> arrayList) {
+    public static AlbumsFragment newInstance( ArrayList<HashMap<String,String>> arrayList) {
         albumsList = arrayList;
-        AlbumsFragment fragment = new AlbumsFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
-        return fragment;
+        return new AlbumsFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-        }
+
     }
 
     @Override
@@ -61,11 +44,8 @@ public class AlbumsFragment extends Fragment {
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
+
+                recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
             recyclerView.setAdapter(new AlbumsAdapter(getActivity(),albumsList, mListener));
         }
         return view;
@@ -88,17 +68,6 @@ public class AlbumsFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnAlbumFragmentInteractionListner {
         // TODO: Update argument type and name
         void OnAlbumFragmentInteraction(int pos);

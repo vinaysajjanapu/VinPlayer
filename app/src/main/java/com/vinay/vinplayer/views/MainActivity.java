@@ -1,7 +1,5 @@
 package com.vinay.vinplayer.views;
 
-import android.app.Activity;
-import android.app.FragmentTransaction;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -18,14 +16,16 @@ import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.VinMedia;
 import com.vinay.vinplayer.fragments.AlbumsFragment;
 import com.vinay.vinplayer.fragments.AllSongsFragment;
+import com.vinay.vinplayer.fragments.ArtistsFragment;
 import com.vinay.vinplayer.helpers.VinMediaLists;
-
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements AllSongsFragment.OnListFragmentInteractionListener,AlbumsFragment.OnAlbumFragmentInteractionListner{
+public class MainActivity extends AppCompatActivity implements
+        AllSongsFragment.OnListFragmentInteractionListener,
+        AlbumsFragment.OnAlbumFragmentInteractionListner,ArtistsFragment.OnArtistFragmentInteractionListner {
 
     ArrayList<HashMap<String, String>> songs;
 
@@ -64,11 +64,11 @@ public class MainActivity extends AppCompatActivity implements AllSongsFragment.
         viewPager = (ViewPager) findViewById(R.id.viewpager);
 
         mFragmentList.add(AllSongsFragment.newInstance(1, VinMedia.currentList));
-        mFragmentList.add(AlbumsFragment.newInstance(1, vinMediaLists.getAlbumsList()));
-
+        mFragmentList.add(AlbumsFragment.newInstance( vinMediaLists.getAlbumsList()));
+        mFragmentList.add(ArtistsFragment.newInstance( vinMediaLists.getArtistsList()));
         titles.add("all songs");
-        titles.add("dddd");
-        titles.add("dddd");
+        titles.add("albums");
+        titles.add("artists");
 
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
@@ -132,8 +132,21 @@ public class MainActivity extends AppCompatActivity implements AllSongsFragment.
     public void OnAlbumFragmentInteraction(int pos) {
 
         mFragmentList.remove(1);
-        vm.changeCurrentList(pos);
-        mFragmentList.add(AllSongsFragment.newInstance(1, vinMediaLists.getAlbumSongsList((VinMediaLists.allAlbums.get(pos).get("album"))) ));
+        vm.changeCurrentList(pos,1);
+        mFragmentList.add(AllSongsFragment.newInstance(1,
+                vinMediaLists.getAlbumSongsList((VinMediaLists.allAlbums.get(pos).get("album"))) ));
+
+        adapter = new ViewPagerAdapter(getSupportFragmentManager());
+
+        viewPager.setAdapter(adapter);
+    }
+
+    @Override
+    public void OnArtistFragmentInteraction(int pos) {
+        mFragmentList.remove(1);
+        vm.changeCurrentList(pos,2);
+        mFragmentList.add(AllSongsFragment.newInstance(1,
+                vinMediaLists.getArtistSongsList((VinMediaLists.allArtists.get(pos).get("artist"))) ));
 
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
 

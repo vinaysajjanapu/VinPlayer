@@ -112,7 +112,7 @@ public class VinMediaLists {
     }
 
     public ArrayList<HashMap<String, String>> getArtistSongsList(String artist_key){
-        return getListByKey("artist_key",artist_key);
+        return getListByKey("artist",artist_key);
     }
 
 
@@ -154,9 +154,11 @@ public class VinMediaLists {
 
     public ArrayList<HashMap<String, String>> getArtistsList(){
         ArrayList<HashMap<String,String>> list = new ArrayList<>();
-        selection = MediaStore.Audio.ArtistColumns.NUMBER_OF_TRACKS + "!= 0";
-        sortOrder = MediaStore.Audio.ArtistColumns.ARTIST + " ASC";
-        Cursor cur = contentResolver.query(uri, null, selection, null, sortOrder);
+        uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        selection = MediaStore.Audio.Albums.NUMBER_OF_SONGS + "!= 0";
+        sortOrder = MediaStore.Audio.Albums.DEFAULT_SORT_ORDER;
+        if(contentResolver==null){ contentResolver = context.getContentResolver();}
+        Cursor cur = contentResolver.query(uri, null, null, null, sortOrder);
         int count = 0;
         if(cur != null)
         {
@@ -165,21 +167,15 @@ public class VinMediaLists {
             {
                 while(cur.moveToNext())
                 {
-                    String artist = cur.getString(cur.getColumnIndex(MediaStore.Audio.ArtistColumns.ARTIST));
-                    String artist_id = cur.getString(cur.getColumnIndex(MediaStore.Audio.ArtistColumns.ARTIST_KEY));
-                    String no_of_albums = cur.getString(cur.getColumnIndex(MediaStore.Audio.ArtistColumns.NUMBER_OF_ALBUMS));
-                    String no_of_tracks = cur.getString(cur.getColumnIndex(MediaStore.Audio.ArtistColumns.NUMBER_OF_TRACKS));
-
+                    String album = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.AlbumColumns.ARTIST));
                     HashMap<String,String> h=new HashMap<>();
-                    h.put("artist",artist);
-                    h.put("artist_id",artist_id);
-                    h.put("no_of_albums",no_of_albums);
-                    h.put("no_of_tracks",no_of_tracks);
-                    list.add(h);
+                    h.put("artist",album);
+                    if (!list.contains(h))list.add(h);
                 }
             }
         }
         cur.close();
+
         allArtists = list;
         return list;
     }
