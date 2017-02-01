@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements
             public void onClick(View v) {
 //mp.release();
 
-               // vm.resetPlayer();
+               vm.resetPlayer();
 
                 vm.startMusic(10);
 

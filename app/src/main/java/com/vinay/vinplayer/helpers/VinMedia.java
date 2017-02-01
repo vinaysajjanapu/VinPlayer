@@ -67,7 +67,6 @@ public class VinMedia {
         try {
             mediaPlayer.setDataSource(currentList.get(position).get("data"));
             mediaPlayer.prepare();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
