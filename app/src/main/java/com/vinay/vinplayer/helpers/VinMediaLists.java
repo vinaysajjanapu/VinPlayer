@@ -4,12 +4,20 @@
 package com.vinay.vinplayer.helpers;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.vinay.vinplayer.R;
+
+import java.io.FileDescriptor;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -104,7 +112,7 @@ public class VinMediaLists {
     }
 
     public ArrayList<HashMap<String, String>> getArtistSongsList(String artist_key){
-        return getListByKey("artist",artist_key);
+        return getListByKey("artist_key",artist_key);
     }
 
 
@@ -146,11 +154,9 @@ public class VinMediaLists {
 
     public ArrayList<HashMap<String, String>> getArtistsList(){
         ArrayList<HashMap<String,String>> list = new ArrayList<>();
-        uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        selection = MediaStore.Audio.Albums.NUMBER_OF_SONGS + "!= 0";
-        sortOrder = MediaStore.Audio.Albums.DEFAULT_SORT_ORDER;
-        if(contentResolver==null){ contentResolver = context.getContentResolver();}
-        Cursor cur = contentResolver.query(uri, null, null, null, sortOrder);
+        selection = MediaStore.Audio.ArtistColumns.NUMBER_OF_TRACKS + "!= 0";
+        sortOrder = MediaStore.Audio.ArtistColumns.ARTIST + " ASC";
+        Cursor cur = contentResolver.query(uri, null, selection, null, sortOrder);
         int count = 0;
         if(cur != null)
         {
@@ -159,23 +165,21 @@ public class VinMediaLists {
             {
                 while(cur.moveToNext())
                 {
-                    String album = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.AlbumColumns.ARTIST));
-
-                   // String album_id = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.AlbumColumns.NUMBER_OF_SONGS_FOR_ARTIST));
-                    //String no_of_songs = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.AlbumColumns.NUMBER_OF_SONGS));
-//                    String album_art = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.AlbumColumns.ALBUM_ART));
+                    String artist = cur.getString(cur.getColumnIndex(MediaStore.Audio.ArtistColumns.ARTIST));
+                    String artist_id = cur.getString(cur.getColumnIndex(MediaStore.Audio.ArtistColumns.ARTIST_KEY));
+                    String no_of_albums = cur.getString(cur.getColumnIndex(MediaStore.Audio.ArtistColumns.NUMBER_OF_ALBUMS));
+                    String no_of_tracks = cur.getString(cur.getColumnIndex(MediaStore.Audio.ArtistColumns.NUMBER_OF_TRACKS));
 
                     HashMap<String,String> h=new HashMap<>();
-                    h.put("artist",album);
-                    //h.put("album_id",album_id);
-                    //h.put("no_of_songs",no_of_songs);
-                    //                  h.put("album_art",album_art);
-                    if (!list.contains(h))list.add(h);
+                    h.put("artist",artist);
+                    h.put("artist_id",artist_id);
+                    h.put("no_of_albums",no_of_albums);
+                    h.put("no_of_tracks",no_of_tracks);
+                    list.add(h);
                 }
             }
         }
         cur.close();
-
         allArtists = list;
         return list;
     }
@@ -206,5 +210,26 @@ public class VinMediaLists {
         return list;
     }
 
-  
+    public Bitmap getAlbumart(Long album_id)
+    {
+        Bitmap bm = null;
+        try
+        {
+            final Uri sArtworkUri = Uri
+                    .parse("content://media/external/audio/albumart");
+
+            Uri uri = ContentUris.withAppendedId(sArtworkUri, album_id);
+
+            ParcelFileDescriptor pfd = context.getContentResolver()
+                    .openFileDescriptor(uri, "r");
+
+            if (pfd != null)
+            {
+                FileDescriptor fd = pfd.getFileDescriptor();
+                bm = BitmapFactory.decodeFileDescriptor(fd);
+            }
+        } catch (Exception e) {
+        }
+        return bm;
+    }
 }

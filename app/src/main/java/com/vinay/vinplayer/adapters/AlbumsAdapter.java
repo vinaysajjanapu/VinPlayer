@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.fragments.AlbumsFragment;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -20,7 +21,6 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
     private Context context;
 
     public AlbumsAdapter(Context context, ArrayList<HashMap<String,String>> items, AlbumsFragment.OnAlbumFragmentInteractionListner listener) {
-        //Set<String> set = new HashSet<String>(list);
         mValues = items;
         this.context = context;
         mListener = listener;

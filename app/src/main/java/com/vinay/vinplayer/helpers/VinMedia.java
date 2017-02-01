@@ -1,4 +1,4 @@
-package com.vinay.vinplayer.helpers;
+package com.vinay.vinplayer;
 
 /**
  * Created by vinaysajjanapu on 31/1/17.
@@ -7,20 +7,28 @@ package com.vinay.vinplayer.helpers;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.provider.MediaStore;
+import android.util.Log;
+
+import com.vinay.vinplayer.helpers.VinMediaLists;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * This class is to control the playback of music
  */
 
 
-public class VinMedia implements MediaPlayer.OnCompletionListener{
+public class VinMedia {
 
 
     public static ArrayList<HashMap<String,String>> currentList;
@@ -48,12 +56,8 @@ public class VinMedia implements MediaPlayer.OnCompletionListener{
         currentList = vinMediaLists.getAllSongsList();
     }
 
-    public void changeCurrentList(int position,int type){
-        if(type==1)
+    public void changeCurrentList(int position){
         currentList = vinMediaLists.getAlbumSongsList(vinMediaLists.getAlbumsList().get(position).get("album"));
-          else
-            currentList = vinMediaLists.getArtistSongsList(vinMediaLists.getArtistsList().get(position).get("artist"));
-
     }
 
     private void setMediaSource(){
@@ -105,10 +109,5 @@ public class VinMedia implements MediaPlayer.OnCompletionListener{
     public HashMap<String, String> getCurrentSongDetails(){
         currentSongDetails = currentList.get(position);
         return currentSongDetails;
-    }
-
-    @Override
-    public void onCompletion(MediaPlayer mp) {
-        //if(currentList.notify())
     }
 }
