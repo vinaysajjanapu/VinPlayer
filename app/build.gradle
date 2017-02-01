@@ -31,5 +31,5 @@ dependencies {
     compile 'com.android.support:support-v4:25.1.0'
     compile 'de.hdodenhof:circleimageview:2.1.0'
     testCompile 'junit:junit:4.12'
-    compile files('libs/universal-image-loader-1.9.5.jar')
+    compile 'com.squareup.picasso:picasso:2.5.2'
 }

@@ -13,7 +13,6 @@ import com.vinay.vinplayer.fragments.AlbumsFragment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder> {
 
@@ -30,7 +29,7 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_album, parent, false);
+                .inflate(R.layout.fragment_album_item, parent, false);
         return new ViewHolder(view);
     }
 
