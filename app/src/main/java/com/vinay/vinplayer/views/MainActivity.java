@@ -1,5 +1,8 @@
 package com.vinay.vinplayer.views;
 
+import android.app.Activity;
+import android.app.FragmentTransaction;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -46,6 +49,9 @@ public class MainActivity extends AppCompatActivity implements AllSongsFragment.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         songs = new ArrayList<>();
         start = (Button) findViewById(R.id.button1);
         pause = (Button) findViewById(R.id.button2);
@@ -114,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements AllSongsFragment.
 
     @Override
     public void onListFragmentInteraction(int p) {
+
         if(vm.isPlaying()){
             vm.resetPlayer();
         }
@@ -124,8 +131,9 @@ public class MainActivity extends AppCompatActivity implements AllSongsFragment.
     @Override
     public void OnAlbumFragmentInteraction(int pos) {
 
-
-        mFragmentList.add(AllSongsFragment.newInstance(1, vinMediaLists.getAlbumSongsList((vinMediaLists.getAlbumsList().get(pos).get("album"))) ));
+        mFragmentList.remove(1);
+        vm.changeCurrentList(pos);
+        mFragmentList.add(AllSongsFragment.newInstance(1, vinMediaLists.getAlbumSongsList((VinMediaLists.allAlbums.get(pos).get("album"))) ));
 
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
 

@@ -48,17 +48,21 @@ public class VinMedia {
         this.context=context;
     }
 
+
     public void VinMediaInitialize(){
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         vinMediaLists = new VinMediaLists(context);
         currentList = vinMediaLists.getAllSongsList();
-        currentList = vinMediaLists.getAlbumSongsList(VinMediaLists.allSongs.get(11).get("album"));
+    }
+
+    public void changeCurrentList(int position){
+        currentList = vinMediaLists.getAlbumSongsList(vinMediaLists.getAlbumsList().get(position).get("album"));
     }
 
     private void setMediaSource(){
         try {
-            mediaPlayer.setDataSource(currentList.get(position % currentList.size()).get("data"));
+            mediaPlayer.setDataSource(currentList.get(position).get("data"));
             mediaPlayer.prepare();
 
         } catch (IOException e) {
@@ -69,6 +73,9 @@ public class VinMedia {
     public void startMusic(int index){
         this.position  = index;
         setMediaSource();
+
+        if(isPlaying())resetPlayer();
+
         mediaPlayer.start();
         isPlaying = true;
     }

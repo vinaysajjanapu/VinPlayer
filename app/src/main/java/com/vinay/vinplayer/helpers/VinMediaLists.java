@@ -1,23 +1,25 @@
+/**
+ * Created by vinaysajjanapu on 31/1/17.
+ */
 package com.vinay.vinplayer.helpers;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.util.Log;
 
 import com.vinay.vinplayer.R;
 
+import java.io.FileDescriptor;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-/**
- * Created by vinaysajjanapu on 31/1/17.
- */
 
 public class VinMediaLists {
 
@@ -27,6 +29,8 @@ public class VinMediaLists {
     private String sortOrder;
     private Uri uri;
     public static ArrayList<HashMap<String,String>> allSongs;
+    public static ArrayList<HashMap<String,String>> allAlbums;
+    public static ArrayList<HashMap<String,String>> allArtists;
 
 
     public VinMediaLists(Context context){
@@ -126,7 +130,6 @@ public class VinMediaLists {
             if(count > 0)
             {
                 while(cur.moveToNext())
-
                 {
                     String album = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.AlbumColumns.ALBUM));
 
@@ -139,13 +142,13 @@ public class VinMediaLists {
                     h.put("album_id",album_id);
                     //h.put("no_of_songs",no_of_songs);
   //                  h.put("album_art",album_art);
-                    list.add(h);
+                    if (!list.contains(h))list.add(h);
                 }
             }
         }
         cur.close();
 
-
+        allAlbums = list;
         return list;
     }
 
@@ -177,6 +180,7 @@ public class VinMediaLists {
             }
         }
         cur.close();
+        allArtists = list;
         return list;
     }
 
@@ -206,18 +210,4 @@ public class VinMediaLists {
         return list;
     }
 
-
-    public Bitmap getAlbumart(int album_id)
-    {
-        android.media.MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        mmr.setDataSource(getAllSongsList().get(album_id).get("data"));
-
-        byte [] data = mmr.getEmbeddedPicture();
-        if(data != null) {
-            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-            return bitmap;
-        }else {
-            return BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
-        }
-    }
 }
