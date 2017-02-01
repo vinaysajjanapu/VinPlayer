@@ -209,6 +209,7 @@ public class MainActivity extends AppCompatActivity implements
                 playerCurrentDuration.setText( vm.getDuration()!= 0 ? String.format("%d:%02d",
                         duration / 60, duration % 60) : "-:--");
 
+
             }
 
             @Override
