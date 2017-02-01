@@ -65,6 +65,7 @@ public class ArtistsFragment extends Fragment {
         }
     }
 
+
     @Override
     public void onDetach() {
         super.onDetach();
