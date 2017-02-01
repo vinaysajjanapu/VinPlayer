@@ -4,32 +4,31 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.vinay.vinplayer.R;
-import com.vinay.vinplayer.adapters.AlbumsAdapter;
+import com.vinay.vinplayer.adapters.ArtistsAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class AlbumsFragment extends Fragment {
+public class ArtistsFragment extends Fragment {
 
 
 
 
-    private OnAlbumFragmentInteractionListner mListener;
+    private OnArtistFragmentInteractionListner mListener;
     private static ArrayList<HashMap<String,String>> albumsList;
 
-    public AlbumsFragment() {
+    public ArtistsFragment() {
     }
 
-    public static AlbumsFragment newInstance( ArrayList<HashMap<String,String>> arrayList) {
+    public static ArtistsFragment newInstance( ArrayList<HashMap<String,String>> arrayList) {
         albumsList = arrayList;
-        return new AlbumsFragment();
+        return new ArtistsFragment();
     }
 
     @Override
@@ -47,9 +46,9 @@ public class AlbumsFragment extends Fragment {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
 
-                recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
+            recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
 
-            recyclerView.setAdapter(new AlbumsAdapter(getActivity(),albumsList, mListener));
+            recyclerView.setAdapter(new ArtistsAdapter(getActivity(),albumsList, mListener));
         }
         return view;
     }
@@ -58,8 +57,8 @@ public class AlbumsFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnAlbumFragmentInteractionListner) {
-            mListener = (OnAlbumFragmentInteractionListner) context;
+        if (context instanceof OnArtistFragmentInteractionListner) {
+            mListener = (OnArtistFragmentInteractionListner) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
@@ -72,7 +71,7 @@ public class AlbumsFragment extends Fragment {
         mListener = null;
     }
 
-    public interface OnAlbumFragmentInteractionListner {
-        void OnAlbumFragmentInteraction(int pos);
+    public interface OnArtistFragmentInteractionListner {
+        void OnArtistFragmentInteraction(int pos);
     }
 }

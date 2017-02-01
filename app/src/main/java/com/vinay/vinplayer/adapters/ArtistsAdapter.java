@@ -8,18 +8,19 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.vinay.vinplayer.R;
-import com.vinay.vinplayer.fragments.AlbumsFragment;
+import com.vinay.vinplayer.fragments.ArtistsFragment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder> {
+public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ViewHolder> {
 
     private final ArrayList<HashMap<String,String>> mValues;
-    private final AlbumsFragment.OnAlbumFragmentInteractionListner mListener;
+    private final ArtistsFragment.OnArtistFragmentInteractionListner mListener;
     private Context context;
 
-    public AlbumsAdapter(Context context, ArrayList<HashMap<String,String>> items, AlbumsFragment.OnAlbumFragmentInteractionListner listener) {
+    public ArtistsAdapter(Context context, ArrayList<HashMap<String,String>> items,
+                          ArtistsFragment.OnArtistFragmentInteractionListner listener) {
         //Set<String> set = new HashSet<String>(list);
         mValues = items;
         this.context = context;
@@ -36,16 +37,14 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 
-      holder.mIdView.setText(mValues.get(position).get("album"));
-       // holder.mContentView.setText(mValues.get(position).get("no_of_songs"));
+        holder.mIdView.setText(mValues.get(position).get("artist"));
+        // holder.mContentView.setText(mValues.get(position).get("no_of_songs"));
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-                    mListener.OnAlbumFragmentInteraction(position);
+                    mListener.OnArtistFragmentInteraction(position);
                 }
             }
         });
