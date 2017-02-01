@@ -36,7 +36,6 @@ public class VinMedia {
     private Context context;
     private Cursor cur;
     private MediaPlayer mediaPlayer;
-    public static boolean isPlaying = false;
     int pausePosition;
     private int position;
     public HashMap<String,String> currentSongDetails;
@@ -52,6 +51,16 @@ public class VinMedia {
     public void VinMediaInitialize(){
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mediaPlayer.setLooping(true);
+        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
+        {
+            @Override
+            public void onPrepared(MediaPlayer mp)
+            {
+                mediaPlayer.start();
+            }
+        });
+
         vinMediaLists = new VinMediaLists(context);
         currentList = vinMediaLists.getAllSongsList();
     }
@@ -66,7 +75,7 @@ public class VinMedia {
     private void setMediaSource(){
         try {
             mediaPlayer.setDataSource(currentList.get(position).get("data"));
-            mediaPlayer.prepare();
+            mediaPlayer.prepareAsync();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -75,39 +84,85 @@ public class VinMedia {
 
     public void startMusic(int index){
         this.position  = index;
-        setMediaSource();
-
         if(isPlaying())resetPlayer();
-
-        mediaPlayer.start();
-        isPlaying = true;
+        setMediaSource();
+        //mediaPlayer.start();
     }
 
     public void pauseMusic(){
         mediaPlayer.pause();
         pausePosition = mediaPlayer.getCurrentPosition();
-        isPlaying = false;
     }
     public void resumeMusic(){
         mediaPlayer.seekTo(pausePosition);
+        Log.d("pausepos",pausePosition+"  ");
         mediaPlayer.start();
-        isPlaying = true;
     }
 
     public void stopMusic(){
         mediaPlayer.stop();
-        resetPlayer();
-        isPlaying = false;
     }
 
+    public void nextSong(){
+        if ((position+1)<currentList.size()){
+            position++;
+            if (isPlaying()||!isClean()){
+                stopMusic();
+                resetPlayer();
+                startMusic(position);
+            }else {
+                startMusic(position);
+            }
+        }
+    }
+
+    public void previousSong(){
+        if ((position-1)<currentList.size()){
+            position--;
+            if (isPlaying()||!isClean()){
+                stopMusic();
+                resetPlayer();
+                startMusic(position);
+            }else {
+                startMusic(position);
+            }
+        }
+    }
+
+    public void setAudioProgress(int seekBarProgress){
+        mediaPlayer.seekTo(seekBarProgress);
+    }
+    public int getAudioProgress(){
+        return mediaPlayer.getCurrentPosition();
+    }
+
+
+    public void setPosition(int position){
+        this.position = position;
+    }
+    public int getPosition(){
+        return position;
+    }
+    public int getDuration(){
+        return Integer.parseInt(getCurrentSongDetails().get("duration"));
+    }
+
+
+
+
     public void resetPlayer(){
+        mediaPlayer.stop();
         mediaPlayer.reset();
+    }
+    public void releasePlayer(){
+        mediaPlayer.release();
     }
 
     public boolean isPlaying(){
         return mediaPlayer.isPlaying();
     }
 
+    public boolean isClean(){ return mediaPlayer.getCurrentPosition()==0;}
 
     public HashMap<String, String> getCurrentSongDetails(){
         currentSongDetails = currentList.get(position);

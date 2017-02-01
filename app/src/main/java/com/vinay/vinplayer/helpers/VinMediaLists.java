@@ -54,19 +54,19 @@ public class VinMediaLists {
                 {
                     String data = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.DATA));
                     // Add code to get more column here
-                    String id=cur.getString(cur.getColumnIndex(MediaStore.Audio.Media._ID));
-                    String album = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.ALBUM));
-                    String album_id = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
-                    String artist = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-                    String artist_key = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.ARTIST_KEY));
-                    String artist_id = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID));
-                    String date_added = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED));
-                    String duration = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.DURATION));
-                    String size = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.SIZE));
-                    String title = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.TITLE));
-                    String track = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.TRACK));
-                    String year = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.YEAR));
-                    String bookmark = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.BOOKMARK));
+                    String id=cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
+                    String album = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM));
+                    String album_id = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID));
+                    String artist = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
+                    String artist_key = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST_KEY));
+                    String artist_id = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST_ID));
+                    String date_added = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED));
+                    String duration = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));
+                    String size = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE));
+                    String title = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
+                    String track = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK));
+                    String year = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR));
+                    String bookmark = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.BOOKMARK));
 
                     HashMap<String,String> h=new HashMap<>();
                     h.put("data",data);
