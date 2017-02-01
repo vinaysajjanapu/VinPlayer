@@ -154,9 +154,10 @@ public class VinMediaLists {
 
     public ArrayList<HashMap<String, String>> getArtistsList(){
         ArrayList<HashMap<String,String>> list = new ArrayList<>();
-        selection = MediaStore.Audio.ArtistColumns.NUMBER_OF_TRACKS + "!= 0";
-        sortOrder = MediaStore.Audio.ArtistColumns.ARTIST + " ASC";
-        Cursor cur = contentResolver.query(uri, null, selection, null, sortOrder);
+        uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        sortOrder = MediaStore.Audio.Artists.DEFAULT_SORT_ORDER;
+        if(contentResolver==null){ contentResolver = context.getContentResolver();}
+        Cursor cur = contentResolver.query(uri, null, null, null, sortOrder);
         int count = 0;
         if(cur != null)
         {
@@ -165,17 +166,13 @@ public class VinMediaLists {
             {
                 while(cur.moveToNext())
                 {
-                    String artist = cur.getString(cur.getColumnIndex(MediaStore.Audio.ArtistColumns.ARTIST));
-                    String artist_id = cur.getString(cur.getColumnIndex(MediaStore.Audio.ArtistColumns.ARTIST_KEY));
-                    String no_of_albums = cur.getString(cur.getColumnIndex(MediaStore.Audio.ArtistColumns.NUMBER_OF_ALBUMS));
-                    String no_of_tracks = cur.getString(cur.getColumnIndex(MediaStore.Audio.ArtistColumns.NUMBER_OF_TRACKS));
+                    String artist_id = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.ArtistColumns.ARTIST_KEY));
+                    String artist = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.ArtistColumns.ARTIST));
 
                     HashMap<String,String> h=new HashMap<>();
                     h.put("artist",artist);
                     h.put("artist_id",artist_id);
-                    h.put("no_of_albums",no_of_albums);
-                    h.put("no_of_tracks",no_of_tracks);
-                    list.add(h);
+                    if (!list.contains(h))list.add(h);
                 }
             }
         }
@@ -210,26 +207,4 @@ public class VinMediaLists {
         return list;
     }
 
-    public Bitmap getAlbumart(Long album_id)
-    {
-        Bitmap bm = null;
-        try
-        {
-            final Uri sArtworkUri = Uri
-                    .parse("content://media/external/audio/albumart");
-
-            Uri uri = ContentUris.withAppendedId(sArtworkUri, album_id);
-
-            ParcelFileDescriptor pfd = context.getContentResolver()
-                    .openFileDescriptor(uri, "r");
-
-            if (pfd != null)
-            {
-                FileDescriptor fd = pfd.getFileDescriptor();
-                bm = BitmapFactory.decodeFileDescriptor(fd);
-            }
-        } catch (Exception e) {
-        }
-        return bm;
-    }
 }

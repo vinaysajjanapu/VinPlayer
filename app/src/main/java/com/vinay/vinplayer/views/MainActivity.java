@@ -64,11 +64,12 @@ public class MainActivity extends AppCompatActivity implements AllSongsFragment.
         viewPager = (ViewPager) findViewById(R.id.viewpager);
 
         mFragmentList.add(AllSongsFragment.newInstance(1, VinMedia.currentList));
-        mFragmentList.add(AlbumsFragment.newInstance(1, vinMediaLists.getAlbumsList()));
 
+        mFragmentList.add(AlbumsFragment.newInstance(2, "artist",vinMediaLists.getArtistsList()));
+        mFragmentList.add(AlbumsFragment.newInstance(2, "album",vinMediaLists.getAlbumsList()));
         titles.add("all songs");
-        titles.add("dddd");
-        titles.add("dddd");
+        titles.add("albums");
+        titles.add("artists");
 
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
@@ -129,11 +130,14 @@ public class MainActivity extends AppCompatActivity implements AllSongsFragment.
     }
 
     @Override
-    public void OnAlbumFragmentInteraction(int pos) {
+    public void OnAlbumFragmentInteraction(int pos,String type) {
 
         mFragmentList.remove(1);
-        vm.changeCurrentList(pos);
-        mFragmentList.add(AllSongsFragment.newInstance(1, vinMediaLists.getAlbumSongsList((VinMediaLists.allAlbums.get(pos).get("album"))) ));
+        vm.changeCurrentList(pos,type);
+        if(type.equals("album"))
+            mFragmentList.add(AllSongsFragment.newInstance(1, vinMediaLists.getAlbumSongsList((VinMediaLists.allAlbums.get(pos).get("album"))) ));
+        else
+            mFragmentList.add(AllSongsFragment.newInstance(1, vinMediaLists.getArtistSongsList((VinMediaLists.allArtists.get(pos).get("artist"))) ));
 
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
 

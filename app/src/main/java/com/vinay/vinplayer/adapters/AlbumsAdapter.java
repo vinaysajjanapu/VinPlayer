@@ -19,9 +19,11 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
     private final ArrayList<HashMap<String,String>> mValues;
     private final AlbumsFragment.OnAlbumFragmentInteractionListner mListener;
     private Context context;
+    private String type;
 
-    public AlbumsAdapter(Context context, ArrayList<HashMap<String,String>> items, AlbumsFragment.OnAlbumFragmentInteractionListner listener) {
+    public AlbumsAdapter(Context context, String type,ArrayList<HashMap<String,String>> items, AlbumsFragment.OnAlbumFragmentInteractionListner listener) {
         mValues = items;
+        this.type  = type;
         this.context = context;
         mListener = listener;
     }
@@ -36,7 +38,7 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 
-      holder.mIdView.setText(mValues.get(position).get("album"));
+      holder.mIdView.setText(mValues.get(position).get(type));
        // holder.mContentView.setText(mValues.get(position).get("no_of_songs"));
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -45,7 +47,7 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.OnAlbumFragmentInteraction(position);
+                    mListener.OnAlbumFragmentInteraction(position,type);
                 }
             }
         });

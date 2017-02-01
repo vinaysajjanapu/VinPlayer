@@ -24,7 +24,7 @@ public class AlbumsFragment extends Fragment {
     private int mColumnCount = 2;
     private OnAlbumFragmentInteractionListner mListener;
     private static ArrayList<HashMap<String,String>> albumsList;
-
+    private static String type_local;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -34,8 +34,9 @@ public class AlbumsFragment extends Fragment {
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static AlbumsFragment newInstance(int columnCount, ArrayList<HashMap<String,String>> arrayList) {
+    public static AlbumsFragment newInstance(int columnCount,String type, ArrayList<HashMap<String,String>> arrayList) {
         albumsList = arrayList;
+        type_local=type;
         AlbumsFragment fragment = new AlbumsFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
@@ -66,7 +67,7 @@ public class AlbumsFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new AlbumsAdapter(getActivity(),albumsList, mListener));
+            recyclerView.setAdapter(new AlbumsAdapter(getActivity(),type_local,albumsList, mListener));
         }
         return view;
     }
@@ -101,6 +102,6 @@ public class AlbumsFragment extends Fragment {
      */
     public interface OnAlbumFragmentInteractionListner {
         // TODO: Update argument type and name
-        void OnAlbumFragmentInteraction(int pos);
+        void OnAlbumFragmentInteraction(int pos,String type);
     }
 }

@@ -56,8 +56,11 @@ public class VinMedia {
         currentList = vinMediaLists.getAllSongsList();
     }
 
-    public void changeCurrentList(int position){
-        currentList = vinMediaLists.getAlbumSongsList(vinMediaLists.getAlbumsList().get(position).get("album"));
+    public void changeCurrentList(int position,String type){
+        if (type.equals("album"))
+            currentList = vinMediaLists.getAlbumSongsList(vinMediaLists.getAlbumsList().get(position).get("album"));
+        else
+            currentList = vinMediaLists.getAlbumSongsList(vinMediaLists.getArtistsList().get(position).get("artist"));
     }
 
     private void setMediaSource(){
