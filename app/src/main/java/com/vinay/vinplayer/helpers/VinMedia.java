@@ -20,7 +20,7 @@ import java.util.HashMap;
 public class VinMedia {
 
 
-    public static ArrayList<HashMap<String,String>> currentList;
+    private static ArrayList<HashMap<String,String>> currentList;
     private static volatile VinMedia Instance = null;
     private Context context;
     private Cursor cur;
@@ -79,6 +79,10 @@ public class VinMedia {
         currentList = vinMediaLists.getAlbumSongsList(vinMediaLists.getAlbumsList().get(position).get("album"));
     else if(i==2)
             currentList = vinMediaLists.getArtistSongsList(vinMediaLists.getArtistsList().get(position).get("artist"));
+    }
+
+    public ArrayList<HashMap<String,String>> getCurrentList(){
+        return currentList;
     }
 
     private void setMediaSource(){

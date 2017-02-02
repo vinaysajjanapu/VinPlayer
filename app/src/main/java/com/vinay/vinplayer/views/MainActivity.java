@@ -15,10 +15,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
+import android.os.Parcelable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -33,6 +35,7 @@ import android.widget.TextView;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
+import com.vinay.vinplayer.fragments.AlbumArtFragment;
 import com.vinay.vinplayer.fragments.AlbumsFragment;
 import com.vinay.vinplayer.fragments.AllSongsFragment;
 import com.vinay.vinplayer.fragments.ArtistsFragment;
@@ -74,7 +77,10 @@ public class MainActivity extends AppCompatActivity implements
     TextView sliderPlayer_songdetails;
     ImageButton sliderPlayer_playpause;
 
-    ImageView nowPlayingAlbumArt;
+    ViewPager albumArtPager;
+    AlbumArtPagerAdapter albumArtPagerAdapter;
+
+
     TextView nowPlayingSongDetails;
     TextView nowPlayingSongTitle;
     TextView playerCurrentDuration;
@@ -137,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements
     private void setupLibraryViewPager(){
 
         librayViewPager = (ViewPager) findViewById(R.id.viewpager);
-        mFragmentList.add(AllSongsFragment.newInstance(1, VinMedia.currentList));
+        mFragmentList.add(AllSongsFragment.newInstance(1, vm.getCurrentList()));
         mFragmentList.add(AlbumsFragment.newInstance( vinMediaLists.getAlbumsList()));
         mFragmentList.add(ArtistsFragment.newInstance( vinMediaLists.getArtistsList()));
         titles.add("all songs");
@@ -163,7 +169,6 @@ public class MainActivity extends AppCompatActivity implements
         sliderPlayer_songdetails = (TextView)findViewById(R.id.slider_playing_songdetails);
         sliderPlayer_playpause = (ImageButton)findViewById(R.id.slider_playing_button_playpause);
 
-        nowPlayingAlbumArt = (ImageView)findViewById(R.id.albumart_nowplaying);
 
         nowPlayingSongDetails = (TextView)findViewById(R.id.nowplaying_songdetails);
         nowPlayingSongTitle = (TextView)findViewById(R.id.nowplaying_songtitle);
@@ -176,7 +181,8 @@ public class MainActivity extends AppCompatActivity implements
         playerButtonNext = (ImageButton)findViewById(R.id.nowplaying_button_next);
         slider = (RelativeLayout)findViewById(R.id.slider);
 
-        slidingUpPanelLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+        setupAlbumArtViewPAger();
+            slidingUpPanelLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
                 if (slideOffset < 0.5f) {
@@ -240,6 +246,38 @@ public class MainActivity extends AppCompatActivity implements
         updateUI();
     }
 
+    private void setupAlbumArtViewPAger() {
+
+        albumArtPager = (ViewPager)findViewById(R.id.nowplaying_albumart_pager);
+        albumArtPagerAdapter = new AlbumArtPagerAdapter(getSupportFragmentManager());
+        albumArtPager.setAdapter(albumArtPagerAdapter);
+        albumArtPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            int albumart_pos;
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int pos) {
+                albumart_pos = pos;
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                if (state==ViewPager.SCROLL_STATE_IDLE){
+                        if ((albumart_pos - vm.getPosition())>0)
+                            vm.nextSong();
+                        else if((albumart_pos - vm.getPosition())<0)
+                            vm.previousSong();
+                    }
+            }
+        });
+
+
+
+    }
+
     private void updateUI(){
         HashMap<String,String> songDetails = vm.getCurrentSongDetails();
         Log.d("songdetails","null Data");
@@ -265,8 +303,6 @@ public class MainActivity extends AppCompatActivity implements
 
                 Picasso.with(this).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
                         .into(sliderPlayer_albumart);
-                Picasso.with(this).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
-                        .into(nowPlayingAlbumArt);
 
                 createBlurredBackground(uri.toString());
 
@@ -274,6 +310,11 @@ public class MainActivity extends AppCompatActivity implements
                 e.printStackTrace();
             }
 
+            albumArtPager.setAdapter(albumArtPagerAdapter);
+            albumArtPagerAdapter.notifyDataSetChanged();
+            albumArtPager.setCurrentItem(vm.getPosition());
+
+            updatePlayPauseButton();
 
             handler = new Handler();
             MainActivity.this.runOnUiThread(new Runnable() {
@@ -334,7 +375,6 @@ public class MainActivity extends AppCompatActivity implements
         blurredBitmap1 = null;
         //view.setBackgroundDrawable( new BitmapDrawable( getResources(), blurredBitmap ) );
     }
-
 
     @Override
     public void onClick(View v) {
@@ -451,13 +491,38 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    public class AlbumArtPagerAdapter extends FragmentStatePagerAdapter {
 
+        AlbumArtFragment albumArtFragment;
+        public AlbumArtPagerAdapter(FragmentManager fm) {super(fm);}
+        @Override
+        public int getCount() {
+            return ((vm.getCurrentList().size()==0)?1:vm.getCurrentList().size());
+        }
+
+        @Override
+        public Parcelable saveState() {
+            return null;
+        }
+
+        @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            String album_id = null;
+            albumArtFragment = AlbumArtFragment.newInstance(position, getApplicationContext(),vm.getCurrentSongDetails());
+            return albumArtFragment;
+        }
+    }
 
     public void playPauseAction(){
         if (vm.isPlaying()){
             vm.pauseMusic();
         }else {
-            if (VinMedia.currentList.size()!=0){
+            if (vm.getCurrentList().size()!=0){
                 if (!vm.isClean()){
                     vm.resumeMusic();
                 }
