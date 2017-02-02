@@ -215,6 +215,8 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 Log.d("seekbar","tracking started");
+
+
             }
 
             @Override
