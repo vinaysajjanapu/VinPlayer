@@ -512,9 +512,10 @@ public class MainActivity extends AppCompatActivity implements
 
         @Override
         public Fragment getItem(int position) {
-            String album_id = null;
             albumArtFragment = AlbumArtFragment.newInstance(position, getApplicationContext(),vm.getCurrentSongDetails());
             return albumArtFragment;
+
+
         }
     }
 
