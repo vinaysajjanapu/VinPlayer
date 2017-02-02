@@ -1,4 +1,4 @@
-package com.vinay.vinplayer;
+package com.vinay.vinplayer.helpers;
 
 /**
  * Created by vinaysajjanapu on 31/1/17.
@@ -7,26 +7,14 @@ package com.vinay.vinplayer;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.AudioManager;
-import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.util.Log;
-
-import com.vinay.vinplayer.helpers.VinMediaLists;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-
-/**
- * This class is to control the playback of music
- */
-
 
 public class VinMedia {
 

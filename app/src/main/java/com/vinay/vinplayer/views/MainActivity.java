@@ -5,10 +5,6 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -20,9 +16,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.TextViewCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Layout;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -31,16 +25,15 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
-import com.vinay.vinplayer.VinMedia;
 import com.vinay.vinplayer.fragments.AlbumsFragment;
 import com.vinay.vinplayer.fragments.AllSongsFragment;
 import com.vinay.vinplayer.fragments.ArtistsFragment;
 import com.vinay.vinplayer.helpers.BlurBuilder;
+import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
 
 import java.io.FileDescriptor;
@@ -48,6 +41,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity implements
@@ -206,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements
                 Log.d("seekbar",progress+"");
                 nowPlayingSeekBarProgress = (progress*vm.getDuration())/100;
                 int duration  = nowPlayingSeekBarProgress/1000;
-                playerCurrentDuration.setText( vm.getDuration()!= 0 ? String.format("%d:%02d",
+                playerCurrentDuration.setText( vm.getDuration()!= 0 ? String.format(Locale.ENGLISH,"%d:%02d",
                         duration / 60, duration % 60) : "-:--");
 
 
@@ -251,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements
                 playerButtonPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
 
             int duration  = vm.getDuration()/1000;
-            playerTotalDuration.setText( vm.getDuration()!= 0 ? String.format("%d:%02d",
+            playerTotalDuration.setText( vm.getDuration()!= 0 ? String.format(Locale.ENGLISH,"%d:%02d",
                             duration / 60, duration % 60) : "-:--");
 
 
@@ -269,7 +264,7 @@ public class MainActivity extends AppCompatActivity implements
                 createBlurredBackground(uri.toString());
 
             }catch (Exception e){
-
+e.printStackTrace();
             }
             // playerCurrentDuration.setText("");
 
