@@ -1,6 +1,10 @@
 package com.vinay.vinplayer.views;
 
+import android.content.BroadcastReceiver;
 import android.content.ContentUris;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -87,6 +91,8 @@ public class MainActivity extends AppCompatActivity implements
     Bitmap temp_input;
     Bitmap default_bg;
     Drawable dr,dr1;
+    IntentFilter filter1;
+    BroadcastReceiver updateUIReciver;
 
 //    String contentURI=null;
 
@@ -114,7 +120,18 @@ public class MainActivity extends AppCompatActivity implements
 
         setupLibraryViewPager();
         setupSlidingPanelLayout();
+        filter1 = new IntentFilter();
 
+        filter1.addAction("change.ui");
+
+        updateUIReciver = new BroadcastReceiver() {
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                updateUI();
+            }
+        };
+        registerReceiver(updateUIReciver,filter1);
     }
 
     private void setupLibraryViewPager(){
@@ -195,28 +212,27 @@ public class MainActivity extends AppCompatActivity implements
  //       sliderPlayer_playpause.setColorFilter(Color.WHITE);
 
 
+
         playerSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 Log.d("seekbar",progress+"");
-                nowPlayingSeekBarProgress = (progress*vm.getDuration())/100;
-                int duration  = nowPlayingSeekBarProgress/1000;
+
+                nowPlayingSeekBarProgress = progress;
                 playerCurrentDuration.setText( vm.getDuration()!= 0 ? String.format(Locale.ENGLISH,"%d:%02d",
-                        duration / 60, duration % 60) : "-:--");
-
-
+                        progress / 60, progress % 60) : "-:--");
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                Log.d("seekbar","tracking started");
+              //  Log.d("seekbar","tracking started");
 
 
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                vm.setAudioProgress(nowPlayingSeekBarProgress);
+                vm.setAudioProgress(nowPlayingSeekBarProgress*1000);
                 Log.d("seekbar","tracking stopped");
             }
         });
@@ -249,6 +265,7 @@ public class MainActivity extends AppCompatActivity implements
             playerTotalDuration.setText( vm.getDuration()!= 0 ? String.format(Locale.ENGLISH,"%d:%02d",
                             duration / 60, duration % 60) : "-:--");
 
+            playerSeekbar.setMax(duration);
 
 
             try {
@@ -264,10 +281,24 @@ public class MainActivity extends AppCompatActivity implements
                 createBlurredBackground(uri.toString());
 
             }catch (Exception e){
-e.printStackTrace();
+                e.printStackTrace();
             }
-            // playerCurrentDuration.setText("");
 
+
+            handler = new Handler();
+            MainActivity.this.runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+               //     Log.d("handler","running");
+                    try {
+                        playerSeekbar.setProgress(vm.getAudioProgress());
+                    }catch (Exception e){
+
+                    }
+                    handler.postDelayed(this, 1000);
+                }
+            });
         }
     }
 
@@ -327,12 +358,10 @@ slider.setBackground(dr);
 
             case R.id.nowplaying_button_next:
                 vm.nextSong();
-                updateUI();
                 break;
 
             case R.id.nowplaying_button_previous:
                 vm.previousSong();
-                updateUI();
                 break;
         }
     }
@@ -341,12 +370,19 @@ slider.setBackground(dr);
     protected void onResume() {
         super.onResume();
         vm.VinMediaInitialize();
+        registerReceiver(updateUIReciver,filter1);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(updateUIReciver);
     }
 
     @Override

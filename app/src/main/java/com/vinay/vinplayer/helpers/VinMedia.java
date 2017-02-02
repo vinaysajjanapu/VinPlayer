@@ -6,6 +6,7 @@ package com.vinay.vinplayer.helpers;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -40,6 +41,26 @@ public class VinMedia {
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mediaPlayer.setLooping(true);
+        mediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
+            @Override
+            public void onSeekComplete(MediaPlayer mp) {
+                Log.d("mediaplayer","seek complete");
+            }
+        });
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                Log.d("mediaplayer","song complete");
+                if (!isClean()&&!isPlaying())nextSong();
+            }
+        });
+        mediaPlayer.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+            @Override
+            public boolean onInfo(MediaPlayer mp, int what, int extra) {
+                Log.d("mediaplayer", what + "  "+ extra);
+                return false;
+            }
+        });
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
         {
             @Override
@@ -102,10 +123,13 @@ public class VinMedia {
                 startMusic(position);
             }
         }
+        Intent local=new Intent();
+        local.setAction("change.ui");
+        context.sendBroadcast(local);
     }
 
     public void previousSong(){
-        if ((position-1)<currentList.size()){
+        if ((position-1)>=0){
             position--;
             if (isPlaying()||!isClean()){
                 stopMusic();
@@ -115,13 +139,18 @@ public class VinMedia {
                 startMusic(position);
             }
         }
+        Intent local=new Intent();
+        local.setAction("change.ui");
+        context.sendBroadcast(local);
     }
 
     public void setAudioProgress(int seekBarProgress){
         mediaPlayer.seekTo(seekBarProgress);
     }
     public int getAudioProgress(){
-        return mediaPlayer.getCurrentPosition();
+       // Log.d("audio progress",mediaPlayer.getCurrentPosition()/1000+"");
+        return mediaPlayer.getCurrentPosition()/1000;
+
     }
 
 
