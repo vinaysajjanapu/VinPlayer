@@ -216,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements
         playerSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Log.d("seekbar",progress+"");
+//                Log.d("seekbar",progress+"");
 
                 nowPlayingSeekBarProgress = progress;
                 playerCurrentDuration.setText( vm.getDuration()!= 0 ? String.format(Locale.ENGLISH,"%d:%02d",
@@ -233,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 vm.setAudioProgress(nowPlayingSeekBarProgress*1000);
-                Log.d("seekbar","tracking stopped");
+    //            Log.d("seekbar","tracking stopped");
             }
         });
 
@@ -248,18 +248,8 @@ public class MainActivity extends AppCompatActivity implements
             sliderPlayer_songtitle.setText(songDetails.get("title"));
             sliderPlayer_songdetails.setText(songDetails.get("artist") + "\t\t" + songDetails.get("album"));
 
-            if (vm.isPlaying())
-                sliderPlayer_playpause.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
-            else
-                sliderPlayer_playpause.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
-
             nowPlayingSongTitle.setText(songDetails.get("title"));
             nowPlayingSongDetails.setText(songDetails.get("artist") + "\t\t" + songDetails.get("album"));
-
-            if (vm.isPlaying())
-                playerButtonPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
-            else
-                playerButtonPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
 
             int duration  = vm.getDuration()/1000;
             playerTotalDuration.setText( vm.getDuration()!= 0 ? String.format(Locale.ENGLISH,"%d:%02d",
@@ -293,6 +283,8 @@ public class MainActivity extends AppCompatActivity implements
                //     Log.d("handler","running");
                     try {
                         playerSeekbar.setProgress(vm.getAudioProgress());
+
+                        if (!vm.isClean())updatePlayPauseButton();
                     }catch (Exception e){
 
                     }
@@ -334,7 +326,7 @@ public class MainActivity extends AppCompatActivity implements
         //BitmapDrawable background = new BitmapDrawable(context.getResources(),default_bg);
         dr=new BitmapDrawable(blurredBitmap);
         dr1=new BitmapDrawable(blurredBitmap1);
-slider.setBackground(dr);
+        slider.setBackground(dr);
         dr1 = null;
         dr = null;
         temp_input = null;
@@ -479,6 +471,8 @@ slider.setBackground(dr);
 
     public void playPauseAction(int position){
         //this.position = position;
+
+
         vm.setPosition(position);
         if (vm.isPlaying()||!vm.isClean()){
             vm.stopMusic();
@@ -489,6 +483,20 @@ slider.setBackground(dr);
         }
 
         updateUI();
+    }
+
+    public void updatePlayPauseButton(){
+        Log.d("update play","asdfghjkl");
+        if (vm.isPlaying())
+            sliderPlayer_playpause.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
+        else
+            sliderPlayer_playpause.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
+
+        if (vm.isPlaying())
+            playerButtonPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
+        else
+            playerButtonPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
+
     }
 
 
