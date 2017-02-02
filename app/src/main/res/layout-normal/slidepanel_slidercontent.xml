@@ -38,7 +38,13 @@
                 android:singleLine="true"
                 android:text="Title of The Song"
                 android:gravity="center_horizontal"
-                android:id="@+id/nowplaying_songtitle"/>
+                android:id="@+id/nowplaying_songtitle"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:scrollHorizontally="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:freezesText="true"/>
 
         </LinearLayout>
 
@@ -53,7 +59,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="350dp"
+        android:layout_height="300dp"
         >
         <!--AlbumArt -->
         <ImageView
