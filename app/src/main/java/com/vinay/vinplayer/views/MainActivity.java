@@ -283,8 +283,7 @@ public class MainActivity extends AppCompatActivity implements
                //     Log.d("handler","running");
                     try {
                         playerSeekbar.setProgress(vm.getAudioProgress());
-
-                        if (!vm.isClean())updatePlayPauseButton();
+                        if (vm.isClean())updatePlayPauseButton();
                     }catch (Exception e){
 
                     }
@@ -356,6 +355,7 @@ public class MainActivity extends AppCompatActivity implements
                 vm.previousSong();
                 break;
         }
+        updatePlayPauseButton();
     }
 
     @Override
@@ -399,6 +399,7 @@ public class MainActivity extends AppCompatActivity implements
             vm.resetPlayer();
         }
         playPauseAction(p);
+        updatePlayPauseButton();
         updateUI();
     }
 
@@ -465,7 +466,6 @@ public class MainActivity extends AppCompatActivity implements
                 }
             }
         }
-
         updateUI();
     }
 
@@ -481,7 +481,6 @@ public class MainActivity extends AppCompatActivity implements
         }else {
             vm.startMusic(position);
         }
-
         updateUI();
     }
 
