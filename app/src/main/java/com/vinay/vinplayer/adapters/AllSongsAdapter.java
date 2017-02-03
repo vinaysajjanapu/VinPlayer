@@ -5,10 +5,8 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.ParcelFileDescriptor;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,7 +20,6 @@ import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.fragments.AllSongsFragment.OnListFragmentInteractionListener;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
-
 
 import java.util.HashMap;
 import java.util.List;
@@ -78,15 +75,11 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
                     mListener.onListFragmentInteraction(position);
                 }
             }
         });
     }
-
-
 
     private void setupBroadCastReceiver(final ViewHolder view, final int position){
 

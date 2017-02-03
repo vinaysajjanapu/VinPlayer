@@ -16,26 +16,19 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.ParcelFileDescriptor;
-import android.os.Parcelable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -44,23 +37,22 @@ import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
-import com.vinay.vinplayer.fragments.AlbumArtFragment;
+import com.vinay.vinplayer.fragments.AlbumDetailsFragment;
 import com.vinay.vinplayer.fragments.AlbumsFragment;
 import com.vinay.vinplayer.fragments.AllSongsFragment;
+import com.vinay.vinplayer.fragments.ArtistDetailsFragment;
 import com.vinay.vinplayer.fragments.ArtistsFragment;
 import com.vinay.vinplayer.fragments.NowPlayingFragment;
 import com.vinay.vinplayer.fragments.QueueFragment;
 import com.vinay.vinplayer.helpers.BlurBuilder;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
-import com.vinay.vinplayer.test;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -68,7 +60,9 @@ public class MainActivity extends AppCompatActivity implements
         AllSongsFragment.OnListFragmentInteractionListener,
         AlbumsFragment.OnAlbumFragmentInteractionListner,ArtistsFragment.OnArtistFragmentInteractionListner,
         View.OnClickListener,
-        QueueFragment.OnQueueFragmentInteractionListener{
+        QueueFragment.OnQueueFragmentInteractionListener,
+        AlbumDetailsFragment.OnAlbumListFragmentInteractionListener,ArtistDetailsFragment.OnArtistListFragmentInteractionListener
+{
 
     ArrayList<HashMap<String, String>> songs;
 
@@ -408,27 +402,44 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void OnAlbumFragmentInteraction(int pos) {
 
-      /*  mFragmentList.remove(1);
-        vm.changeCurrentList(pos, 1);
-        mFragmentList.add(AllSongsFragment.newInstance(1,
-                vinMediaLists.getAlbumSongsList((VinMediaLists.allAlbums.get(pos).get("album")))));
+        vm.updateQueue(pos,1);
 
-        adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        FragmentManager fm = getSupportFragmentManager();
 
-        librayViewPager.setAdapter(adapter);
-    */}
+        AlbumDetailsFragment dFragment = AlbumDetailsFragment.newInstance(vinMediaLists.getAlbumSongsList(
+                VinMediaLists.allAlbums.get(pos).get("album")));
+        // Show DialogFragment
+        dFragment.show(fm, "Dialog Fragment");
+    }
 
     @Override
     public void OnArtistFragmentInteraction(int pos) {
-      /*  mFragmentList.remove(1);
-        vm.changeCurrentList(pos, 2);
-        mFragmentList.add(AllSongsFragment.newInstance(1,
-                vinMediaLists.getArtistSongsList((VinMediaLists.allArtists.get(pos).get("artist")))));
 
-        adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        vm.updateQueue(pos,2);
 
-        librayViewPager.setAdapter(adapter);
-   */ }
+        FragmentManager fm = getSupportFragmentManager();
+
+        ArtistDetailsFragment  dFragment = ArtistDetailsFragment.newInstance(
+                vinMediaLists.getArtistSongsList((VinMediaLists.allArtists.get(pos).get("artist"))));
+        // Show DialogFragment
+        dFragment.show(fm, "Dialog Fragment");
+    }
+
+    @Override
+    public void onAlbumListFragmentInteraction(int i) {
+        if (vm.isPlaying()) {
+            vm.resetPlayer();
+        }
+        playPauseAction(i);
+    }
+
+    @Override
+    public void onArtistListFragmentInteraction(int i) {
+        if (vm.isPlaying()) {
+            vm.resetPlayer();
+        }
+        playPauseAction(i);
+    }
 
 
     public class ViewPagerAdapter extends FragmentPagerAdapter {
