@@ -183,7 +183,11 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
                 if(action.equals(getString(R.string.newSongLoaded))){
-                    onNewSongLoaded();
+                    try {
+                        onNewSongLoaded();
+                    }catch (Exception e){
+
+                    }
                 }else if (action.equals(getString(R.string.songPaused))){
                     onSongPaused();
                 }else if (action.equals(getString(R.string.songResumed))){
