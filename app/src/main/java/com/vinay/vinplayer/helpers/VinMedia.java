@@ -52,9 +52,36 @@ public class VinMedia {
         songResumedIntent.setAction(context.getString(R.string.songResumed));
         musicStoppedIntent.setAction(context.getString(R.string.musicStopped));
 
+        newMediaPlayer();
+        vinMediaLists = new VinMediaLists(context);
+        currentList = vinMediaLists.getAllSongsList();
+    }
+
+    public void changeCurrentList(int position,int i){
+        if(i==1)
+        currentList = vinMediaLists.getAlbumSongsList(vinMediaLists.getAlbumsList().get(position).get("album"));
+    else if(i==2)
+            currentList = vinMediaLists.getArtistSongsList(vinMediaLists.getArtistsList().get(position).get("artist"));
+    }
+
+    public ArrayList<HashMap<String,String>> getCurrentList(){
+        return currentList;
+    }
+
+    private void setMediaSource(){
+        try {
+            mediaPlayer.setDataSource(currentList.get(position).get("data"));
+            Log.d("mediaplayer status","starting music");
+            mediaPlayer.prepareAsync();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void newMediaPlayer(){
         mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);mediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
             @Override
             public void onSeekComplete(MediaPlayer mp) {
                 Log.d("mediaplayer","seek complete");
@@ -78,50 +105,34 @@ public class VinMedia {
             }
         });
 
-        vinMediaLists = new VinMediaLists(context);
-        currentList = vinMediaLists.getAllSongsList();
-    }
 
-    public void changeCurrentList(int position,int i){
-        if(i==1)
-        currentList = vinMediaLists.getAlbumSongsList(vinMediaLists.getAlbumsList().get(position).get("album"));
-    else if(i==2)
-            currentList = vinMediaLists.getArtistSongsList(vinMediaLists.getArtistsList().get(position).get("artist"));
-    }
-
-    public ArrayList<HashMap<String,String>> getCurrentList(){
-        return currentList;
-    }
-
-    private void setMediaSource(){
-        try {
-            mediaPlayer.setDataSource(currentList.get(position).get("data"));
-            mediaPlayer.prepareAsync();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void startMusic(int index){
-        this.position  = index;
-        if(isPlaying()||!isClean())resetPlayer();
-        setMediaSource();
         context.sendBroadcast(newSongLoadIntent);
+        this.position  = index;
+        if(isPlaying()||!isClean()){
+            resetPlayer();
+        }
+        newMediaPlayer();
+        setMediaSource();
     }
 
     public void pauseMusic(){
+        Log.d("mediaplayer status","pausing music");
         mediaPlayer.pause();
         context.sendBroadcast(songPausedIntent);
         pausePosition = mediaPlayer.getCurrentPosition();
     }
     public void resumeMusic(){
+        Log.d("mediaplayer status","resuming music");
         mediaPlayer.seekTo(pausePosition);
         mediaPlayer.start();
         context.sendBroadcast(songResumedIntent);
     }
 
     public void stopMusic(){
+        Log.d("mediaplayer status","stopping music");
         mediaPlayer.stop();
     }
 
@@ -146,6 +157,14 @@ public class VinMedia {
         }
     }
 
+
+    public void resetPlayer(){
+        Log.d("mediaplayer status","reset player");
+        mediaPlayer.stop();
+        mediaPlayer.reset();
+        mediaPlayer.release();
+    }
+
     public void setAudioProgress(int seekBarProgress){
         if(!isPlaying())pausePosition = seekBarProgress;
         mediaPlayer.seekTo(seekBarProgress);
@@ -165,10 +184,6 @@ public class VinMedia {
     }
 
 
-    public void resetPlayer(){
-        mediaPlayer.stop();
-        mediaPlayer.reset();
-    }
     public void releasePlayer(){
         mediaPlayer.release();
     }
