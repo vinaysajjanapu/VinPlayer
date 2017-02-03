@@ -111,7 +111,7 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
             if ((pos1==-1)&&(pos2==-1))pos1 = position;
             else if ((pos1!=-1)&&(pos2==-1)) pos2 = position;
 
-            Log.d("dfhfjgfkhgljkh","loaded");
+            Log.d("mediaplayer status","onNewSongLoaded");
            // view.img_playindic.setVisibility(View.VISIBLE);
         }
     }
@@ -119,7 +119,7 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
         if (position == pos1){
             pos1=pos2;
             pos2=-1;
-            Log.d("dfhfjgfkhgljkh","stopped");
+            Log.d("mediaplayer status","onMusicStopped");
          //   view.img_playindic.setVisibility(View.INVISIBLE);
         }
 

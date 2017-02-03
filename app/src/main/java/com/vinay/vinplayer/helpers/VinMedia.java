@@ -98,8 +98,10 @@ public class VinMedia {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 context.sendBroadcast(musicStoppedIntent);
-                Log.d("mediaplayer","song complete");
-                if (!isClean()&&!isPlaying())nextSong();
+                Log.d("Broadcast","song complete");
+                if (!isClean()&&!isPlaying()){
+                      nextSong();
+                }
             }
         });
 
@@ -115,6 +117,7 @@ public class VinMedia {
 
     public void startMusic(int index){
         context.sendBroadcast(newSongLoadIntent);
+        Log.d("Broadcast","music started");
         this.position  = index;
         if(isPlaying()||!isClean()){
             resetPlayer();
@@ -124,16 +127,16 @@ public class VinMedia {
     }
 
     public void pauseMusic(){
-        Log.d("mediaplayer status","pausing music");
         mediaPlayer.pause();
         context.sendBroadcast(songPausedIntent);
+        Log.d("Broadcast","music paused");
         pausePosition = mediaPlayer.getCurrentPosition();
     }
     public void resumeMusic(){
-        Log.d("mediaplayer status","resuming music");
         mediaPlayer.seekTo(pausePosition);
         mediaPlayer.start();
         context.sendBroadcast(songResumedIntent);
+        Log.d("Broadcast","music paused");
     }
 
     public void nextSong(){

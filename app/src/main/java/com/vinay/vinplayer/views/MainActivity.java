@@ -16,6 +16,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -29,6 +30,8 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -47,6 +50,7 @@ import com.vinay.vinplayer.fragments.QueueFragment;
 import com.vinay.vinplayer.helpers.BlurBuilder;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
+import com.vinay.vinplayer.test;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -78,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements
     SlidingUpPanelLayout slidingUpPanelLayout;
 
     RelativeLayout sliderPlayer;
-    SeekBar sliderPlayer_seekbar;
+    ProgressBar sliderPlayer_progressBar;
     CircleImageView sliderPlayer_albumart;
     TextView sliderPlayer_songtitle;
     TextView sliderPlayer_songdetails;
@@ -102,6 +106,8 @@ public class MainActivity extends AppCompatActivity implements
     SystemBarTintManager tintManager;
 
     RelativeLayout.LayoutParams lp_now,lp_que;
+    Handler handler;
+
 
 //    String contentURI=null;
 
@@ -180,9 +186,24 @@ public class MainActivity extends AppCompatActivity implements
                 createBlurredBackground(uri.toString());
 
             } catch (Exception e) {
-                e.printStackTrace();
+             //   e.printStackTrace();
             }
 
+            sliderPlayer_progressBar.setMax(vm.getDuration()/1000);
+            handler = new Handler();
+            this.runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    //Log.d("handler","running");
+                    try {
+                        sliderPlayer_progressBar.setProgress(vm.getAudioProgress());
+                    } catch (Exception e) {
+
+                    }
+                    handler.postDelayed(this, 1000);
+                }
+            });
         }
     }
 
@@ -220,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements
 
         slidingUpPanelLayout = (SlidingUpPanelLayout) findViewById(R.id.slidingpanel_layout);
         sliderPlayer = (RelativeLayout) findViewById(R.id.slider_playingdetails);
-        sliderPlayer_seekbar = (SeekBar) findViewById(R.id.slider_seekBar);
+        sliderPlayer_progressBar = (ProgressBar) findViewById(R.id.slider_progressBar);
         sliderPlayer_albumart = (CircleImageView) findViewById(R.id.albumart_slider_playingsong);
         sliderPlayer_songtitle = (TextView) findViewById(R.id.slider_playingsong_songname);
         sliderPlayer_songdetails = (TextView) findViewById(R.id.slider_playing_songdetails);
@@ -239,6 +260,9 @@ public class MainActivity extends AppCompatActivity implements
         }
         lp_que = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 actionBarHeight);
+
+
+
         Log.d("actionBar height",actionBarHeight+"");
         slidingUpPanelLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
@@ -351,7 +375,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        vm.VinMediaInitialize();
+        //vm.VinMediaInitialize();
         registerReceiver(broadcastReceiver, intentFilter);
     }
 
