@@ -39,9 +39,12 @@ import com.vinay.vinplayer.fragments.AlbumArtFragment;
 import com.vinay.vinplayer.fragments.AlbumsFragment;
 import com.vinay.vinplayer.fragments.AllSongsFragment;
 import com.vinay.vinplayer.fragments.ArtistsFragment;
+import com.vinay.vinplayer.fragments.NowPlayingFragment;
+import com.vinay.vinplayer.fragments.QueueFragment;
 import com.vinay.vinplayer.helpers.BlurBuilder;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
+import com.vinay.vinplayer.test;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -58,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements
 
     ArrayList<HashMap<String, String>> songs;
 
-    Button start, pause, stop;
     VinMedia vm;
 
     ViewPager librayViewPager;
@@ -77,39 +79,21 @@ public class MainActivity extends AppCompatActivity implements
     TextView sliderPlayer_songdetails;
     ImageButton sliderPlayer_playpause;
 
-    ViewPager albumArtPager;
-    AlbumArtPagerAdapter albumArtPagerAdapter;
-
-
-    TextView nowPlayingSongDetails;
-    TextView nowPlayingSongTitle;
-    TextView playerCurrentDuration;
-    TextView playerTotalDuration;
-
-    SeekBar playerSeekbar;
-    ImageButton playerButtonPrevious;
-    ImageButton playerButtonNext;
-    ImageButton playerButtonPlayPause;
     RelativeLayout slider;
+
+    ViewPager nowPlayingPager;
+    NowPlayingPagerAdapter nowPlayingPagerAdapter;
+    List<Fragment> NowPlayingFragments = new ArrayList<>();
 
     Bitmap blurredBitmap, blurredBitmap1;
     Bitmap input_to_blur;
     Bitmap temp_input;
     Bitmap default_bg;
-    Drawable dr,dr1;
-    IntentFilter filter1;
-    BroadcastReceiver updateUIReciver;
+    Drawable dr;
+    IntentFilter intentFilter;
+    BroadcastReceiver broadcastReceiver;
 
 //    String contentURI=null;
-
-
-    boolean firstback=false,secondback=false;
-
-    Thread thread;
-    Handler handler;
-
-    Boolean isNowPlayingSeekingDone = false;
-    int nowPlayingSeekBarProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,18 +110,69 @@ public class MainActivity extends AppCompatActivity implements
 
         setupLibraryViewPager();
         setupSlidingPanelLayout();
-        filter1 = new IntentFilter();
+        setupNowPlayingPager();
+        setupBroadCastReceiver();
 
-        filter1.addAction("change.ui");
+    }
 
-        updateUIReciver = new BroadcastReceiver() {
+    private void setupBroadCastReceiver(){
 
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(getString(R.string.newSongLoaded));
+        intentFilter.addAction(getString(R.string.songPaused));
+        intentFilter.addAction(getString(R.string.songResumed));
+        intentFilter.addAction(getString(R.string.musicStopped));
+
+        broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                updateUI();
+                String action = intent.getAction();
+                if(action.equals(getString(R.string.newSongLoaded))){
+                    onNewSongLoaded();
+                }else if (action.equals(getString(R.string.songPaused))){
+                    onSongPaused();
+                }else if (action.equals(getString(R.string.songResumed))){
+                    onSongResumed();
+                }else if (action.equals(getString(R.string.musicStopped))){
+                    onMusicStopped();
+                }
             }
         };
-        registerReceiver(updateUIReciver,filter1);
+        registerReceiver(broadcastReceiver,intentFilter);
+    }
+
+    private void onNewSongLoaded(){
+        HashMap<String,String> songDetails = vm.getCurrentSongDetails();
+
+        if (songDetails!=null) {
+            sliderPlayer_playpause.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
+            sliderPlayer_songtitle.setText(songDetails.get("title"));
+            sliderPlayer_songdetails.setText(songDetails.get("artist") + "\t\t" + songDetails.get("album"));
+
+            try {
+                final Uri sArtworkUri = Uri
+                        .parse("content://media/external/audio/albumart");
+                Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(songDetails.get("album_id")));
+
+                Picasso.with(this).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
+                        .into(sliderPlayer_albumart);
+
+                createBlurredBackground(uri.toString());
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+        }
+    }
+    private void onSongPaused(){
+        sliderPlayer_playpause.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
+    }
+    private void onSongResumed(){
+        sliderPlayer_playpause.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
+    }
+    private void onMusicStopped(){
+
     }
 
     private void setupLibraryViewPager(){
@@ -161,7 +196,6 @@ public class MainActivity extends AppCompatActivity implements
     private void setupSlidingPanelLayout(){
 
         slidingUpPanelLayout = (SlidingUpPanelLayout)findViewById(R.id.slidingpanel_layout);
-
         sliderPlayer = (RelativeLayout)findViewById(R.id.slider_playingdetails);
         sliderPlayer_seekbar = (SeekBar)findViewById(R.id.slider_seekBar);
         sliderPlayer_albumart = (CircleImageView)findViewById(R.id.albumart_slider_playingsong);
@@ -169,20 +203,9 @@ public class MainActivity extends AppCompatActivity implements
         sliderPlayer_songdetails = (TextView)findViewById(R.id.slider_playing_songdetails);
         sliderPlayer_playpause = (ImageButton)findViewById(R.id.slider_playing_button_playpause);
 
-
-        nowPlayingSongDetails = (TextView)findViewById(R.id.nowplaying_songdetails);
-        nowPlayingSongTitle = (TextView)findViewById(R.id.nowplaying_songtitle);
-
-        playerCurrentDuration = (TextView)findViewById(R.id.nowplaying_song_currentduration);
-        playerTotalDuration = (TextView)findViewById(R.id.nowplaying_song_duration);
-        playerSeekbar = (SeekBar)findViewById(R.id.nowplaying_seekbar);
-        playerButtonPlayPause = (ImageButton)findViewById(R.id.nowplaying_button_play_pause);
-        playerButtonPrevious = (ImageButton)findViewById(R.id.nowplaying_button_previous);
-        playerButtonNext = (ImageButton)findViewById(R.id.nowplaying_button_next);
         slider = (RelativeLayout)findViewById(R.id.slider);
 
-        setupAlbumArtViewPAger();
-            slidingUpPanelLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+        slidingUpPanelLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
                 if (slideOffset < 0.5f) {
@@ -202,136 +225,19 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         sliderPlayer_playpause.setOnClickListener(this);
-        playerButtonPlayPause.setOnClickListener(this);
-        playerButtonPrevious.setOnClickListener(this);
-        playerButtonNext.setOnClickListener(this);
-
-        playerCurrentDuration.setText("");
-
-        nowPlayingSongTitle.setTextColor(Color.WHITE);
-        playerCurrentDuration.setTextColor(Color.WHITE);
-        playerTotalDuration.setTextColor(Color.WHITE);
-
-        playerButtonPlayPause.setColorFilter(Color.WHITE);
-        playerButtonNext.setColorFilter(Color.WHITE);
-        playerButtonPrevious.setColorFilter(Color.WHITE);
- //       sliderPlayer_playpause.setColorFilter(Color.WHITE);
-
-
-
-        playerSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//                Log.d("seekbar",progress+"");
-
-                nowPlayingSeekBarProgress = progress;
-                playerCurrentDuration.setText( vm.getDuration()!= 0 ? String.format(Locale.ENGLISH,"%d:%02d",
-                        progress / 60, progress % 60) : "-:--");
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-              //  Log.d("seekbar","tracking started");
-
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                vm.setAudioProgress(nowPlayingSeekBarProgress*1000);
-    //            Log.d("seekbar","tracking stopped");
-            }
-        });
-
-        updateUI();
-    }
-
-    private void setupAlbumArtViewPAger() {
-
-        albumArtPager = (ViewPager)findViewById(R.id.nowplaying_albumart_pager);
-        albumArtPagerAdapter = new AlbumArtPagerAdapter(getSupportFragmentManager());
-        albumArtPager.setAdapter(albumArtPagerAdapter);
-        albumArtPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            int albumart_pos;
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int pos) {
-                albumart_pos = pos;
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                if (state==ViewPager.SCROLL_STATE_IDLE){
-                        if ((albumart_pos - vm.getPosition())>0)
-                            vm.nextSong();
-                        else if((albumart_pos - vm.getPosition())<0)
-                            vm.previousSong();
-                    }
-            }
-        });
-
+        sliderPlayer_playpause.setColorFilter(Color.BLACK);
 
 
     }
 
-    private void updateUI(){
-        HashMap<String,String> songDetails = vm.getCurrentSongDetails();
-        Log.d("songdetails","null Data");
-        if (songDetails!=null) {
-            Log.d("songdetails",songDetails.toString());
-            sliderPlayer_songtitle.setText(songDetails.get("title"));
-            sliderPlayer_songdetails.setText(songDetails.get("artist") + "\t\t" + songDetails.get("album"));
+    private void setupNowPlayingPager(){
 
-            nowPlayingSongTitle.setText(songDetails.get("title"));
-            nowPlayingSongDetails.setText(songDetails.get("artist") + "\t\t" + songDetails.get("album"));
+        nowPlayingPager = (ViewPager) findViewById(R.id.nowplaying_pager);
+        NowPlayingFragments.add(NowPlayingFragment.newInstance(vm));
+        NowPlayingFragments.add(QueueFragment.newInstance(vm));
+        nowPlayingPagerAdapter = new NowPlayingPagerAdapter(getSupportFragmentManager());
+        nowPlayingPager.setAdapter(nowPlayingPagerAdapter);
 
-            int duration  = vm.getDuration()/1000;
-            playerTotalDuration.setText( vm.getDuration()!= 0 ? String.format(Locale.ENGLISH,"%d:%02d",
-                            duration / 60, duration % 60) : "-:--");
-
-            playerSeekbar.setMax(duration);
-
-
-            try {
-                final Uri sArtworkUri = Uri
-                        .parse("content://media/external/audio/albumart");
-                Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(songDetails.get("album_id")));
-
-                Picasso.with(this).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
-                        .into(sliderPlayer_albumart);
-
-                createBlurredBackground(uri.toString());
-
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-
-            albumArtPager.setAdapter(albumArtPagerAdapter);
-            albumArtPagerAdapter.notifyDataSetChanged();
-            albumArtPager.setCurrentItem(vm.getPosition());
-
-            updatePlayPauseButton();
-
-            handler = new Handler();
-            MainActivity.this.runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-               //     Log.d("handler","running");
-                    try {
-                        playerSeekbar.setProgress(vm.getAudioProgress());
-                        if (vm.isClean())updatePlayPauseButton();
-                    }catch (Exception e){
-
-                    }
-                    handler.postDelayed(this, 1000);
-                }
-            });
-        }
     }
 
     private void createBlurredBackground(String url) {
@@ -365,9 +271,7 @@ public class MainActivity extends AppCompatActivity implements
 
         //BitmapDrawable background = new BitmapDrawable(context.getResources(),default_bg);
         dr=new BitmapDrawable(blurredBitmap);
-        dr1=new BitmapDrawable(blurredBitmap1);
         slider.setBackground(dr);
-        dr1 = null;
         dr = null;
         temp_input = null;
         input_to_blur = null;
@@ -382,27 +286,14 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.slider_playing_button_playpause:
                 playPauseAction();
                 break;
-
-            case R.id.nowplaying_button_play_pause:
-                playPauseAction();
-                break;
-
-            case R.id.nowplaying_button_next:
-                vm.nextSong();
-                break;
-
-            case R.id.nowplaying_button_previous:
-                vm.previousSong();
-                break;
         }
-        updatePlayPauseButton();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         vm.VinMediaInitialize();
-        registerReceiver(updateUIReciver,filter1);
+        registerReceiver(broadcastReceiver,intentFilter);
     }
 
     @Override
@@ -414,7 +305,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onStop() {
         super.onStop();
-        unregisterReceiver(updateUIReciver);
+        unregisterReceiver(broadcastReceiver);
     }
 
     @Override
@@ -423,7 +314,6 @@ public class MainActivity extends AppCompatActivity implements
         vm.releasePlayer();
         vm = null;
     }
-
 
     @Override
     public void onBackPressed() {
@@ -439,8 +329,6 @@ public class MainActivity extends AppCompatActivity implements
             vm.resetPlayer();
         }
         playPauseAction(p);
-        updatePlayPauseButton();
-        updateUI();
     }
 
     @Override
@@ -491,35 +379,29 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    public class AlbumArtPagerAdapter extends FragmentStatePagerAdapter {
+    public class NowPlayingPagerAdapter extends FragmentPagerAdapter {
 
-        AlbumArtFragment albumArtFragment;
-        public AlbumArtPagerAdapter(FragmentManager fm) {super(fm);}
-        @Override
-        public int getCount() {
-            return ((vm.getCurrentList().size()==0)?1:vm.getCurrentList().size());
-        }
-
-        @Override
-        public Parcelable saveState() {
-            return null;
-        }
-
-        @Override
-        public int getItemPosition(Object object) {
-            return POSITION_NONE;
+        public NowPlayingPagerAdapter(FragmentManager manager) {
+            super(manager);
         }
 
         @Override
         public Fragment getItem(int position) {
-            albumArtFragment = AlbumArtFragment.newInstance(position, getApplicationContext(),vm.getCurrentSongDetails());
-            return albumArtFragment;
+            return NowPlayingFragments.get(position);
+        }
 
+        @Override
+        public int getCount() {
+            return 2;
+        }
 
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return " ";
         }
     }
 
-    public void playPauseAction(){
+    private void playPauseAction(){
         if (vm.isPlaying()){
             vm.pauseMusic();
         }else {
@@ -532,12 +414,9 @@ public class MainActivity extends AppCompatActivity implements
                 }
             }
         }
-        updateUI();
     }
 
-    public void playPauseAction(int position){
-        //this.position = position;
-
+    private void playPauseAction(int position){
 
         vm.setPosition(position);
         if (vm.isPlaying()||!vm.isClean()){
@@ -547,22 +426,8 @@ public class MainActivity extends AppCompatActivity implements
         }else {
             vm.startMusic(position);
         }
-        updateUI();
     }
 
-    public void updatePlayPauseButton(){
-        Log.d("update play","asdfghjkl");
-        if (vm.isPlaying())
-            sliderPlayer_playpause.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
-        else
-            sliderPlayer_playpause.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
-
-        if (vm.isPlaying())
-            playerButtonPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
-        else
-            playerButtonPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
-
-    }
 
 
 }

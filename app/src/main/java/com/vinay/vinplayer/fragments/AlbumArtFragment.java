@@ -1,3 +1,7 @@
+/**
+ * Created by vinaysajjanapu on 2/2/17.
+ */
+
 package com.vinay.vinplayer.fragments;
 
 import android.content.ContentUris;
@@ -23,9 +27,6 @@ import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 
-/**
- * Created by vinaysajjanapu on 2/2/17.
- */
 
 public class AlbumArtFragment extends Fragment {
 
@@ -35,9 +36,9 @@ public class AlbumArtFragment extends Fragment {
 
     public AlbumArtFragment() {    }
 
-    public static AlbumArtFragment newInstance(int position, Context mContext,HashMap<String,String> songDetails) {
+    public static AlbumArtFragment newInstance(int position, Context mContext) {
         AlbumArtFragment fragment = new AlbumArtFragment();
-        fragment.songDetails = songDetails;
+        fragment.songDetails = new VinMedia(mContext).getCurrentList().get(position);
         return fragment;
     }
 
@@ -51,11 +52,7 @@ public class AlbumArtFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_albumart, container, false);
         albumArt = (ImageView)view.findViewById(R.id.albumart_nowplaying);
-        setupImage();
 
-        return view;
-    }
-    private void setupImage(){
         try {
             final Uri sArtworkUri = Uri
                     .parse("content://media/external/audio/albumart");
@@ -67,8 +64,9 @@ public class AlbumArtFragment extends Fragment {
             e.printStackTrace();
         }
 
-
+        return view;
     }
+
     @Override
     public void onDetach() {
         super.onDetach();

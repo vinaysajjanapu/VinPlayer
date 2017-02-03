@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">VinPlayer</string>
+
+    <!--Broadcast Intent Names-->
+    <string name="newSongLoaded">newSongLoaded</string>
+    <string name="songPaused">songPaused</string>
+    <string name="songResumed">songResumed</string>
+    <string name="musicStopped">musicStopped</string>
+
 </resources>

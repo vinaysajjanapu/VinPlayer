@@ -21,10 +21,11 @@
 
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@+id/albumart_slider_playingsong"
+                android:layout_toLeftOf="@+id/slider_playing_button_playpause"
                 android:orientation="vertical">
 
                 <TextView
@@ -32,7 +33,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:singleLine="true"
-                    android:text="Play some song"
+                    android:text="Select a song to Play"
                     android:textSize="16sp" />
 
                 <TextView

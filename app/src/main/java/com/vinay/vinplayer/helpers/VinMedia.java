@@ -13,6 +13,8 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
 
+import com.vinay.vinplayer.R;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,12 +27,14 @@ public class VinMedia {
     private Context context;
     private Cursor cur;
     private MediaPlayer mediaPlayer;
-    int pausePosition;
-    private int position;
+    public static int pausePosition;
+    public static int position=0;
     public HashMap<String,String> currentSongDetails;
     private static Uri uri;
     private ContentResolver contentResolver;
     VinMediaLists vinMediaLists;
+    Intent newSongLoadIntent,songPausedIntent,songResumedIntent,musicStoppedIntent;
+
 
     public VinMedia(Context context){
         this.context=context;
@@ -38,9 +42,18 @@ public class VinMedia {
 
 
     public void VinMediaInitialize(){
+        newSongLoadIntent = new Intent();
+        songPausedIntent = new Intent();
+        songResumedIntent = new Intent();
+        musicStoppedIntent = new Intent();
+
+        newSongLoadIntent.setAction(context.getString(R.string.newSongLoaded));
+        songPausedIntent.setAction(context.getString(R.string.songPaused));
+        songResumedIntent.setAction(context.getString(R.string.songResumed));
+        musicStoppedIntent.setAction(context.getString(R.string.musicStopped));
+
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mediaPlayer.setLooping(true);
         mediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
             @Override
             public void onSeekComplete(MediaPlayer mp) {
@@ -50,17 +63,12 @@ public class VinMedia {
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
+                context.sendBroadcast(musicStoppedIntent);
                 Log.d("mediaplayer","song complete");
                 if (!isClean()&&!isPlaying())nextSong();
             }
         });
-        mediaPlayer.setOnInfoListener(new MediaPlayer.OnInfoListener() {
-            @Override
-            public boolean onInfo(MediaPlayer mp, int what, int extra) {
-                Log.d("mediaplayer", what + "  "+ extra);
-                return false;
-            }
-        });
+
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
         {
             @Override
@@ -97,19 +105,20 @@ public class VinMedia {
 
     public void startMusic(int index){
         this.position  = index;
-        if(isPlaying())resetPlayer();
+        if(isPlaying()||!isClean())resetPlayer();
         setMediaSource();
-        //mediaPlayer.start();
+        context.sendBroadcast(newSongLoadIntent);
     }
 
     public void pauseMusic(){
         mediaPlayer.pause();
+        context.sendBroadcast(songPausedIntent);
         pausePosition = mediaPlayer.getCurrentPosition();
     }
     public void resumeMusic(){
         mediaPlayer.seekTo(pausePosition);
-        Log.d("pausepos",pausePosition+"  ");
         mediaPlayer.start();
+        context.sendBroadcast(songResumedIntent);
     }
 
     public void stopMusic(){
@@ -119,44 +128,31 @@ public class VinMedia {
     public void nextSong(){
         if ((position+1)<currentList.size()){
             position++;
-            if (isPlaying()||!isClean()){
-                stopMusic();
-                resetPlayer();
-                startMusic(position);
-            }else {
-                startMusic(position);
-            }
+            startMusic(position);
         }
-        Intent local=new Intent();
-        local.setAction("change.ui");
-        context.sendBroadcast(local);
     }
 
     public void previousSong(){
         if ((position-1)>=0){
             position--;
-            if (isPlaying()||!isClean()){
+           /* if (isPlaying()||!isClean()){
                 stopMusic();
                 resetPlayer();
                 startMusic(position);
             }else {
                 startMusic(position);
-            }
+            }*/
+            startMusic(position);
         }
-        Intent local=new Intent();
-        local.setAction("change.ui");
-        context.sendBroadcast(local);
     }
 
     public void setAudioProgress(int seekBarProgress){
+        if(!isPlaying())pausePosition = seekBarProgress;
         mediaPlayer.seekTo(seekBarProgress);
     }
     public int getAudioProgress(){
-       // Log.d("audio progress",mediaPlayer.getCurrentPosition()/1000+"");
         return mediaPlayer.getCurrentPosition()/1000;
-
     }
-
 
     public void setPosition(int position){
         this.position = position;
@@ -167,8 +163,6 @@ public class VinMedia {
     public int getDuration(){
         return Integer.parseInt(getCurrentSongDetails().get("duration"));
     }
-
-
 
 
     public void resetPlayer(){
