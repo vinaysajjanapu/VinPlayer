@@ -207,7 +207,7 @@ public class MainActivity extends AppCompatActivity implements
     private void setupLibraryViewPager() {
 
         librayViewPager = (ViewPager) findViewById(R.id.viewpager);
-        mFragmentList.add(AllSongsFragment.newInstance(1, vm.getCurrentList()));
+        mFragmentList.add(AllSongsFragment.newInstance(1, vinMediaLists.getAllSongsList()));
         mFragmentList.add(AlbumsFragment.newInstance(vinMediaLists.getAlbumsList()));
         mFragmentList.add(ArtistsFragment.newInstance(vinMediaLists.getArtistsList()));
         titles.add("all songs");
@@ -273,8 +273,6 @@ public class MainActivity extends AppCompatActivity implements
 
         sliderPlayer_playpause.setOnClickListener(this);
         sliderPlayer_playpause.setColorFilter(Color.BLACK);
-
-
     }
 
     private void setupNowPlayingPager() {
@@ -410,7 +408,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void OnAlbumFragmentInteraction(int pos) {
 
-        mFragmentList.remove(1);
+      /*  mFragmentList.remove(1);
         vm.changeCurrentList(pos, 1);
         mFragmentList.add(AllSongsFragment.newInstance(1,
                 vinMediaLists.getAlbumSongsList((VinMediaLists.allAlbums.get(pos).get("album")))));
@@ -418,11 +416,11 @@ public class MainActivity extends AppCompatActivity implements
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         librayViewPager.setAdapter(adapter);
-    }
+    */}
 
     @Override
     public void OnArtistFragmentInteraction(int pos) {
-        mFragmentList.remove(1);
+      /*  mFragmentList.remove(1);
         vm.changeCurrentList(pos, 2);
         mFragmentList.add(AllSongsFragment.newInstance(1,
                 vinMediaLists.getArtistSongsList((VinMediaLists.allArtists.get(pos).get("artist")))));
@@ -430,7 +428,7 @@ public class MainActivity extends AppCompatActivity implements
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         librayViewPager.setAdapter(adapter);
-    }
+   */ }
 
 
     public class ViewPagerAdapter extends FragmentPagerAdapter {

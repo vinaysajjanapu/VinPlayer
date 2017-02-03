@@ -22,7 +22,7 @@ import java.util.HashMap;
 public class VinMedia {
 
 
-    private static ArrayList<HashMap<String,String>> currentList;
+    private static ArrayList<HashMap<String,String>> allSongs,currentQueue;
     private static volatile VinMedia Instance = null;
     private Context context;
     private Cursor cur;
@@ -42,6 +42,15 @@ public class VinMedia {
 
 
     public void VinMediaInitialize(){
+        iniatializeBroadcasts();
+        newMediaPlayer();
+        vinMediaLists = new VinMediaLists(context);
+        allSongs = vinMediaLists.getAllSongsList();
+        if (currentQueue==null)currentQueue = allSongs;
+    }
+
+    private void iniatializeBroadcasts() {
+
         newSongLoadIntent = new Intent();
         songPausedIntent = new Intent();
         songResumedIntent = new Intent();
@@ -51,26 +60,22 @@ public class VinMedia {
         songPausedIntent.setAction(context.getString(R.string.songPaused));
         songResumedIntent.setAction(context.getString(R.string.songResumed));
         musicStoppedIntent.setAction(context.getString(R.string.musicStopped));
-
-        newMediaPlayer();
-        vinMediaLists = new VinMediaLists(context);
-        currentList = vinMediaLists.getAllSongsList();
     }
 
-    public void changeCurrentList(int position,int i){
+    public void updateQueue(int position,int i){
         if(i==1)
-        currentList = vinMediaLists.getAlbumSongsList(vinMediaLists.getAlbumsList().get(position).get("album"));
-    else if(i==2)
-            currentList = vinMediaLists.getArtistSongsList(vinMediaLists.getArtistsList().get(position).get("artist"));
+            currentQueue = vinMediaLists.getAlbumSongsList(vinMediaLists.getAlbumsList().get(position).get("album"));
+        else if(i==2)
+            currentQueue = vinMediaLists.getArtistSongsList(vinMediaLists.getArtistsList().get(position).get("artist"));
     }
 
     public ArrayList<HashMap<String,String>> getCurrentList(){
-        return currentList;
+        return currentQueue;
     }
 
     private void setMediaSource(){
         try {
-            mediaPlayer.setDataSource(currentList.get(position).get("data"));
+            mediaPlayer.setDataSource(currentQueue.get(position).get("data"));
             Log.d("mediaplayer status","starting music");
             mediaPlayer.prepareAsync();
 
@@ -81,7 +86,9 @@ public class VinMedia {
 
     void newMediaPlayer(){
         mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);mediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+        mediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
             @Override
             public void onSeekComplete(MediaPlayer mp) {
                 Log.d("mediaplayer","seek complete");
@@ -104,8 +111,6 @@ public class VinMedia {
                 mediaPlayer.start();
             }
         });
-
-
     }
 
     public void startMusic(int index){
@@ -131,13 +136,8 @@ public class VinMedia {
         context.sendBroadcast(songResumedIntent);
     }
 
-    public void stopMusic(){
-        Log.d("mediaplayer status","stopping music");
-                mediaPlayer.stop();
-    }
-
     public void nextSong(){
-        if ((position+1)<currentList.size()){
+        if ((position+1)<currentQueue.size()){
             position++;
             startMusic(position);
         }
@@ -146,17 +146,9 @@ public class VinMedia {
     public void previousSong(){
         if ((position-1)>=0){
             position--;
-           /* if (isPlaying()||!isClean()){
-                stopMusic();
-                resetPlayer();
-                startMusic(position);
-            }else {
-                startMusic(position);
-            }*/
             startMusic(position);
         }
     }
-
 
     public void resetPlayer(){
         Log.d("mediaplayer status","reset player");
@@ -173,6 +165,7 @@ public class VinMedia {
         if(!isPlaying())pausePosition = seekBarProgress;
         mediaPlayer.seekTo(seekBarProgress);
     }
+
     public int getAudioProgress(){
         return mediaPlayer.getCurrentPosition()/1000;
     }
@@ -180,13 +173,14 @@ public class VinMedia {
     public void setPosition(int position){
         this.position = position;
     }
+
     public int getPosition(){
         return position;
     }
+
     public int getDuration(){
         return Integer.parseInt(getCurrentSongDetails().get("duration"));
     }
-
 
     public void releasePlayer(){
         mediaPlayer.release();
@@ -213,7 +207,8 @@ public class VinMedia {
     }
 
     public HashMap<String, String> getCurrentSongDetails(){
-        currentSongDetails = currentList.get(position);
+        currentSongDetails = currentQueue.get(getPosition());
         return currentSongDetails;
     }
+
 }
