@@ -36,17 +36,15 @@ public class AlbumDetailsFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_allsongs, container, false);
+        View view = inflater.inflate(R.layout.fragment_album_details, container, false);
 
         // Set the adapter
-        if (view instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+            RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.album_details_list);
 
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
             recyclerView.setAdapter(new AlbumSongsAdapter(getContext(),allsongs, mListener));
-        }
         return view;
     }
 
