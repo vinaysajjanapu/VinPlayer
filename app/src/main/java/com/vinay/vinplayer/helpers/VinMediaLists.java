@@ -15,6 +15,7 @@ import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.vinay.vinplayer.BuildConfig;
 import com.vinay.vinplayer.R;
 
 import java.io.FileDescriptor;
@@ -31,6 +32,7 @@ public class VinMediaLists {
     public static ArrayList<HashMap<String,String>> allSongs;
     public static ArrayList<HashMap<String,String>> allAlbums;
     public static ArrayList<HashMap<String,String>> allArtists;
+    public static ArrayList<HashMap<String,String>> allgeners;
 
 
     public VinMediaLists(Context context){
@@ -182,28 +184,46 @@ public class VinMediaLists {
 
 
     public ArrayList<HashMap<String, String>> getGenresList(){
-        ArrayList<HashMap<String,String>> list = new ArrayList<>();
-        selection = MediaStore.Audio.Albums.NUMBER_OF_SONGS + "!= 0";
-      //  sortOrder = MediaStore.Audio.AlbumColumns.ALBUM + " ASC";
-        Cursor cur = contentResolver.query(uri, null, selection, null, null);
-        int count = 0;
-        if(cur != null)
-        {
-            count = cur.getCount();
-            if(count > 0)
-            {
-                while(cur.moveToNext())
-                {
-                    String genre = cur.getString(cur.getColumnIndex(MediaStore.Audio.GenresColumns.NAME));
-                   // String genre = cur.getString(cur.getColumnIndex(MediaStore.Audio.Genres.Members.));
-                    HashMap<String,String> h=new HashMap<>();
-                    h.put("genre",genre);
-                    list.add(h);
+        int index;
+        long genreId;
+        Uri uri;
+        Cursor genrecursor;
+        Cursor tempcursor;
+        String[] proj1 = {MediaStore.Audio.Genres.NAME, MediaStore.Audio.Genres._ID};
+        String[] proj2={MediaStore.Audio.Media.DISPLAY_NAME};
+        String result;
+        HashMap<String,String> genre;
+        genrecursor = context.getContentResolver().query(MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI, proj1, null, null, null);
+        ArrayList<HashMap<String,String>> genres = new ArrayList<HashMap<String, String>>();
+
+
+        if (genrecursor!=null && genrecursor.moveToFirst()) {
+            do {
+                genre = new HashMap<>();
+                index = genrecursor.getColumnIndexOrThrow(MediaStore.Audio.Genres.NAME);
+                if (BuildConfig.DEBUG)  Log.i("Tag-Genre name", genrecursor.getString(index));
+                genre.put("genre",genrecursor.getString(index));
+                if(genre.get("genre").equalsIgnoreCase("")) {
+                    genre.put("genre","no-genre");
                 }
-            }
+
+                index = genrecursor.getColumnIndexOrThrow(MediaStore.Audio.Genres._ID);
+                genreId = Long.parseLong(genrecursor.getString(index));
+                uri = MediaStore.Audio.Genres.Members.getContentUri("external", genreId);
+
+                tempcursor =  context.getContentResolver().query(uri, proj2, null, null, null);
+                if (BuildConfig.DEBUG)  Log.i("Tag-Number of s", tempcursor.getCount()+"");
+                genre.put("nos", String.valueOf(tempcursor.getCount()));
+
+
+                if (!genres.contains(genre)) {
+                    genres.add(genre);
+
+                }
+            } while(genrecursor.moveToNext());
         }
-        cur.close();
-        return list;
+        allgeners=genres;
+     return genres;
     }
 
     public Bitmap getAlbumart(Long album_id)

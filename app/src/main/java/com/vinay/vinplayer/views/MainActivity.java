@@ -45,6 +45,7 @@ import com.vinay.vinplayer.fragments.AlbumsFragment;
 import com.vinay.vinplayer.fragments.AllSongsFragment;
 import com.vinay.vinplayer.fragments.ArtistDetailsFragment;
 import com.vinay.vinplayer.fragments.ArtistsFragment;
+import com.vinay.vinplayer.fragments.GenreFragment;
 import com.vinay.vinplayer.fragments.NowPlayingFragment;
 import com.vinay.vinplayer.fragments.QueueFragment;
 import com.vinay.vinplayer.helpers.BlurBuilder;
@@ -65,7 +66,8 @@ public class MainActivity extends AppCompatActivity implements
         AlbumsFragment.OnAlbumFragmentInteractionListner,ArtistsFragment.OnArtistFragmentInteractionListner,
         View.OnClickListener,
         QueueFragment.OnQueueFragmentInteractionListener,
-        AlbumDetailsFragment.OnAlbumListFragmentInteractionListener,ArtistDetailsFragment.OnArtistListFragmentInteractionListener
+        AlbumDetailsFragment.OnAlbumListFragmentInteractionListener,ArtistDetailsFragment.OnArtistListFragmentInteractionListener,
+        GenreFragment.OnGenreFragmentInteractionListner
 {
 
     ArrayList<HashMap<String, String>> songs;
@@ -118,18 +120,21 @@ public class MainActivity extends AppCompatActivity implements
         getSupportActionBar().hide();
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+
+
        /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 setStatusBarTint();
         }
 */
         isStoragePermissionGranted();
 
+
         songs = new ArrayList<>();
         vm = new VinMedia(this);
         vm.VinMediaInitialize();
 
         vinMediaLists = new VinMediaLists(this);
-
+            vinMediaLists.getGenresList();
         setupLibraryViewPager();
         setupSlidingPanelLayout();
         setupNowPlayingPager();
@@ -225,9 +230,11 @@ public class MainActivity extends AppCompatActivity implements
         mFragmentList.add(AllSongsFragment.newInstance(1, vinMediaLists.getAllSongsList()));
         mFragmentList.add(AlbumsFragment.newInstance(vinMediaLists.getAlbumsList()));
         mFragmentList.add(ArtistsFragment.newInstance(vinMediaLists.getArtistsList()));
+        mFragmentList.add(GenreFragment.newInstance(vinMediaLists.getGenresList()));
         titles.add("all songs");
         titles.add("albums");
         titles.add("artists");
+        titles.add("genres");
 
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
@@ -463,6 +470,11 @@ public class MainActivity extends AppCompatActivity implements
             vm.resetPlayer();
         }
         playPauseAction(i);
+    }
+
+    @Override
+    public void OnGenreFragmentInteraction(int pos) {
+
     }
 
 
