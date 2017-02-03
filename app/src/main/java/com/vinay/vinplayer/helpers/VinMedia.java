@@ -133,7 +133,7 @@ public class VinMedia {
 
     public void stopMusic(){
         Log.d("mediaplayer status","stopping music");
-        mediaPlayer.stop();
+                mediaPlayer.stop();
     }
 
     public void nextSong(){
@@ -160,9 +160,13 @@ public class VinMedia {
 
     public void resetPlayer(){
         Log.d("mediaplayer status","reset player");
-        mediaPlayer.stop();
-        mediaPlayer.reset();
-        mediaPlayer.release();
+        try {
+            mediaPlayer.stop();
+            mediaPlayer.reset();
+        }catch (Exception e){
+
+        }
+            mediaPlayer.release();
     }
 
     public void setAudioProgress(int seekBarProgress){
@@ -189,10 +193,24 @@ public class VinMedia {
     }
 
     public boolean isPlaying(){
-        return mediaPlayer.isPlaying();
+        boolean isPlaying = false;
+        try {
+            isPlaying = mediaPlayer.isPlaying();
+        }catch (Exception e){
+
+        }
+        return isPlaying;
     }
 
-    public boolean isClean(){ return mediaPlayer.getCurrentPosition()==0;}
+    public boolean isClean() {
+        boolean isClean = false;
+        try {
+            isClean = (mediaPlayer.getCurrentPosition() == 0);
+        } catch (Exception e) {
+
+        }
+        return isClean;
+    }
 
     public HashMap<String, String> getCurrentSongDetails(){
         currentSongDetails = currentList.get(position);

@@ -1,11 +1,13 @@
 package com.vinay.vinplayer.views;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -18,6 +20,7 @@ import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.os.Parcelable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -119,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements
                 setStatusBarTint();
         }
 */
-
+        isStoragePermissionGranted();
 
         songs = new ArrayList<>();
         vm = new VinMedia(this);
@@ -319,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements
                     default_bg = BitmapFactory.decodeFileDescriptor(fd);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+
             }
             //default_bg = ((BitmapDrawable)songAlbumbg.getDrawable()).getBitmap();
             if (default_bg == null) {
@@ -492,7 +495,6 @@ public class MainActivity extends AppCompatActivity implements
 
         vm.setPosition(position);
         if (vm.isPlaying() || !vm.isClean()) {
-            vm.stopMusic();
             vm.resetPlayer();
             vm.startMusic(position);
         } else {
@@ -500,6 +502,32 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    public  boolean isStoragePermissionGranted() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                Log.v("Storage Permisson","granted");
+                return true;
+            } else {
+
+                Log.v("Storage Permisson","revoked");
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+                return false;
+            }
+        }
+        else { //permission is automatically granted on sdk<23 upon installation
+            Log.v("Storage Permisson","granted");
+            return true;
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
+            Log.v("Storage Permisson","Permission: "+permissions[0]+ "was "+grantResults[0]);
+            //resume tasks needing this permission
+        }
+    }
 
     /*private void setStatusBarTint() {
         try {
