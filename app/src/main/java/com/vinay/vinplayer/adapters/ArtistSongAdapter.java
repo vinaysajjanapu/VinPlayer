@@ -17,7 +17,6 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
-import com.vinay.vinplayer.fragments.AlbumDetailsFragment;
 import com.vinay.vinplayer.fragments.ArtistDetailsFragment;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;

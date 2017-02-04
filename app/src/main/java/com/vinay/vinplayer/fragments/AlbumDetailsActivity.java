@@ -18,7 +18,7 @@ import com.vinay.vinplayer.adapters.AlbumSongsAdapter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class AlbumDetailsFragment extends SlidingActivity {
+public class AlbumDetailsActivity extends SlidingActivity {
 
     static ArrayList<HashMap<String,String>> allsongs;
         @Override

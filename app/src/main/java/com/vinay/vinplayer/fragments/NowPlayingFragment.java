@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v4.app.FragmentManager;
 import android.content.Context;
@@ -35,6 +36,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class NowPlayingFragment extends Fragment implements View.OnClickListener {
 
 
@@ -50,6 +53,9 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
     ImageButton playerButtonNext;
     ImageButton playerButtonPlayPause;
 
+    ImageButton playerButtonShuffle;
+    ImageButton playerButtonRepeat;
+
     Thread thread;
     Handler handler;
 
@@ -60,6 +66,8 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
     private boolean seekbarDragging = false;
     private BroadcastReceiver broadcastReceiver;
 
+    private SharedPreferences media_settings;
+    private SharedPreferences.Editor editor;
 
     private OnNowPlayingFragmentInteractionListener mListener;
 
@@ -92,6 +100,9 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
     }
     private void setupViews(View view){
 
+        media_settings = getActivity().getSharedPreferences(getString(R.string.media_settings),MODE_PRIVATE);
+        editor = media_settings.edit();
+
         nowPlayingSongDetails = (TextView)view.findViewById(R.id.nowplaying_songdetails);
         nowPlayingSongTitle = (TextView)view.findViewById(R.id.nowplaying_songtitle);
 
@@ -104,16 +115,29 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
         playerButtonPrevious = (ImageButton)view.findViewById(R.id.nowplaying_button_previous);
         playerButtonNext = (ImageButton)view.findViewById(R.id.nowplaying_button_next);
 
+        playerButtonShuffle = (ImageButton)view.findViewById(R.id.nowplaying_button_shuffle);
+        playerButtonRepeat = (ImageButton)view.findViewById(R.id.nowplaying_button_repeat);
+
         playerButtonPlayPause.setOnClickListener(this);
         playerButtonPrevious.setOnClickListener(this);
         playerButtonNext.setOnClickListener(this);
+        playerButtonShuffle.setOnClickListener(this);
+        playerButtonRepeat.setOnClickListener(this);
 
         playerCurrentDuration.setText("");
 
         nowPlayingSongTitle.setTextColor(Color.WHITE);
         playerCurrentDuration.setTextColor(Color.WHITE);
         playerTotalDuration.setTextColor(Color.WHITE);
+        if (media_settings.getBoolean(getActivity().getString(R.string.shuffle),false))
+            playerButtonShuffle.setColorFilter(Color.WHITE);
+        else playerButtonShuffle.setColorFilter(Color.GREEN);
 
+        if (media_settings.getInt(getActivity().getString(R.string.repeat_mode),0)==0)
+            playerButtonShuffle.setColorFilter(Color.WHITE);
+        else playerButtonShuffle.setColorFilter(Color.GREEN);
+
+        playerButtonRepeat.setColorFilter(Color.WHITE);
 
         playerButtonPlayPause.setColorFilter(Color.WHITE);
         playerButtonNext.setColorFilter(Color.WHITE);
@@ -310,7 +334,46 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
                 case R.id.nowplaying_button_previous:
                     vinMedia.previousSong();
                     break;
-            }
+
+                case R.id.nowplaying_button_shuffle:
+                    Log.d("shuffle button","clicked");
+                    if (media_settings.getBoolean(getActivity().getString(R.string.shuffle),true)){
+                        playerButtonShuffle.setColorFilter(Color.WHITE);
+                        editor.putBoolean(getActivity().getString(R.string.shuffle),false);
+                        editor.apply();
+                    }else {
+                        playerButtonShuffle.setColorFilter(Color.GREEN);
+                        editor.putBoolean(getActivity().getString(R.string.shuffle),true);
+                        editor.apply();
+                    }
+                break;
+
+                case R.id.nowplaying_button_repeat:
+                    Log.d("repeat button","clicked");
+                    switch (media_settings.getInt(getActivity().getString(R.string.repeat_mode),0)){
+                        case 0:
+                            playerButtonRepeat.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.icon_repeat_music));
+                            playerButtonRepeat.setColorFilter(Color.GREEN);
+                            editor.putInt(getActivity().getString(R.string.repeat_mode),1);
+                            editor.apply();
+                            break;
+                        case 1:
+                            playerButtonRepeat.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.icon_repeat_track));
+                            playerButtonRepeat.setColorFilter(Color.GREEN);
+                            editor.putInt(getActivity().getString(R.string.repeat_mode),2);
+                            editor.apply();
+                            break;
+                        case 2:
+                            playerButtonRepeat.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.icon_repeat_music));
+                            playerButtonRepeat.setColorFilter(Color.WHITE);
+                            editor.putInt(getActivity().getString(R.string.repeat_mode),0);
+                            editor.apply();
+                            break;
+                    }
+
+                break;
+
+        }
           //  updatePlayPauseButton();
     }
 
@@ -318,12 +381,14 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
         if (vinMedia.isPlaying()){
             vinMedia.pauseMusic();
         }else {
-            if (vinMedia.getCurrentList().size()!=0){
-                if (!vinMedia.isClean()){
-                    vinMedia.resumeMusic();
-                }
-                else {
-                    vinMedia.startMusic(vinMedia.getPosition());
+            if (vinMedia.getCurrentList()!=null) {
+                if (vinMedia.getCurrentList().size() != 0) {
+                    if (!vinMedia.isClean()) {
+                        vinMedia.resumeMusic();
+                    } else {
+                        vinMedia.startMusic(vinMedia.getPosition());
+
+                    }
                 }
             }
         }

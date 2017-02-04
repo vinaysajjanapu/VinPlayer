@@ -18,8 +18,6 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
-import com.vinay.vinplayer.fragments.AlbumDetailsFragment;
-import com.vinay.vinplayer.fragments.AllSongsFragment;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
 
