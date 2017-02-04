@@ -8,17 +8,14 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.vinay.vinplayer.R;
-import com.vinay.vinplayer.adapters.AllSongsAdapter;
 import com.vinay.vinplayer.adapters.QueueAdapter;
 import com.vinay.vinplayer.helpers.VinMedia;
-
 
 import java.util.ArrayList;
 import java.util.HashMap;

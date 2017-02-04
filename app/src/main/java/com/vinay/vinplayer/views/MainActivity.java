@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements
         AlbumsFragment.OnAlbumFragmentInteractionListner,ArtistsFragment.OnArtistFragmentInteractionListner,
         View.OnClickListener,
         QueueFragment.OnQueueFragmentInteractionListener,
-        AlbumDetailsFragment.OnAlbumListFragmentInteractionListener,ArtistDetailsFragment.OnArtistListFragmentInteractionListener,
+        ArtistDetailsFragment.OnArtistListFragmentInteractionListener,
         GenreFragment.OnGenreFragmentInteractionListner
 {
 
@@ -140,6 +140,8 @@ public class MainActivity extends AppCompatActivity implements
         setupNowPlayingPager();
         setupBroadCastReceiver();
 
+
+
     }
 
     private void setupBroadCastReceiver() {
@@ -167,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements
                     Log.d("slider","closepanel");
                     slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                 }
-            }
+                }
         };
         registerReceiver(broadcastReceiver, intentFilter);
     }
@@ -435,12 +437,8 @@ public class MainActivity extends AppCompatActivity implements
 
         vm.updateQueue(pos,1);
 
-        FragmentManager fm = getSupportFragmentManager();
-
-        AlbumDetailsFragment dFragment = AlbumDetailsFragment.newInstance(vinMediaLists.getAlbumSongsList(
-                VinMediaLists.allAlbums.get(pos).get("album")));
-        // Show DialogFragment
-        dFragment.show(fm, "Dialog Fragment");
+      startActivity(new Intent(getApplicationContext(),AlbumDetailsFragment.class).putExtra("list",
+              vinMediaLists.getAlbumSongsList((VinMediaLists.allAlbums.get(pos).get("album")))));
     }
 
     @Override
@@ -456,13 +454,7 @@ public class MainActivity extends AppCompatActivity implements
         dFragment.show(fm, "Dialog Fragment");
     }
 
-    @Override
-    public void onAlbumListFragmentInteraction(int i) {
-        if (vm.isPlaying()) {
-            vm.resetPlayer();
-        }
-        playPauseAction(i);
-    }
+
 
     @Override
     public void onArtistListFragmentInteraction(int i) {

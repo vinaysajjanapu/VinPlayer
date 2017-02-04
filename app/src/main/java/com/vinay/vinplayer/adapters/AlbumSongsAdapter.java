@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
@@ -34,16 +35,15 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.ViewHolder> {
 
     private final List<HashMap<String,String>> mValues;
-    private final AlbumDetailsFragment.OnAlbumListFragmentInteractionListener mListener;
+
     Context context;
     private VinMediaLists vinMediaLists;
     private BroadcastReceiver broadcastReceiver;
     private IntentFilter intentFilter;
     static int pos1=0,pos2=0;
 
-    public AlbumSongsAdapter(Context context, List<HashMap<String,String>> items, AlbumDetailsFragment.OnAlbumListFragmentInteractionListener listener) {
+    public AlbumSongsAdapter(Context context, List<HashMap<String,String>> items) {
         mValues = items;
-        mListener = listener;
         this.context=context;
     }
 
@@ -79,9 +79,7 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (null != mListener) {
-                    mListener.onAlbumListFragmentInteraction(position);
-                }
+                Toast.makeText(context,"ddddddddddd",Toast.LENGTH_SHORT).show();
             }
         });
     }

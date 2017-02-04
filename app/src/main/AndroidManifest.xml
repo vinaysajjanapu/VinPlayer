@@ -27,6 +27,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".test"></activity>
+        <activity android:name=".fragments.AlbumDetailsFragment"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Sliding.Light"/>
     </application>
 
 </manifest>

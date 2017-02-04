@@ -34,4 +34,5 @@ dependencies {
     compile 'com.sothree.slidinguppanel:library:3.3.1'
     testCompile 'junit:junit:4.12'
     compile 'com.readystatesoftware.systembartint:systembartint:1.0.3'
+    compile 'com.klinkerapps:sliding-activity:1.4.4'
 }

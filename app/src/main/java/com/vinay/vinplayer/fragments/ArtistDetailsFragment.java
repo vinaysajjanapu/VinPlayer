@@ -71,6 +71,8 @@ public class ArtistDetailsFragment extends DialogFragment {
         mListener = null;
     }
 
+
+
     public interface OnArtistListFragmentInteractionListener {
 
         void onArtistListFragmentInteraction(int i);
