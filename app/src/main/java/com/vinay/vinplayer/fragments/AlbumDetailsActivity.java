@@ -90,6 +90,7 @@ public class AlbumDetailsActivity extends SlidingActivity {
                            // e.printStackTrace();
                         }
                    }
+
                     }, 500);
 
             enableFullscreen();
