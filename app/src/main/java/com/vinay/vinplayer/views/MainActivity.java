@@ -6,11 +6,13 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -110,8 +112,11 @@ public class MainActivity extends AppCompatActivity implements
     RelativeLayout.LayoutParams lp_now,lp_que;
     Handler handler;
 
+    SharedPreferences media_settings;
+    SharedPreferences.Editor editor;
 
 //    String contentURI=null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,9 +130,23 @@ public class MainActivity extends AppCompatActivity implements
        /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 setStatusBarTint();
         }
-*/
+
+
+*/      getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
+
         isStoragePermissionGranted();
 
+        media_settings = getSharedPreferences(getString(R.string.media_settings),MODE_PRIVATE);
+        editor = media_settings.edit();
+        editor.putInt(getString(R.string.repeat_mode),VinMedia.REPEAT_QUEUE);
+        editor.putBoolean(getString(R.string.shuffle),VinMedia.SHUFFLE_OFF);
+        editor.apply();
 
         songs = new ArrayList<>();
         vm = new VinMedia(this);
@@ -140,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements
         setupNowPlayingPager();
         setupBroadCastReceiver();
 
-
+        createBlurredBackground(null);
 
     }
 
@@ -169,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements
                     Log.d("slider","closepanel");
                     slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                 }
-                }
+            }
         };
         registerReceiver(broadcastReceiver, intentFilter);
     }
@@ -259,6 +278,8 @@ public class MainActivity extends AppCompatActivity implements
         slider = (RelativeLayout) findViewById(R.id.slider);
         sliderDragger = (RelativeLayout)findViewById(R.id.slider_dragger);
 
+        sliderPlayer_progressBar.getIndeterminateDrawable().setColorFilter(Color.GREEN, PorterDuff.Mode.MULTIPLY);
+
         lp_now = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
         TypedValue tv = new TypedValue();
@@ -299,7 +320,8 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         sliderPlayer_playpause.setOnClickListener(this);
-        sliderPlayer_playpause.setColorFilter(Color.BLACK);
+        sliderPlayer_playpause.setColorFilter(Color.WHITE);
+
     }
 
     private void setupNowPlayingPager() {
@@ -420,6 +442,8 @@ public class MainActivity extends AppCompatActivity implements
         if (vm.isPlaying()) {
             vm.resetPlayer();
         }
+        vm.updateQueue(0);
+        sendBroadcast(new Intent().setAction(getString(R.string.queueUpdated)));
         playPauseAction(p);
     }
 
@@ -435,7 +459,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void OnAlbumFragmentInteraction(int pos) {
 
-        vm.updateQueue(pos,1);
+        vm.updateTempQueue(pos,1);
 
       startActivity(new Intent(getApplicationContext(),AlbumDetailsFragment.class).putExtra("list",
               vinMediaLists.getAlbumSongsList((VinMediaLists.allAlbums.get(pos).get("album")))));
@@ -444,7 +468,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void OnArtistFragmentInteraction(int pos) {
 
-        vm.updateQueue(pos,2);
+        vm.updateTempQueue(pos,2);
 
         FragmentManager fm = getSupportFragmentManager();
 
@@ -454,13 +478,13 @@ public class MainActivity extends AppCompatActivity implements
         dFragment.show(fm, "Dialog Fragment");
     }
 
-
-
     @Override
     public void onArtistListFragmentInteraction(int i) {
         if (vm.isPlaying()) {
             vm.resetPlayer();
         }
+        vm.updateQueue(1);
+        sendBroadcast(new Intent().setAction(getString(R.string.queueUpdated)));
         playPauseAction(i);
     }
 

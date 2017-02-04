@@ -27,7 +27,7 @@ public class GenreAdapter extends RecyclerView.Adapter<GenreAdapter.ViewHolder> 
     private Context context;
 
     public GenreAdapter(Context context, ArrayList<HashMap<String,String>> items,
-                          GenreFragment.OnGenreFragmentInteractionListner listener) {
+                        GenreFragment.OnGenreFragmentInteractionListner listener) {
         //Set<String> set = new HashSet<String>(list);
         mValues = items;
         this.context = context;

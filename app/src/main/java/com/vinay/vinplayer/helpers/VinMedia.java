@@ -7,6 +7,7 @@ package com.vinay.vinplayer.helpers;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -21,8 +22,14 @@ import java.util.HashMap;
 
 public class VinMedia {
 
+    public static Boolean SHUFFLE_ON = true;
+    public static Boolean SHUFFLE_OFF = false;
 
-    private static ArrayList<HashMap<String,String>> allSongs,currentQueue;
+    public static int REPEAT_NONE = 0;
+    public static int REPEAT_QUEUE = 1;
+    public static int REPEAT_TRACK = 2;
+
+    private static ArrayList<HashMap<String,String>> allSongs,currentQueue,tempQueue;
     private static volatile VinMedia Instance = null;
     private Context context;
     private Cursor cur;
@@ -34,6 +41,9 @@ public class VinMedia {
     private ContentResolver contentResolver;
     VinMediaLists vinMediaLists;
     Intent newSongLoadIntent,songPausedIntent,songResumedIntent,musicStoppedIntent;
+    SharedPreferences media_settings;
+    int repeatmode;
+    boolean is_shuffle;
 
 
     public VinMedia(Context context){
@@ -45,8 +55,10 @@ public class VinMedia {
         iniatializeBroadcasts();
         newMediaPlayer();
         vinMediaLists = new VinMediaLists(context);
+
+        media_settings = context.getSharedPreferences(context.getString(R.string.media_settings),Context.MODE_PRIVATE);
         allSongs = vinMediaLists.getAllSongsList();
-        if (currentQueue==null)currentQueue = allSongs;
+        //if (currentQueue==null)currentQueue = allSongs;
     }
 
     private void iniatializeBroadcasts() {
@@ -62,11 +74,17 @@ public class VinMedia {
         musicStoppedIntent.setAction(context.getString(R.string.musicStopped));
     }
 
-    public void updateQueue(int position,int i){
+    public void updateTempQueue(int position,int i){
         if(i==1)
-            currentQueue = vinMediaLists.getAlbumSongsList(vinMediaLists.getAlbumsList().get(position).get("album"));
+            tempQueue = vinMediaLists.getAlbumSongsList(vinMediaLists.getAlbumsList().get(position).get("album"));
         else if(i==2)
-            currentQueue = vinMediaLists.getArtistSongsList(vinMediaLists.getArtistsList().get(position).get("artist"));
+            tempQueue = vinMediaLists.getArtistSongsList(vinMediaLists.getArtistsList().get(position).get("artist"));
+    }
+
+    public void updateQueue(int position){
+        if (position!=0){
+            currentQueue = tempQueue;
+        }else currentQueue = allSongs;
     }
 
     public ArrayList<HashMap<String,String>> getCurrentList(){
@@ -124,6 +142,7 @@ public class VinMedia {
         }
         newMediaPlayer();
         setMediaSource();
+       // mediaPlayer.start();
     }
 
     public void pauseMusic(){
@@ -140,15 +159,33 @@ public class VinMedia {
     }
 
     public void nextSong(){
-        if ((position+1)<currentQueue.size()){
-            position++;
+        repeatmode = media_settings.getInt(context.getString(R.string.repeat_mode),2);
+        is_shuffle = media_settings.getBoolean(context.getString(R.string.shuffle),false);
+        if (!is_shuffle){
+            if (position==currentQueue.size()-1){
+                if (repeatmode==1)position=0;
+            }else if ((position+1)<currentQueue.size()){
+                if (repeatmode!=2)position++;
+            }
+            startMusic(position);
+        }else {
+            position = (int)(Math.random() * (getCurrentList().size()));
             startMusic(position);
         }
     }
 
     public void previousSong(){
-        if ((position-1)>=0){
-            position--;
+        repeatmode = media_settings.getInt(context.getString(R.string.repeat_mode),2);
+        is_shuffle = media_settings.getBoolean(context.getString(R.string.shuffle),false);
+        if (!is_shuffle) {
+            if (position == 0) {
+                if (repeatmode == 1) position = currentQueue.size() - 1;
+            } else if ((position - 1) >= 0) {
+                if (repeatmode != 2) position--;
+            }
+            startMusic(position);
+        }else {
+            position = (int)(Math.random() * (getCurrentList().size()));
             startMusic(position);
         }
     }

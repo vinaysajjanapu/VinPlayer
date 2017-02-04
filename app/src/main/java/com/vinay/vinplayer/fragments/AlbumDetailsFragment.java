@@ -28,8 +28,8 @@ public class AlbumDetailsFragment extends SlidingActivity {
             setTitle("jj");
             setContent(R.layout.fragment_album_details);
 
-            setPrimaryColors( getResources().getColor(R.color.colorPrimary),
-                    getResources().getColor(R.color.colorPrimaryDark));
+            setPrimaryColors( getResources().getColor(R.color.transparentLightBlack),
+                    getResources().getColor(R.color.transparentBlack));
 
             expandFromPoints(0,0,0,0);
 
@@ -79,5 +79,3 @@ public class AlbumDetailsFragment extends SlidingActivity {
 
     }
 }
-
-

@@ -7,5 +7,14 @@
     <string name="songResumed">songResumed</string>
     <string name="musicStopped">musicStopped</string>
     <string name="closePanel">closePanel</string>
+    <string name="queueUpdated">queueUpdated</string>
+
+
+
+    <!--media settings-->
+    <string name="media_settings">media_settings</string>
+    <string name="shuffle">shuffle</string>
+    <string name="repeat_mode">repeatmode</string>
+
 
 </resources>

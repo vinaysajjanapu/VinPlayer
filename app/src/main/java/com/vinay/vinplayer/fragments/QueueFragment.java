@@ -1,7 +1,9 @@
 package com.vinay.vinplayer.fragments;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -28,9 +30,12 @@ public class QueueFragment extends Fragment {
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
+    private BroadcastReceiver broadcastReceiver;
+    private IntentFilter intentFilter;
     private int mColumnCount = 1;
-
-    static ArrayList<HashMap<String,String>> songQueue;
+    RecyclerView recyclerView;
+    QueueAdapter queueAdapter;
+    ArrayList<HashMap<String,String>> songQueue;
 
     public QueueFragment() {
     }
@@ -42,7 +47,6 @@ public class QueueFragment extends Fragment {
         QueueFragment fragment = new QueueFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
-        songQueue=vinMedia1.getCurrentList();
         fragment.setArguments(args);
         return fragment;
     }
@@ -52,7 +56,6 @@ public class QueueFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-
         }
     }
 
@@ -60,18 +63,21 @@ public class QueueFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_queue, container, false);
+        setupBroadCastReceiver();
 
-        // Set the adapter
-   //     if (view instanceof RecyclerView) {
+        if (vinMedia.getCurrentList()!=null)songQueue = vinMedia.getCurrentList();
+        else songQueue = null;
+
+        queueAdapter = new QueueAdapter(getActivity(),songQueue,mListener);
             Context context = view.getContext();
-            final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.queue_list);
+           recyclerView = (RecyclerView) view.findViewById(R.id.queue_list);
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
 
-            recyclerView.setAdapter(new QueueAdapter(getContext(),songQueue, mListener));
+            recyclerView.setAdapter(queueAdapter);
 
         final float[] start_y = new float[1];
         recyclerView.setOnTouchListener(new View.OnTouchListener() {
@@ -80,12 +86,19 @@ public class QueueFragment extends Fragment {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     start_y[0] = event.getY();
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    if (recyclerView.getChildAt(0).getTop()==0){
-                        if((int)(start_y[0]-event.getY())<50){
-                            Log.d("scroll","dragged");
-                            getActivity().sendBroadcast(new Intent().setAction(getString(R.string.closePanel)));
-                        }
-                    }
+                   if (songQueue!=null) {
+                       if (recyclerView.getChildAt(0).getTop() == 0) {
+                           if ((int) (start_y[0] - event.getY()) < 50) {
+                               Log.d("scroll", "dragged");
+                               getActivity().sendBroadcast(new Intent().setAction(getString(R.string.closePanel)));
+                           }
+                       }
+                   }else {
+                       if ((int) (start_y[0] - event.getY()) < 50) {
+                           Log.d("scroll", "dragged");
+                           getActivity().sendBroadcast(new Intent().setAction(getString(R.string.closePanel)));
+                       }
+                   }
                 }
                 return false;
             }
@@ -94,11 +107,37 @@ public class QueueFragment extends Fragment {
 
         return view;
     }
+    private void setupBroadCastReceiver(){
+
+        Log.d("queuefrag","setup bcast listener");
+
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(getString(R.string.queueUpdated));
+
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d("queuefrag","received");
+                String action = intent.getAction();
+                if (action.equals(getString(R.string.queueUpdated))){
+                    queueUpdated();
+                }
+            }
+        };
+        getActivity().registerReceiver(broadcastReceiver,intentFilter);
+    }
+
+    private void queueUpdated() {
+        Log.d("queuefrag","queueupdated");
+        songQueue=vinMedia.getCurrentList();
+        queueAdapter = new QueueAdapter(getActivity(),songQueue,mListener);
+        recyclerView.setAdapter(queueAdapter);
+    }
 
 
     @Override
     public void onAttach(Context context) {
-        if (context instanceof AllSongsFragment.OnListFragmentInteractionListener) {
+        if (context instanceof OnQueueFragmentInteractionListener) {
             mListener = (OnQueueFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
@@ -111,6 +150,7 @@ public class QueueFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener=null;
+        getActivity().unregisterReceiver(broadcastReceiver);
     }
 
     /**

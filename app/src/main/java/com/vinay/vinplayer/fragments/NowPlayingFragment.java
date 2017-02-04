@@ -121,6 +121,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
 
         albumArtPager = (ViewPager)view.findViewById(R.id.nowplaying_albumart_pager);
         albumArtPagerAdapter = new AlbumArtPagerAdapter(getActivity().getSupportFragmentManager());
+
         albumArtPager.setAdapter(albumArtPagerAdapter);
 
 
@@ -255,7 +256,11 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
         public AlbumArtPagerAdapter(FragmentManager fm) {super(fm);}
         @Override
         public int getCount() {
-            return ((vinMedia.getCurrentList().size()==0)?1:vinMedia.getCurrentList().size());
+            if (vinMedia.getCurrentList() == null) {
+                return 1;
+            } else {
+                return ((vinMedia.getCurrentList().size() == 0) ? 1 : vinMedia.getCurrentList().size());
+            }
         }
 
         @Override
@@ -270,7 +275,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
 
         @Override
         public Fragment getItem(int position) {
-            albumArtFragment = AlbumArtFragment.newInstance(position, getActivity());
+            albumArtFragment = AlbumArtFragment.newInstance(position, getActivity(),vinMedia);
             return albumArtFragment;
         }
 
@@ -284,6 +289,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
     @Override
     public void onDetach() {
         super.onDetach();
+        getActivity().unregisterReceiver(broadcastReceiver);
     }
 
     @Override

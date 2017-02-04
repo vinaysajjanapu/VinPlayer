@@ -71,6 +71,30 @@
             android:layout_margin="20dp"
             />
 
+        <ImageButton
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@android:color/transparent"
+            android:id="@+id/nowplaying_button_shuffle"
+            android:src="@drawable/icon_shuffle_music"
+            android:scaleType="fitXY"
+            android:layout_toRightOf="@+id/nowplaying_button_next"
+            android:layout_centerVertical="true"
+            android:layout_margin="20dp"
+            />
+
+
+        <ImageButton
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@android:color/transparent"
+            android:id="@+id/nowplaying_button_repeat"
+            android:src="@drawable/icon_repeat_music"
+            android:scaleType="fitXY"
+            android:layout_toLeftOf="@+id/nowplaying_button_previous"
+            android:layout_centerVertical="true"
+            android:layout_margin="20dp"
+            />
 
 
     </RelativeLayout>

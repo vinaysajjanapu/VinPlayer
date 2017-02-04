@@ -148,6 +148,9 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
             circleImageView = (CircleImageView)view.findViewById(R.id.SongThumb);
             img_playindic = (ImageView)view.findViewById(R.id.img_playindic);
 
+            songname.setTextColor(Color.WHITE);
+            ArtisName_duration.setTextColor(Color.WHITE);
+
             img_playindic.setColorFilter(Color.BLACK);
         }
 

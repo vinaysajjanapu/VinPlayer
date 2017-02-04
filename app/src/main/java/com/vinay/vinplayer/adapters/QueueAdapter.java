@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.fragments.AllSongsFragment;
 import com.vinay.vinplayer.fragments.QueueFragment;
+import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
 
 import java.util.HashMap;
@@ -36,6 +38,7 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.ViewHolder> 
     private VinMediaLists vinMediaLists;
     private BroadcastReceiver broadcastReceiver;
     private IntentFilter intentFilter;
+    private VinMedia vinMedia;
 
     public QueueAdapter(Context context, List<HashMap<String,String>> items, QueueFragment.OnQueueFragmentInteractionListener listener) {
         mValues = items;
@@ -52,11 +55,14 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(final QueueAdapter.ViewHolder holder, final int position) {
 
-        holder.mItem = mValues.get(position);
-        holder.songname.setText(mValues.get(position).get("title"));
-        holder.ArtisName_duration.setText(
-                mValues.get(position).get("album") + "\t-\t"+ mValues.get(position).get("artist") + ""
-        );
+        //Log.d("queue",mValues.size()+"");
+        if (mValues!=null) {
+            holder.mItem = mValues.get(position);
+            holder.songname.setText(mValues.get(position).get("title"));
+            holder.ArtisName_duration.setText(
+                    mValues.get(position).get("album") + "\t-\t" + mValues.get(position).get("artist") + ""
+            );
+        }
 
 
        // setupBroadCastReceiver(holder,position);
@@ -88,7 +94,7 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return (mValues!=null)?mValues.size():0;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -106,7 +112,6 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.ViewHolder> 
             ArtisName_duration = (TextView) view.findViewById(R.id.ArtisName_duration);
             circleImageView = (CircleImageView)view.findViewById(R.id.SongThumb);
             img_playindic = (ImageView)view.findViewById(R.id.img_playindic);
-
 
             img_playindic.setColorFilter(Color.WHITE);
             songname.setTextColor(Color.WHITE);
