@@ -271,8 +271,10 @@ public class VinMedia extends Service {
     }
 
     public HashMap<String, String> getCurrentSongDetails(){
-        currentSongDetails = currentQueue.get(getPosition());
-        return currentSongDetails;
+        if (currentQueue!=null) {
+            currentSongDetails = currentQueue.get(getPosition());
+            return currentSongDetails;
+        }else return null;
     }
 
 }

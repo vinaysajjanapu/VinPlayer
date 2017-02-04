@@ -9,11 +9,11 @@ import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.klinker.android.sliding.SlidingActivity;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.adapters.AlbumSongsAdapter;
+import com.vinay.vinplayer.klinker.SlidingActivity;
 import com.vinay.vinplayer.services.VinMusicService;
 
 import java.util.ArrayList;
@@ -29,8 +29,8 @@ public class AlbumDetailsActivity extends SlidingActivity {
             setTitle("jj");
             setContent(R.layout.fragment_album_details);
 
-            setPrimaryColors( getResources().getColor(R.color.transparentLightBlack),
-                    getResources().getColor(R.color.transparentBlack));
+            setPrimaryColors( getResources().getColor(R.color.colorPrimary),
+                    getResources().getColor(R.color.colorPrimaryDark));
 
             expandFromPoints(0,0,0,0);
 
@@ -74,7 +74,7 @@ public class AlbumDetailsActivity extends SlidingActivity {
                                     .into(target);
 
                         } catch (Exception e) {
-                            e.printStackTrace();
+                           // e.printStackTrace();
                         }
                    }
                     }, 500);

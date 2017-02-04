@@ -545,11 +545,13 @@ public class MainActivity extends AppCompatActivity implements
         if (vm.isPlaying()) {
             vm.pauseMusic();
         } else {
-            if (vm.getCurrentList().size() != 0) {
-                if (!vm.isClean()) {
-                    vm.resumeMusic();
-                } else {
-                    vm.startMusic(vm.getPosition());
+            if (vm.getCurrentList()!=null) {
+                if (vm.getCurrentList().size() != 0) {
+                    if (!vm.isClean()) {
+                        vm.resumeMusic();
+                    } else {
+                        vm.startMusic(vm.getPosition());
+                    }
                 }
             }
         }

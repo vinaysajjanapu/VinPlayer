@@ -17,4 +17,7 @@
     <string name="repeat_mode">repeatmode</string>
 
 
+    <string name="sliding_transparent_view_description">Click to return to previous screen</string>
+
+
 </resources>

@@ -5,4 +5,8 @@
     <color name="colorAccent">#FF4081</color>
     <color name="transparentBlack">#c0000000</color>
     <color name="transparentLightBlack">#60000000</color>
+
+    <color name="light_background">#FAFAFA</color>
+    <color name="dark_background">#303030</color>
+    <color name="fab_ripple">#88ffffff</color>
 </resources>
