@@ -152,6 +152,8 @@ public class MainActivity extends AppCompatActivity implements
         vm = new VinMedia(this);
         vm.VinMediaInitialize();
 
+        startService(new Intent(this,VinMedia.class));
+
         vinMediaLists = new VinMediaLists(this);
             vinMediaLists.getGenresList();
         setupLibraryViewPager();

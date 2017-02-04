@@ -33,8 +33,9 @@
             android:theme="@style/Theme.Sliding.Light" />
 
         <service
-            android:name=".services.VinMusicService"
+            android:name=".helpers.VinMedia"
             android:exported="false"/>
+
     </application>
 
 </manifest>

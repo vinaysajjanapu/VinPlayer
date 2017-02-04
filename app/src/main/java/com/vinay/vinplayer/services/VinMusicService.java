@@ -1,48 +1,45 @@
 package com.vinay.vinplayer.services;
 
 import android.app.IntentService;
+import android.app.Service;
 import android.content.Intent;
 import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
+import android.util.Log;
+
+import com.vinay.vinplayer.helpers.VinMedia;
+
+import java.io.IOException;
 
 
-public class VinMusicService extends IntentService {
+public class VinMusicService extends Service {
 
-    private static final String ACTION_FOO = "com.vinay.vinplayer.services.action.FOO";
+    private VinMedia vinMedia;
 
-    MediaPlayer mediaPlayer;
-
-    public VinMusicService() {
-        super("VinMusicService");
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
-
-    public static void startmusicPlayer(Context context) {
-        Intent intent = new Intent(context, VinMusicService.class);
-        intent.setAction(ACTION_FOO);
-        context.startService(intent);
+    public VinMusicService(VinMedia vinMedia1) {
+        super();
+        this.vinMedia = vinMedia1;
     }
-
 
 
     @Override
-    protected void onHandleIntent(Intent intent) {
-        if (intent != null) {
-            final String action = intent.getAction();
-            if (ACTION_FOO.equals(action)) {
+    public int onStartCommand(Intent intent, int flags, int startId) {
 
-                handleActionFoo();
-            }
-        }
+        if (vinMedia.getCurrentList()!=null)
+            Log.d("service",vinMedia.getCurrentList().size()+"");
+
+
+
+        return super.onStartCommand(intent, flags, startId);
     }
-
-
-
-    private void handleActionFoo() {
-       mediaPlayer=new MediaPlayer();
-
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
 
 }

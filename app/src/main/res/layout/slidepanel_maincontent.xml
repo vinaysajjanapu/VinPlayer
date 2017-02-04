@@ -41,10 +41,10 @@
 
     <github.chenupt.springindicator.SpringIndicator
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        app:siTextSize="18sp"
-        app:siTextColor="@color/colorPrimaryDark"
-        app:siSelectedTextColor="@android:color/white"
-        app:siIndicatorColor="@color/colorPrimary"
+        app:siTextSize="15sp"
+        app:siTextColor="@android:color/white"
+        app:siSelectedTextColor="@android:color/black"
+        app:siIndicatorColor="@android:color/white"
         android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="56dp"/>

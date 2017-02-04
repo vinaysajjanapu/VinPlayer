@@ -4,6 +4,7 @@ package com.vinay.vinplayer.helpers;
  * Created by vinaysajjanapu on 31/1/17.
  */
 
+import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +13,8 @@ import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.vinay.vinplayer.R;
@@ -20,7 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class VinMedia {
+public class VinMedia extends Service {
 
     public static Boolean SHUFFLE_ON = true;
     public static Boolean SHUFFLE_OFF = false;
@@ -48,6 +51,27 @@ public class VinMedia {
 
     public VinMedia(Context context){
         this.context=context;
+    }
+
+
+
+    private VinMedia vinMedia;
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+
+    public VinMedia() {
+        super();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+        return super.onStartCommand(intent, flags, startId);
     }
 
 
