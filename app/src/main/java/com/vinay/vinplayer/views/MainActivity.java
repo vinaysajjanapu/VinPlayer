@@ -61,6 +61,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import github.chenupt.springindicator.SpringIndicator;
 
 public class MainActivity extends AppCompatActivity implements
         AllSongsFragment.OnListFragmentInteractionListener,
@@ -76,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements
     VinMedia vm;
 
     ViewPager librayViewPager;
-    TabLayout tabLayout;
+    SpringIndicator tabLayout;
     List<Fragment> mFragmentList = new ArrayList<>();
     List<String> titles = new ArrayList<>();
     VinMediaLists vinMediaLists;
@@ -159,9 +160,6 @@ public class MainActivity extends AppCompatActivity implements
         setupBroadCastReceiver();
 
         createBlurredBackground(null);
-
-        VinMusicService.startActionBaz(this,"","");
-        VinMusicService.startActionFoo(this,"","");
 
     }
 
@@ -254,16 +252,16 @@ public class MainActivity extends AppCompatActivity implements
         mFragmentList.add(AlbumsFragment.newInstance(vinMediaLists.getAlbumsList()));
         mFragmentList.add(ArtistsFragment.newInstance(vinMediaLists.getArtistsList()));
         mFragmentList.add(GenreFragment.newInstance(vinMediaLists.getGenresList()));
-        titles.add("all songs");
-        titles.add("albums");
-        titles.add("artists");
-        titles.add("genres");
+        titles.add("all");
+        titles.add("album");
+        titles.add("artist");
+        titles.add("genre");
 
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         librayViewPager.setAdapter(adapter);
-        tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(librayViewPager);
+        tabLayout = (SpringIndicator) findViewById(R.id.tabs);
+        tabLayout.setViewPager(librayViewPager);
 
     }
 

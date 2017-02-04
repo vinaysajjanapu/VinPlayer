@@ -27,9 +27,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".test" />
-        <activity
-            android:name=".fragments.AlbumDetailsFragment"
-        <activity android:name=".test"></activity>
         <activity android:name=".fragments.AlbumDetailsActivity"
             android:excludeFromRecents="true"
             android:taskAffinity=""
@@ -37,7 +34,7 @@
 
         <service
             android:name=".services.VinMusicService"
-            android:exported="false"></service>
+            android:exported="false"/>
     </application>
 
 </manifest>
