@@ -26,7 +26,6 @@ public class QueueFragment extends Fragment {
 
     private OnQueueFragmentInteractionListener mListener;
 
-    private static VinMedia vinMedia;
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
@@ -42,8 +41,7 @@ public class QueueFragment extends Fragment {
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static QueueFragment newInstance(int columnCount, VinMedia vinMedia1) {
-        vinMedia = vinMedia1;
+    public static QueueFragment newInstance(int columnCount) {
         QueueFragment fragment = new QueueFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
@@ -65,7 +63,7 @@ public class QueueFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_queue, container, false);
         setupBroadCastReceiver();
 
-        if (vinMedia.getCurrentList()!=null)songQueue = vinMedia.getCurrentList();
+        if (VinMedia.getInstance().getCurrentList()!=null)songQueue = VinMedia.getInstance().getCurrentList();
         else songQueue = null;
 
         queueAdapter = new QueueAdapter(getActivity(),songQueue,mListener);
@@ -129,7 +127,7 @@ public class QueueFragment extends Fragment {
 
     private void queueUpdated() {
         Log.d("queuefrag","queueupdated");
-        songQueue=vinMedia.getCurrentList();
+        songQueue= VinMedia.getInstance().getCurrentList();
         queueAdapter = new QueueAdapter(getActivity(),songQueue,mListener);
         recyclerView.setAdapter(queueAdapter);
     }

@@ -24,25 +24,35 @@ import java.util.HashMap;
 
 public class VinMediaLists {
 
-    Context context;
-    private ContentResolver contentResolver;
     private String selection;
     private String sortOrder;
-    private Uri uri;
+
     public static ArrayList<HashMap<String,String>> allSongs;
     public static ArrayList<HashMap<String,String>> allAlbums;
     public static ArrayList<HashMap<String,String>> allArtists;
     public static ArrayList<HashMap<String,String>> allgeners;
 
+    private static volatile VinMediaLists Instance = null;
 
-    public VinMediaLists(Context context){
-        this.context=context;
+    public static VinMediaLists getInstance() {
+        VinMediaLists localInstance = Instance;
+        if (localInstance == null) {
+            synchronized (VinMediaLists.class) {
+                localInstance = Instance;
+                if (localInstance == null) {
+                    Instance = localInstance = new VinMediaLists();
+                }
+            }
+        }
+        return localInstance;
     }
 
-    public ArrayList<HashMap<String,String>> getAllSongsList(){
+
+
+    public ArrayList<HashMap<String,String>> getAllSongsList(Context context){
         ArrayList<HashMap<String,String>> allSongsList = new ArrayList<>();
-        contentResolver = context.getContentResolver();
-        uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        ContentResolver contentResolver = context.getContentResolver();
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
         sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
         Cursor cur = contentResolver.query(uri, null, selection, null, sortOrder);
@@ -96,10 +106,9 @@ public class VinMediaLists {
     }
 
 
-
-    public ArrayList<HashMap<String, String>> getListByKey(String key, String value){
-
+    public ArrayList<HashMap<String, String>> getListByKey(String key, String value,Context context){
         ArrayList<HashMap<String,String>> list = new ArrayList<>();
+        allSongs = getAllSongsList(context);
         for(int itr =0;itr<allSongs.size();itr++){
             if (allSongs.get(itr).get(key).equals(value)){
                 Log.d("matched",allSongs.get(itr).get(key));
@@ -109,21 +118,21 @@ public class VinMediaLists {
         return list;
     }
 
-    public ArrayList<HashMap<String, String>> getAlbumSongsList(String album){
-        return getListByKey("album",album);
+    public ArrayList<HashMap<String, String>> getAlbumSongsList(String album,Context context){
+        return getListByKey("album",album,context);
     }
 
-    public ArrayList<HashMap<String, String>> getArtistSongsList(String artist_key){
-        return getListByKey("artist",artist_key);
+    public ArrayList<HashMap<String, String>> getArtistSongsList(String artist_key,Context context){
+        return getListByKey("artist",artist_key,context);
     }
 
 
-    public ArrayList<HashMap<String, String>> getAlbumsList(){
+    public ArrayList<HashMap<String, String>> getAlbumsList(Context context){
         ArrayList<HashMap<String,String>> list = new ArrayList<>();
-        uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         selection = MediaStore.Audio.Albums.NUMBER_OF_SONGS + "!= 0";
         sortOrder = MediaStore.Audio.Albums.DEFAULT_SORT_ORDER;
-        if(contentResolver==null){ contentResolver = context.getContentResolver();}
+        ContentResolver contentResolver = context.getContentResolver();
         Cursor cur = contentResolver.query(uri, null, null, null, sortOrder);
         int count = 0;
         if(cur != null)
@@ -154,12 +163,12 @@ public class VinMediaLists {
         return list;
     }
 
-    public ArrayList<HashMap<String, String>> getArtistsList(){
+    public ArrayList<HashMap<String, String>> getArtistsList(Context context){
         ArrayList<HashMap<String,String>> list = new ArrayList<>();
-        uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         selection = MediaStore.Audio.Albums.NUMBER_OF_SONGS + "!= 0";
         sortOrder = MediaStore.Audio.Albums.DEFAULT_SORT_ORDER;
-        if(contentResolver==null){ contentResolver = context.getContentResolver();}
+        ContentResolver contentResolver = context.getContentResolver();
         Cursor cur = contentResolver.query(uri, null, null, null, sortOrder);
         int count = 0;
         if(cur != null)
@@ -183,7 +192,7 @@ public class VinMediaLists {
     }
 
 
-    public ArrayList<HashMap<String, String>> getGenresList(){
+    public ArrayList<HashMap<String, String>> getGenresList(Context context){
         int index;
         long genreId;
         Uri uri;
@@ -226,7 +235,7 @@ public class VinMediaLists {
      return genres;
     }
 
-    public Bitmap getAlbumart(Long album_id)
+    public Bitmap getAlbumart(Long album_id,Context context)
     {
         Bitmap bm = null;
         try

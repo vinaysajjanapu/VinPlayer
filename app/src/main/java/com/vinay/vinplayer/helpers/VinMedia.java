@@ -10,6 +10,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -18,12 +21,13 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.vinay.vinplayer.R;
+import com.vinay.vinplayer.VinPlayer;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class VinMedia extends Service {
+public class VinMedia implements NotificationManager.NotificationCenterDelegate, SensorEventListener {
 
     public static Boolean SHUFFLE_ON = true;
     public static Boolean SHUFFLE_OFF = false;
@@ -34,7 +38,6 @@ public class VinMedia extends Service {
 
     private static ArrayList<HashMap<String,String>> allSongs,currentQueue,tempQueue;
     private static volatile VinMedia Instance = null;
-    private Context context;
     private Cursor cur;
     private MediaPlayer mediaPlayer;
     public static int pausePosition;
@@ -42,50 +45,28 @@ public class VinMedia extends Service {
     public HashMap<String,String> currentSongDetails;
     private static Uri uri;
     private ContentResolver contentResolver;
-    VinMediaLists vinMediaLists;
+
     Intent newSongLoadIntent,songPausedIntent,songResumedIntent,musicStoppedIntent;
     SharedPreferences media_settings;
     int repeatmode;
     boolean is_shuffle;
 
 
-    public VinMedia(Context context){
-        this.context=context;
+
+    public static VinMedia getInstance() {
+        VinMedia localInstance = Instance;
+        if (localInstance == null) {
+            synchronized (VinMedia.class) {
+                localInstance = Instance;
+                if (localInstance == null) {
+                    Instance = localInstance = new VinMedia();
+                }
+            }
+        }
+        return localInstance;
     }
 
-
-
-    private VinMedia vinMedia;
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-
-    public VinMedia() {
-        super();
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-
-        return super.onStartCommand(intent, flags, startId);
-    }
-
-
-    public void VinMediaInitialize(){
-        iniatializeBroadcasts();
-        newMediaPlayer();
-        vinMediaLists = new VinMediaLists(context);
-
-        media_settings = context.getSharedPreferences(context.getString(R.string.media_settings),Context.MODE_PRIVATE);
-        allSongs = vinMediaLists.getAllSongsList();
-        //if (currentQueue==null)currentQueue = allSongs;
-    }
-
-    private void iniatializeBroadcasts() {
+    private void iniatializeBroadcasts(Context context) {
 
         newSongLoadIntent = new Intent();
         songPausedIntent = new Intent();
@@ -98,17 +79,15 @@ public class VinMedia extends Service {
         musicStoppedIntent.setAction(context.getString(R.string.musicStopped));
     }
 
-    public void updateTempQueue(int position,int i){
-        if(i==1)
-            tempQueue = vinMediaLists.getAlbumSongsList(vinMediaLists.getAlbumsList().get(position).get("album"));
-        else if(i==2)
-            tempQueue = vinMediaLists.getArtistSongsList(vinMediaLists.getArtistsList().get(position).get("artist"));
+    public void updateTempQueue(int position,ArrayList<HashMap<String,String>> songList, Context context){
+            tempQueue = songList;
+        //VinMediaLists.getInstance().getArtistSongsList(VinMediaLists.getInstance().getArtistsList(context).get(position).get("artist"),context);
     }
 
-    public void updateQueue(int position){
+    public void updateQueue(int position,Context context){
         if (position!=0){
             currentQueue = tempQueue;
-        }else currentQueue = allSongs;
+        }else currentQueue = VinMediaLists.getInstance().getAllSongsList(context);
     }
 
     public ArrayList<HashMap<String,String>> getCurrentList(){
@@ -126,7 +105,7 @@ public class VinMedia extends Service {
         }
     }
 
-    void newMediaPlayer(){
+    void newMediaPlayer(final Context context){
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
@@ -142,11 +121,10 @@ public class VinMedia extends Service {
                 context.sendBroadcast(musicStoppedIntent);
                 Log.d("Broadcast","song complete");
                 if (!isClean()&&!isPlaying()){
-                      nextSong();
+                      nextSong(context);
                 }
             }
         });
-
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
         {
             @Override
@@ -157,32 +135,53 @@ public class VinMedia extends Service {
         });
     }
 
-    public void startMusic(int index){
-        context.sendBroadcast(newSongLoadIntent);
+    public void startMusic(int index,Context context){
         Log.d("Broadcast","music started");
         this.position  = index;
-        if(isPlaying()||!isClean()){
-            resetPlayer();
+        if (mediaPlayer!=null){
+            if(isPlaying()||!isClean()){
+                resetPlayer();
+            }
         }
-        newMediaPlayer();
+        iniatializeBroadcasts(context);
+        newMediaPlayer(context);
         setMediaSource();
+        context.sendBroadcast(newSongLoadIntent);
        // mediaPlayer.start();
+
+        NotificationManager.getInstance().postNotificationName(NotificationManager.audioDidStarted, getCurrentSongDetails());
+
+
+            Intent intent = new Intent(VinPlayer.applicationContext, VinMusicService.class);
+            VinPlayer.applicationContext.startService(intent);
+//        } else {
+//            Intent intent = new Intent(VinPlayer.applicationContext, VinMusicService.class);
+//            VinPlayer.applicationContext.stopService(intent);
+//        }
+
+        NotificationManager.getInstance().notifyNewSongLoaded(NotificationManager.newaudioloaded, getCurrentSongDetails());
+
+
+
     }
 
-    public void pauseMusic(){
+
+    public void pauseMusic(Context context){
         mediaPlayer.pause();
         context.sendBroadcast(songPausedIntent);
         Log.d("Broadcast","music paused");
         pausePosition = mediaPlayer.getCurrentPosition();
     }
-    public void resumeMusic(){
+
+    public void resumeMusic(Context context){
         mediaPlayer.seekTo(pausePosition);
         mediaPlayer.start();
         context.sendBroadcast(songResumedIntent);
         Log.d("Broadcast","music paused");
     }
 
-    public void nextSong(){
+    public void nextSong(Context context){
+        media_settings = context.getSharedPreferences(context.getString(R.string.media_settings),Context.MODE_PRIVATE);
         repeatmode = media_settings.getInt(context.getString(R.string.repeat_mode),2);
         is_shuffle = media_settings.getBoolean(context.getString(R.string.shuffle),false);
         if (!is_shuffle){
@@ -191,15 +190,16 @@ public class VinMedia extends Service {
             }else if ((position+1)<currentQueue.size()){
                 if (repeatmode!=2)position++;
             }
-            startMusic(position);
+            startMusic(position,context);
         }else {
             position = (int)(Math.random() * (getCurrentList().size()));
-            startMusic(position);
+            startMusic(position,context);
         }
     }
 
-    public void previousSong(){
-        repeatmode = media_settings.getInt(context.getString(R.string.repeat_mode),2);
+    public void previousSong(Context context){
+        media_settings = context.getSharedPreferences(context.getString(R.string.media_settings),Context.MODE_PRIVATE);
+        repeatmode = media_settings.getInt(context.getString(R.string.repeat_mode),1);
         is_shuffle = media_settings.getBoolean(context.getString(R.string.shuffle),false);
         if (!is_shuffle) {
             if (position == 0) {
@@ -207,10 +207,10 @@ public class VinMedia extends Service {
             } else if ((position - 1) >= 0) {
                 if (repeatmode != 2) position--;
             }
-            startMusic(position);
+            startMusic(position,context);
         }else {
             position = (int)(Math.random() * (getCurrentList().size()));
-            startMusic(position);
+            startMusic(position,context);
         }
     }
 
@@ -219,10 +219,11 @@ public class VinMedia extends Service {
         try {
             mediaPlayer.stop();
             mediaPlayer.reset();
+            mediaPlayer.release();
         }catch (Exception e){
 
         }
-            mediaPlayer.release();
+
     }
 
     public void setAudioProgress(int seekBarProgress){
@@ -243,11 +244,15 @@ public class VinMedia extends Service {
     }
 
     public int getDuration(){
-        return Integer.parseInt(getCurrentSongDetails().get("duration"));
+        return (getCurrentSongDetails()!=null)? Integer.parseInt(getCurrentSongDetails().get("duration")):0;
     }
 
     public void releasePlayer(){
-        mediaPlayer.release();
+        if (mediaPlayer!=null){
+            mediaPlayer.release();
+            Intent intent = new Intent(VinPlayer.applicationContext, VinMusicService.class);
+            //VinPlayer.applicationContext.stopService(intent);
+            }
     }
 
     public boolean isPlaying(){
@@ -277,4 +282,29 @@ public class VinMedia extends Service {
         }else return null;
     }
 
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
+    @Override
+    public void didReceivedNotification(int id, Object... args) {
+
+    }
+
+    @Override
+    public void newSongLoaded(Object... args) {
+
+    }
+
+//    public int generateObserverTag() {
+//        return lastTag++;
+//    }
+//
+//
 }

@@ -1,11 +1,9 @@
 package com.vinay.vinplayer.fragments;
 
 import android.content.BroadcastReceiver;
-import android.content.ContentUris;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.support.v4.app.FragmentManager;
 import android.content.Context;
 import android.graphics.Color;
@@ -15,9 +13,6 @@ import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,13 +21,10 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
-import com.vinay.vinplayer.adapters.AllSongsAdapter;
 import com.vinay.vinplayer.helpers.VinMedia;
 
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -61,7 +53,6 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
 
     Boolean isNowPlayingSeekingDone = false;
     int nowPlayingSeekBarProgress;
-    static VinMedia vinMedia;
     private IntentFilter intentFilter;
     private boolean seekbarDragging = false;
     private BroadcastReceiver broadcastReceiver;
@@ -76,9 +67,8 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static NowPlayingFragment newInstance(VinMedia vinMedia1) {
+    public static NowPlayingFragment newInstance() {
         NowPlayingFragment fragment = new NowPlayingFragment();
-        vinMedia = vinMedia1;
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -153,7 +143,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 nowPlayingSeekBarProgress = progress;
-                playerCurrentDuration.setText( vinMedia.getDuration()!= 0 ? String.format(Locale.ENGLISH,"%d:%02d",
+                playerCurrentDuration.setText( VinMedia.getInstance().getDuration()!= 0 ? String.format(Locale.ENGLISH,"%d:%02d",
                         progress / 60, progress % 60) : "-:--");
             }
 
@@ -165,7 +155,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 seekbarDragging = false;
-                vinMedia.setAudioProgress(nowPlayingSeekBarProgress*1000);
+                VinMedia.getInstance().setAudioProgress(nowPlayingSeekBarProgress*1000);
             }
         });
 
@@ -185,10 +175,10 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
             @Override
             public void onPageScrollStateChanged(int state) {
                 if (state==ViewPager.SCROLL_STATE_IDLE){
-                    if ((albumart_pos - vinMedia.getPosition())>0)
-                        vinMedia.nextSong();
-                    else if((albumart_pos - vinMedia.getPosition())<0)
-                        vinMedia.previousSong();
+                    if ((albumart_pos - VinMedia.getInstance().getPosition())>0)
+                        VinMedia.getInstance().nextSong(getActivity());
+                    else if((albumart_pos - VinMedia.getInstance().getPosition())<0)
+                        VinMedia.getInstance().previousSong(getActivity());
                 }
             }
         });
@@ -227,15 +217,15 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
 
     private void onNewSongLoaded(){
 
-        HashMap<String,String> songDetails = vinMedia.getCurrentSongDetails();
+        HashMap<String,String> songDetails = VinMedia.getInstance().getCurrentSongDetails();
         Log.d("songdetails","null Data");
         if (songDetails!=null) {
 
             nowPlayingSongTitle.setText(songDetails.get("title"));
             nowPlayingSongDetails.setText(songDetails.get("album")+ "\t-\t" + songDetails.get("artist") );
 
-            int duration = vinMedia.getDuration() / 1000;
-            playerTotalDuration.setText(vinMedia.getDuration() != 0 ? String.format(Locale.ENGLISH, "%d:%02d",
+            int duration = VinMedia.getInstance().getDuration() / 1000;
+            playerTotalDuration.setText(VinMedia.getInstance().getDuration() != 0 ? String.format(Locale.ENGLISH, "%d:%02d",
                     duration / 60, duration % 60) : "-:--");
 
             playerSeekbar.setMax(duration);
@@ -243,7 +233,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
             //albumArtPagerAdapter = new AlbumArtPagerAdapter(getActivity().getSupportFragmentManager());
             albumArtPagerAdapter.notifyDataSetChanged();
             albumArtPager.setAdapter(albumArtPagerAdapter);
-            albumArtPager.setCurrentItem(vinMedia.getPosition());
+            albumArtPager.setCurrentItem(VinMedia.getInstance().getPosition());
 
             playerButtonPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
 
@@ -254,7 +244,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
                 public void run() {
                     //Log.d("handler","running");
                     try {
-                        if (!seekbarDragging)playerSeekbar.setProgress(vinMedia.getAudioProgress());
+                        if (!seekbarDragging)playerSeekbar.setProgress(VinMedia.getInstance().getAudioProgress());
                     } catch (Exception e) {
 
                     }
@@ -280,10 +270,10 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
         public AlbumArtPagerAdapter(FragmentManager fm) {super(fm);}
         @Override
         public int getCount() {
-            if (vinMedia.getCurrentList() == null) {
+            if (VinMedia.getInstance().getCurrentList() == null) {
                 return 1;
             } else {
-                return ((vinMedia.getCurrentList().size() == 0) ? 1 : vinMedia.getCurrentList().size());
+                return ((VinMedia.getInstance().getCurrentList().size() == 0) ? 1 : VinMedia.getInstance().getCurrentList().size());
             }
         }
 
@@ -299,7 +289,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
 
         @Override
         public Fragment getItem(int position) {
-            albumArtFragment = AlbumArtFragment.newInstance(position, getActivity(),vinMedia);
+            albumArtFragment = AlbumArtFragment.newInstance(position, getActivity());
             return albumArtFragment;
         }
 
@@ -328,11 +318,11 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
                     break;
 
                 case R.id.nowplaying_button_next:
-                    vinMedia.nextSong();
+                    VinMedia.getInstance().nextSong(getActivity());
                     break;
 
                 case R.id.nowplaying_button_previous:
-                    vinMedia.previousSong();
+                    VinMedia.getInstance().previousSong(getActivity());
                     break;
 
                 case R.id.nowplaying_button_shuffle:
@@ -378,15 +368,15 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
     }
 
     private void playPauseAction(){
-        if (vinMedia.isPlaying()){
-            vinMedia.pauseMusic();
+        if (VinMedia.getInstance().isPlaying()){
+            VinMedia.getInstance().pauseMusic(getActivity());
         }else {
-            if (vinMedia.getCurrentList()!=null) {
-                if (vinMedia.getCurrentList().size() != 0) {
-                    if (!vinMedia.isClean()) {
-                        vinMedia.resumeMusic();
+            if (VinMedia.getInstance().getCurrentList()!=null) {
+                if (VinMedia.getInstance().getCurrentList().size() != 0) {
+                    if (!VinMedia.getInstance().isClean()) {
+                        VinMedia.getInstance().resumeMusic(getActivity());
                     } else {
-                        vinMedia.startMusic(vinMedia.getPosition());
+                        VinMedia.getInstance().startMusic(VinMedia.getInstance().getPosition(),getActivity());
 
                     }
                 }

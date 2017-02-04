@@ -20,7 +20,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -49,10 +48,9 @@ import com.vinay.vinplayer.fragments.GenreFragment;
 import com.vinay.vinplayer.fragments.NowPlayingFragment;
 import com.vinay.vinplayer.fragments.QueueFragment;
 import com.vinay.vinplayer.helpers.BlurBuilder;
+import com.vinay.vinplayer.helpers.NotificationManager;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
-import com.vinay.vinplayer.services.VinMusicService;
-import com.vinay.vinplayer.test;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -69,18 +67,17 @@ public class MainActivity extends AppCompatActivity implements
         View.OnClickListener,
         QueueFragment.OnQueueFragmentInteractionListener,
         ArtistDetailsFragment.OnArtistListFragmentInteractionListener,
-        GenreFragment.OnGenreFragmentInteractionListner
+        GenreFragment.OnGenreFragmentInteractionListner,
+        NotificationManager.NotificationCenterDelegate
 {
-    public static final String ARG_USE_EXPANSION = "arg_use_expansion";
+
     ArrayList<HashMap<String, String>> songs;
 
-    VinMedia vm;
 
     ViewPager librayViewPager;
     SpringIndicator tabLayout;
     List<Fragment> mFragmentList = new ArrayList<>();
     List<String> titles = new ArrayList<>();
-    VinMediaLists vinMediaLists;
     ViewPagerAdapter adapter;
 
     SlidingUpPanelLayout slidingUpPanelLayout;
@@ -115,6 +112,8 @@ public class MainActivity extends AppCompatActivity implements
     SharedPreferences media_settings;
     SharedPreferences.Editor editor;
 
+
+
 //    String contentURI=null;
 
 
@@ -144,25 +143,18 @@ public class MainActivity extends AppCompatActivity implements
 
         media_settings = getSharedPreferences(getString(R.string.media_settings),MODE_PRIVATE);
         editor = media_settings.edit();
-        editor.putInt(getString(R.string.repeat_mode),VinMedia.REPEAT_NONE);
-        editor.putBoolean(getString(R.string.shuffle),VinMedia.SHUFFLE_OFF);
+        editor.putInt(getString(R.string.repeat_mode), VinMedia.REPEAT_NONE);
+        editor.putBoolean(getString(R.string.shuffle), VinMedia.SHUFFLE_OFF);
         editor.apply();
 
         songs = new ArrayList<>();
-        vm = new VinMedia(this);
-        vm.VinMediaInitialize();
 
-        startService(new Intent(this,VinMedia.class));
-
-        vinMediaLists = new VinMediaLists(this);
-            vinMediaLists.getGenresList();
         setupLibraryViewPager();
         setupSlidingPanelLayout();
         setupNowPlayingPager();
         setupBroadCastReceiver();
 
         createBlurredBackground(null);
-
     }
 
     private void setupBroadCastReceiver() {
@@ -196,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void onNewSongLoaded() {
-        HashMap<String, String> songDetails = vm.getCurrentSongDetails();
+        HashMap<String, String> songDetails = VinMedia.getInstance().getCurrentSongDetails();
 
         if (songDetails != null) {
             sliderPlayer_playpause.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
@@ -217,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements
              //   e.printStackTrace();
             }
 
-            sliderPlayer_progressBar.setMax(vm.getDuration()/1000);
+            sliderPlayer_progressBar.setMax(VinMedia.getInstance().getDuration()/1000);
             handler = new Handler();
             this.runOnUiThread(new Runnable() {
 
@@ -225,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements
                 public void run() {
                     //Log.d("handler","running");
                     try {
-                        sliderPlayer_progressBar.setProgress(vm.getAudioProgress());
+                        sliderPlayer_progressBar.setProgress(VinMedia.getInstance().getAudioProgress());
                     } catch (Exception e) {
 
                     }
@@ -250,10 +242,10 @@ public class MainActivity extends AppCompatActivity implements
     private void setupLibraryViewPager() {
 
         librayViewPager = (ViewPager) findViewById(R.id.viewpager);
-        mFragmentList.add(AllSongsFragment.newInstance(1, vinMediaLists.getAllSongsList()));
-        mFragmentList.add(AlbumsFragment.newInstance(vinMediaLists.getAlbumsList()));
-        mFragmentList.add(ArtistsFragment.newInstance(vinMediaLists.getArtistsList()));
-        mFragmentList.add(GenreFragment.newInstance(vinMediaLists.getGenresList()));
+        mFragmentList.add(AllSongsFragment.newInstance(1, VinMediaLists.getInstance().getAllSongsList(this)));
+        mFragmentList.add(AlbumsFragment.newInstance(VinMediaLists.getInstance().getAlbumsList(this)));
+        mFragmentList.add(ArtistsFragment.newInstance(VinMediaLists.getInstance().getArtistsList(this)));
+        mFragmentList.add(GenreFragment.newInstance(VinMediaLists.getInstance().getGenresList(this)));
         titles.add("all");
         titles.add("album");
         titles.add("artist");
@@ -350,8 +342,8 @@ public class MainActivity extends AppCompatActivity implements
 
             }
         });
-        NowPlayingFragments.add(NowPlayingFragment.newInstance(vm));
-        NowPlayingFragments.add(QueueFragment.newInstance(1,vm));
+        NowPlayingFragments.add(NowPlayingFragment.newInstance());
+        NowPlayingFragments.add(QueueFragment.newInstance(1));
         nowPlayingPagerAdapter = new NowPlayingPagerAdapter(getSupportFragmentManager());
         nowPlayingPager.setAdapter(nowPlayingPagerAdapter);
 
@@ -409,13 +401,20 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        addObserver();
         //vm.VinMediaInitialize();
+        sendBroadcast(new Intent().setAction(getString(R.string.newSongLoaded)));
         registerReceiver(broadcastReceiver, intentFilter);
+    }
+
+    private void loadAlreadyPlaying() {
+
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        removeObserver();
 
     }
 
@@ -428,8 +427,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        vm.releasePlayer();
-        vm = null;
+       // VinMedia.getInstance().releasePlayer();
     }
 
     @Override
@@ -442,10 +440,10 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onListFragmentInteraction(int p) {
 
-        if (vm.isPlaying()) {
-            vm.resetPlayer();
+        if (VinMedia.getInstance().isPlaying()) {
+            VinMedia.getInstance().resetPlayer();
         }
-        vm.updateQueue(0);
+        VinMedia.getInstance().updateQueue(0,this);
         sendBroadcast(new Intent().setAction(getString(R.string.queueUpdated)));
         playPauseAction(p);
     }
@@ -454,46 +452,64 @@ public class MainActivity extends AppCompatActivity implements
     public void OnQueueFragmentInteraction(int p) {
 
         Log.d("queue","fragment interation  "+p);
-        if (vm.isPlaying()) {
-            vm.resetPlayer();
+        if (VinMedia.getInstance().isPlaying()) {
+            VinMedia.getInstance().resetPlayer();
         }
         playPauseAction(p);
     }
     @Override
     public void OnAlbumFragmentInteraction(int pos) {
 
-        vm.updateTempQueue(pos,1);
+        VinMedia.getInstance().updateTempQueue(pos,VinMediaLists.getInstance()
+                .getAlbumSongsList(VinMediaLists.getInstance().getAlbumsList(this)
+                 .get(pos).get("album"),this),this);
 
-      startActivity(new Intent(getApplicationContext(),AlbumDetailsActivity.class)
-              .putExtra("list", vinMediaLists.getAlbumSongsList((VinMediaLists.allAlbums.get(pos).get("album"))))
-                .putExtra(ARG_USE_EXPANSION,true));
+      startActivity(new Intent(getApplicationContext(),AlbumDetailsActivity.class).putExtra("list",
+              VinMediaLists.getInstance().getAlbumSongsList((VinMediaLists.allAlbums.get(pos).get("album")),this)));
     }
 
     @Override
     public void OnArtistFragmentInteraction(int pos) {
 
-        vm.updateTempQueue(pos,2);
+        VinMedia.getInstance().updateTempQueue(pos,VinMediaLists.getInstance()
+                .getArtistSongsList(VinMediaLists.getInstance().getArtistsList(this)
+                        .get(pos).get("artist"),this),this);
 
         FragmentManager fm = getSupportFragmentManager();
 
         ArtistDetailsFragment  dFragment = ArtistDetailsFragment.newInstance(
-                vinMediaLists.getArtistSongsList((VinMediaLists.allArtists.get(pos).get("artist"))));
+                VinMediaLists.getInstance().getArtistSongsList((VinMediaLists.allArtists.get(pos).get("artist")),this));
         // Show DialogFragment
         dFragment.show(fm, "Dialog Fragment");
     }
 
     @Override
     public void onArtistListFragmentInteraction(int i) {
-        if (vm.isPlaying()) {
-            vm.resetPlayer();
+        if (VinMedia.getInstance().isPlaying()) {
+            VinMedia.getInstance().resetPlayer();
         }
-        vm.updateQueue(1);
+        VinMedia.getInstance().updateQueue(1,this);
         sendBroadcast(new Intent().setAction(getString(R.string.queueUpdated)));
         playPauseAction(i);
     }
 
     @Override
     public void OnGenreFragmentInteraction(int pos) {
+
+    }
+
+    @Override
+    public void didReceivedNotification(int id, Object... args) {
+        if (id == NotificationManager.audioDidStarted || id == NotificationManager.audioPlayStateChanged || id == NotificationManager.audioDidReset) {
+           // updateTitle(id == NotificationManager.audioDidReset && (Boolean) args[1]);
+        } else if (id == NotificationManager.audioProgressDidChanged) {
+            HashMap<String,String> mSongDetail = VinMedia.getInstance().getCurrentSongDetails();
+           // updateProgress(mSongDetail);
+        }
+    }
+
+    @Override
+    public void newSongLoaded(Object... args) {
 
     }
 
@@ -543,15 +559,15 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void playPauseAction() {
-        if (vm.isPlaying()) {
-            vm.pauseMusic();
+        if (VinMedia.getInstance().isPlaying()) {
+            VinMedia.getInstance().pauseMusic(this);
         } else {
-            if (vm.getCurrentList()!=null) {
-                if (vm.getCurrentList().size() != 0) {
-                    if (!vm.isClean()) {
-                        vm.resumeMusic();
+            if (VinMedia.getInstance().getCurrentList()!=null) {
+                if (VinMedia.getInstance().getCurrentList().size() != 0) {
+                    if (!VinMedia.getInstance().isClean()) {
+                        VinMedia.getInstance().resumeMusic(this);
                     } else {
-                        vm.startMusic(vm.getPosition());
+                        VinMedia.getInstance().startMusic(VinMedia.getInstance().getPosition(),this);
                     }
                 }
             }
@@ -560,13 +576,29 @@ public class MainActivity extends AppCompatActivity implements
 
     private void playPauseAction(int position) {
 
-        vm.setPosition(position);
-        if (vm.isPlaying() || !vm.isClean()) {
-            vm.resetPlayer();
-            vm.startMusic(position);
+        VinMedia.getInstance().setPosition(position);
+        if (VinMedia.getInstance().isPlaying() || !VinMedia.getInstance().isClean()) {
+            VinMedia.getInstance().resetPlayer();
+            VinMedia.getInstance().startMusic(position,this);
         } else {
-            vm.startMusic(position);
+            VinMedia.getInstance().startMusic(position,this);
         }
+    }
+
+    public void addObserver() {
+        NotificationManager.getInstance().addObserver(this, NotificationManager.audioDidReset);
+        NotificationManager.getInstance().addObserver(this, NotificationManager.audioPlayStateChanged);
+        NotificationManager.getInstance().addObserver(this, NotificationManager.audioDidStarted);
+        NotificationManager.getInstance().addObserver(this, NotificationManager.audioProgressDidChanged);
+        NotificationManager.getInstance().addObserver(this, NotificationManager.newaudioloaded);
+    }
+
+    public void removeObserver() {
+        NotificationManager.getInstance().removeObserver(this, NotificationManager.audioDidReset);
+        NotificationManager.getInstance().removeObserver(this, NotificationManager.audioPlayStateChanged);
+        NotificationManager.getInstance().removeObserver(this, NotificationManager.audioDidStarted);
+        NotificationManager.getInstance().removeObserver(this, NotificationManager.audioProgressDidChanged);
+        NotificationManager.getInstance().removeObserver(this, NotificationManager.newaudioloaded);
     }
 
     public  boolean isStoragePermissionGranted() {

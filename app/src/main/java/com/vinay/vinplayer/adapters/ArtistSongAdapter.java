@@ -19,7 +19,6 @@ import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.fragments.ArtistDetailsFragment;
 import com.vinay.vinplayer.helpers.VinMedia;
-import com.vinay.vinplayer.helpers.VinMediaLists;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +34,6 @@ public class ArtistSongAdapter extends RecyclerView.Adapter<ArtistSongAdapter.Vi
     private final List<HashMap<String,String>> mValues;
     private final ArtistDetailsFragment.OnArtistListFragmentInteractionListener mListener;
     Context context;
-    private VinMediaLists vinMediaLists;
     private BroadcastReceiver broadcastReceiver;
     private IntentFilter intentFilter;
     static int pos1=0,pos2=0;
@@ -48,7 +46,6 @@ public class ArtistSongAdapter extends RecyclerView.Adapter<ArtistSongAdapter.Vi
 
     @Override
     public ArtistSongAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        vinMediaLists = new VinMediaLists(context);
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_allsongs_item, parent, false);
         return new ArtistSongAdapter.ViewHolder(view);
     }
@@ -111,7 +108,7 @@ public class ArtistSongAdapter extends RecyclerView.Adapter<ArtistSongAdapter.Vi
         context.registerReceiver(broadcastReceiver,intentFilter);
     }
     private void onNewSongLoaded(ArtistSongAdapter.ViewHolder view, int position){
-        if (position== VinMedia.position){
+        if (position== VinMedia.getInstance().getPosition()){
             if ((pos1==-1)&&(pos2==-1))pos1 = position;
             else if ((pos1!=-1)&&(pos2==-1)) pos2 = position;
 

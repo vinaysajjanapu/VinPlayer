@@ -19,7 +19,6 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.helpers.VinMedia;
-import com.vinay.vinplayer.helpers.VinMediaLists;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +34,6 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
     private final List<HashMap<String,String>> mValues;
 
     Context context;
-    private VinMediaLists vinMediaLists;
     private BroadcastReceiver broadcastReceiver;
     private IntentFilter intentFilter;
     static int pos1=0,pos2=0;
@@ -47,7 +45,6 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
 
     @Override
     public AlbumSongsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        vinMediaLists = new VinMediaLists(context);
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_allsongs_item, parent, false);
         return new AlbumSongsAdapter.ViewHolder(view);
     }
@@ -64,6 +61,7 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
 
 
         try {
+            Log.d("albumsonsrecycler","set image");
             final Uri sArtworkUri = Uri
                     .parse("content://media/external/audio/albumart");
             Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mValues.get(position).get("album_id")));
@@ -77,11 +75,27 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Toast.makeText(context,"ddddddddddd",Toast.LENGTH_SHORT).show();
+                if (VinMedia.getInstance().isPlaying()) {
+                    VinMedia.getInstance().resetPlayer();
+                }
+                VinMedia.getInstance().updateQueue(1,context);
+                context.sendBroadcast(new Intent().setAction(context.getString(R.string.queueUpdated)));
+                playPauseAction(position);
+               // Toast.makeText(context,"Playing Album",Toast.LENGTH_SHORT).show();
             }
         });
     }
+    private void playPauseAction(int position) {
+
+        VinMedia.getInstance().setPosition(position);
+        if (VinMedia.getInstance().isPlaying() || !VinMedia.getInstance().isClean()) {
+            VinMedia.getInstance().resetPlayer();
+            VinMedia.getInstance().startMusic(position,context);
+        } else {
+            VinMedia.getInstance().startMusic(position,context);
+        }
+    }
+
 
     private void setupBroadCastReceiver(final AlbumSongsAdapter.ViewHolder view, final int position){
 
@@ -109,7 +123,7 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
         context.registerReceiver(broadcastReceiver,intentFilter);
     }
     private void onNewSongLoaded(AlbumSongsAdapter.ViewHolder view, int position){
-        if (position== VinMedia.position){
+        if (position== VinMedia.getInstance().getPosition()){
             if ((pos1==-1)&&(pos2==-1))pos1 = position;
             else if ((pos1!=-1)&&(pos2==-1)) pos2 = position;
 
@@ -150,6 +164,9 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
             circleImageView = (CircleImageView)view.findViewById(R.id.SongThumb);
             img_playindic = (ImageView)view.findViewById(R.id.img_playindic);
 
+            view.setBackgroundColor(Color.argb(50,0,0,0));
+            songname.setTextColor(Color.WHITE);
+            ArtisName_duration.setTextColor(Color.WHITE);
             img_playindic.setColorFilter(Color.BLACK);
         }
 

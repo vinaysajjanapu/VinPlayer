@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +15,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
-import com.vinay.vinplayer.fragments.AllSongsFragment;
 import com.vinay.vinplayer.fragments.QueueFragment;
-import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
 
 import java.util.HashMap;
@@ -35,10 +32,8 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.ViewHolder> 
     private final List<HashMap<String,String>> mValues;
     private final QueueFragment.OnQueueFragmentInteractionListener mListener;
     Context context;
-    private VinMediaLists vinMediaLists;
     private BroadcastReceiver broadcastReceiver;
     private IntentFilter intentFilter;
-    private VinMedia vinMedia;
 
     public QueueAdapter(Context context, List<HashMap<String,String>> items, QueueFragment.OnQueueFragmentInteractionListener listener) {
         mValues = items;
