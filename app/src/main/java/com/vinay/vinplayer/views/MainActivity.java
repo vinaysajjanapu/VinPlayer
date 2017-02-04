@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements
         ArtistDetailsFragment.OnArtistListFragmentInteractionListener,
         GenreFragment.OnGenreFragmentInteractionListner
 {
-
+    public static final String ARG_USE_EXPANSION = "arg_use_expansion";
     ArrayList<HashMap<String, String>> songs;
 
     VinMedia vm;
@@ -464,8 +464,9 @@ public class MainActivity extends AppCompatActivity implements
 
         vm.updateTempQueue(pos,1);
 
-      startActivity(new Intent(getApplicationContext(),AlbumDetailsActivity.class).putExtra("list",
-              vinMediaLists.getAlbumSongsList((VinMediaLists.allAlbums.get(pos).get("album")))));
+      startActivity(new Intent(getApplicationContext(),AlbumDetailsActivity.class)
+              .putExtra("list", vinMediaLists.getAlbumSongsList((VinMediaLists.allAlbums.get(pos).get("album"))))
+                .putExtra(ARG_USE_EXPANSION,true));
     }
 
     @Override

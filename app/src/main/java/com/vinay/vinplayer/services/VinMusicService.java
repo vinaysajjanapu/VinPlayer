@@ -1,18 +1,12 @@
 package com.vinay.vinplayer.services;
 
-import android.app.IntentService;
 import android.app.Service;
 import android.content.Intent;
-import android.content.Context;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.vinay.vinplayer.helpers.VinMedia;
-
-import java.io.IOException;
 
 
 public class VinMusicService extends Service {
