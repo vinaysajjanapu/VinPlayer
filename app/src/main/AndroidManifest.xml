@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".test"></activity>
-        <activity android:name=".fragments.AlbumDetailsFragment"
+        <activity android:name=".fragments.AlbumDetailsActivity"
             android:excludeFromRecents="true"
             android:taskAffinity=""
             android:theme="@style/Theme.Sliding.Light"/>

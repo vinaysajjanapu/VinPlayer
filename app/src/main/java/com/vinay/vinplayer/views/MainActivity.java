@@ -32,17 +32,15 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
-import com.vinay.vinplayer.fragments.AlbumDetailsFragment;
+import com.vinay.vinplayer.fragments.AlbumDetailsActivity;
 import com.vinay.vinplayer.fragments.AlbumsFragment;
 import com.vinay.vinplayer.fragments.AllSongsFragment;
 import com.vinay.vinplayer.fragments.ArtistDetailsFragment;
@@ -53,7 +51,6 @@ import com.vinay.vinplayer.fragments.QueueFragment;
 import com.vinay.vinplayer.helpers.BlurBuilder;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
-import com.vinay.vinplayer.test;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -144,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements
 
         media_settings = getSharedPreferences(getString(R.string.media_settings),MODE_PRIVATE);
         editor = media_settings.edit();
-        editor.putInt(getString(R.string.repeat_mode),VinMedia.REPEAT_QUEUE);
+        editor.putInt(getString(R.string.repeat_mode),VinMedia.REPEAT_NONE);
         editor.putBoolean(getString(R.string.shuffle),VinMedia.SHUFFLE_OFF);
         editor.apply();
 
@@ -461,7 +458,7 @@ public class MainActivity extends AppCompatActivity implements
 
         vm.updateTempQueue(pos,1);
 
-      startActivity(new Intent(getApplicationContext(),AlbumDetailsFragment.class).putExtra("list",
+      startActivity(new Intent(getApplicationContext(),AlbumDetailsActivity.class).putExtra("list",
               vinMediaLists.getAlbumSongsList((VinMediaLists.allAlbums.get(pos).get("album")))));
     }
 
