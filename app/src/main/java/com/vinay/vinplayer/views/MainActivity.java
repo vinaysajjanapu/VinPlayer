@@ -263,6 +263,7 @@ public class MainActivity extends AppCompatActivity implements
         tabLayout = (SpringIndicator) findViewById(R.id.tabs);
         tabLayout.setViewPager(librayViewPager);
 
+
     }
 
     private void setupSlidingPanelLayout() {
