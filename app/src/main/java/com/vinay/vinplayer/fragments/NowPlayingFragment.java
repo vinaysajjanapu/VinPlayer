@@ -387,6 +387,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
                         vinMedia.resumeMusic();
                     } else {
                         vinMedia.startMusic(vinMedia.getPosition());
+
                     }
                 }
             }
