@@ -26,11 +26,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".test" />
+        <activity
+            android:name=".fragments.AlbumDetailsFragment"
         <activity android:name=".test"></activity>
         <activity android:name=".fragments.AlbumDetailsActivity"
             android:excludeFromRecents="true"
             android:taskAffinity=""
-            android:theme="@style/Theme.Sliding.Light"/>
+            android:theme="@style/Theme.Sliding.Light" />
+
+        <service
+            android:name=".services.VinMusicService"
+            android:exported="false"></service>
     </application>
 
 </manifest>

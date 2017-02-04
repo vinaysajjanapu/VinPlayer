@@ -51,6 +51,8 @@ import com.vinay.vinplayer.fragments.QueueFragment;
 import com.vinay.vinplayer.helpers.BlurBuilder;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
+import com.vinay.vinplayer.services.VinMusicService;
+import com.vinay.vinplayer.test;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -157,6 +159,9 @@ public class MainActivity extends AppCompatActivity implements
         setupBroadCastReceiver();
 
         createBlurredBackground(null);
+
+        VinMusicService.startActionBaz(this,"","");
+        VinMusicService.startActionFoo(this,"","");
 
     }
 
