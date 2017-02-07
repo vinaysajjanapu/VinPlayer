@@ -335,6 +335,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
                         playerButtonShuffle.setColorFilter(Color.GREEN);
                         editor.putBoolean(getActivity().getString(R.string.shuffle),true);
                         editor.apply();
+                        VinMedia.getInstance().createShuffleQueue();
                     }
                 break;
 

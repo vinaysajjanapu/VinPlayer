@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,6 +22,7 @@ import com.vinay.vinplayer.helpers.VinMedia;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 public class QueueFragment extends Fragment {
 
@@ -77,6 +79,7 @@ public class QueueFragment extends Fragment {
 
             recyclerView.setAdapter(queueAdapter);
 
+        recyclerView.scrollToPosition(VinMedia.getInstance().getPosition());
         final float[] start_y = new float[1];
         recyclerView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -111,6 +114,7 @@ public class QueueFragment extends Fragment {
 
         intentFilter = new IntentFilter();
         intentFilter.addAction(getString(R.string.queueUpdated));
+        intentFilter.addAction(getString(R.string.newSongLoaded));
 
         broadcastReceiver = new BroadcastReceiver() {
             @Override
@@ -119,10 +123,16 @@ public class QueueFragment extends Fragment {
                 String action = intent.getAction();
                 if (action.equals(getString(R.string.queueUpdated))){
                     queueUpdated();
+                }else {
+                    newSongLoaded();
                 }
             }
         };
         getActivity().registerReceiver(broadcastReceiver,intentFilter);
+    }
+
+    private void newSongLoaded() {
+        recyclerView.scrollToPosition(VinMedia.getInstance().getPosition());
     }
 
     private void queueUpdated() {
@@ -166,4 +176,5 @@ public class QueueFragment extends Fragment {
         void OnQueueFragmentInteraction(int i);
 
     }
+
 }

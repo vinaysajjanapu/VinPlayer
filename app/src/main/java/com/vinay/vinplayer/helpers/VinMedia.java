@@ -45,6 +45,8 @@ public class VinMedia implements NotificationManager.NotificationCenterDelegate,
     public HashMap<String,String> currentSongDetails;
     private static Uri uri;
     private ContentResolver contentResolver;
+    private static int[] shuffle_queue;
+    static int shuffle_index;
 
     Intent newSongLoadIntent,songPausedIntent,songResumedIntent,musicStoppedIntent;
     SharedPreferences media_settings;
@@ -161,8 +163,6 @@ public class VinMedia implements NotificationManager.NotificationCenterDelegate,
 
         NotificationManager.getInstance().notifyNewSongLoaded(NotificationManager.newaudioloaded, getCurrentSongDetails());
 
-
-
     }
 
 
@@ -190,11 +190,15 @@ public class VinMedia implements NotificationManager.NotificationCenterDelegate,
             }else if ((position+1)<currentQueue.size()){
                 if (repeatmode!=2)position++;
             }
-            startMusic(position,context);
+           // startMusic(position,context);
         }else {
-            position = (int)(Math.random() * (getCurrentList().size()));
-            startMusic(position,context);
+            if (shuffle_index==currentQueue.size()-1){
+              shuffle_index=0;
+            }else if ((shuffle_index+1)<currentQueue.size()){
+                    position = getShuffleQueue()[++shuffle_index];
+              }
         }
+        startMusic(position,context);
     }
 
     public void previousSong(Context context){
@@ -207,11 +211,36 @@ public class VinMedia implements NotificationManager.NotificationCenterDelegate,
             } else if ((position - 1) >= 0) {
                 if (repeatmode != 2) position--;
             }
-            startMusic(position,context);
+           // startMusic(position,context);
         }else {
-            position = (int)(Math.random() * (getCurrentList().size()));
-            startMusic(position,context);
+            if (shuffle_index == 0) {
+                shuffle_index = currentQueue.size() - 1;
+            } else if ((shuffle_index - 1) >= 0) {
+                    position = getShuffleQueue()[--shuffle_index];
+            }
         }
+        startMusic(position,context);
+    }
+    public int[] getShuffleQueue(){
+        return shuffle_queue;
+    }
+
+    public void createShuffleQueue(){
+        shuffle_index = 0;
+        int[] shuffle_list = new int[currentQueue.size()];
+        int ind1,k,l;
+        for (ind1=0;ind1<getCurrentList().size();ind1++)shuffle_list[ind1] = ind1;
+        for (ind1=0;ind1<getCurrentList().size();ind1++){
+            k = shuffle_list[ind1];
+            l = (int)(Math.random()*getCurrentList().size());
+            shuffle_list[ind1] = shuffle_list[l];
+            shuffle_list[l] = k;
+        }
+        shuffle_queue = shuffle_list;
+        String s="";
+        for (ind1=0;ind1<getCurrentList().size();ind1++)s = s + " "+shuffle_queue[ind1];
+        Log.d("shuffle queue", s);
+
     }
 
     public void resetPlayer(){
@@ -301,6 +330,8 @@ public class VinMedia implements NotificationManager.NotificationCenterDelegate,
     public void newSongLoaded(Object... args) {
 
     }
+
+
 
 //    public int generateObserverTag() {
 //        return lastTag++;

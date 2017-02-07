@@ -1,8 +1,4 @@
-/*
- * This is the source code of VinPlayer for Android v. 1.0.0.
- * You should have received a copy of the license in this archive (see LICENSE).
- * Copyright @Dibakar_Mistry, 2015.
- */
+
 package com.vinay.vinplayer.helpers;
 
 import android.content.BroadcastReceiver;
@@ -30,6 +26,7 @@ public class VinPlayerReceiver extends BroadcastReceiver {
 
 			switch (keyEvent.getKeyCode()) {
 			case KeyEvent.KEYCODE_HEADSETHOOK:
+				break;
 			case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
 				if (!VinMedia.getInstance().isPlaying()&&!VinMedia.getInstance().isClean()) {
 					VinMedia.getInstance().resumeMusic(context);
