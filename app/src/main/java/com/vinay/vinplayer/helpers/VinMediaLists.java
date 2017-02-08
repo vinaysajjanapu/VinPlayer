@@ -159,6 +159,7 @@ public class VinMediaLists {
         }
         cur.close();
 
+        allAlbums = list;
         return list;
     }
 
@@ -186,6 +187,7 @@ public class VinMediaLists {
         }
         cur.close();
 
+        allArtists = list;
         return list;
     }
 
