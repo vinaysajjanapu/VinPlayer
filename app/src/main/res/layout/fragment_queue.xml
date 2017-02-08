@@ -12,6 +12,9 @@
         android:layout_marginTop="?actionBarSize"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:scrollbars="horizontal"
+        android:scrollbarSize="@dimen/activity_horizontal_margin"
+        android:scrollbarStyle="insideOverlay"
         app:layoutManager="LinearLayoutManager"
         tools:context="com.vinay.vinplayer.fragments.QueueFragment"
         tools:listitem="@layout/fragment_allsongs_item" />

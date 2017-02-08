@@ -30,7 +30,7 @@ public class VinMediaLists {
     public static ArrayList<HashMap<String,String>> allSongs;
     public static ArrayList<HashMap<String,String>> allAlbums;
     public static ArrayList<HashMap<String,String>> allArtists;
-    public static ArrayList<HashMap<String,String>> allgeners;
+    public static ArrayList<HashMap<String,String>> allgenres;
 
     private static volatile VinMediaLists Instance = null;
 
@@ -159,7 +159,6 @@ public class VinMediaLists {
         }
         cur.close();
 
-        allAlbums = list;
         return list;
     }
 
@@ -178,16 +177,15 @@ public class VinMediaLists {
             {
                 while(cur.moveToNext())
                 {
-                    String album = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.AlbumColumns.ARTIST));
+                    String artist = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.AlbumColumns.ARTIST));
                     HashMap<String,String> h=new HashMap<>();
-                    h.put("artist",album);
+                    h.put("artist",artist);
                     if (!list.contains(h))list.add(h);
                 }
             }
         }
         cur.close();
 
-        allArtists = list;
         return list;
     }
 
@@ -231,9 +229,11 @@ public class VinMediaLists {
                 }
             } while(genrecursor.moveToNext());
         }
-        allgeners=genres;
+        allgenres=genres;
      return genres;
     }
+
+
 
     public Bitmap getAlbumart(Long album_id,Context context)
     {
@@ -252,8 +252,11 @@ public class VinMediaLists {
             {
                 FileDescriptor fd = pfd.getFileDescriptor();
                 bm = BitmapFactory.decodeFileDescriptor(fd);
+            }else {
+                bm = BitmapFactory.decodeResource(context.getResources(),R.drawable.albumart_default);
             }
         } catch (Exception e) {
+            bm = BitmapFactory.decodeResource(context.getResources(),R.drawable.albumart_default);
         }
         return bm;
     }

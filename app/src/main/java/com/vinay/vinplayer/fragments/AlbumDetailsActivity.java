@@ -83,7 +83,7 @@ public class AlbumDetailsActivity extends SlidingActivity {
                                     .error(R.drawable.albumart_default)
                                     .into(target);
 
-                            createBlurredBackground(uri.toString());
+                            recyclerView.setBackground(BlurBuilder.getInstance().drawable_img(allsongs.get(0).get("album_id"),getApplicationContext()));
                         } catch (Exception e) {
                            // e.printStackTrace();
                         }
@@ -94,45 +94,4 @@ public class AlbumDetailsActivity extends SlidingActivity {
             enableFullscreen();
 
     }
-
-    private void createBlurredBackground(String url) {
-        //  Bitmap emptyBitmap = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), myBitmap.getConfig());
-        //default_bg = BitmapFactory.decodeFile(url);
-        if (url != null) {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = 1;
-            default_bg = null;
-            try {
-                Uri uri = Uri.parse(url);
-                ParcelFileDescriptor pfd = this.getContentResolver().openFileDescriptor(uri, "r");
-                if (pfd != null) {
-                    FileDescriptor fd = pfd.getFileDescriptor();
-                    default_bg = BitmapFactory.decodeFileDescriptor(fd);
-                }
-            } catch (IOException e) {
-
-            }
-            //default_bg = ((BitmapDrawable)songAlbumbg.getDrawable()).getBitmap();
-            if (default_bg == null) {
-                default_bg = BitmapFactory.decodeResource(getResources(), R.drawable.albumart_default);
-            }
-        } else {
-            default_bg = BitmapFactory.decodeResource(getResources(), R.drawable.albumart_default);
-        }
-        temp_input = default_bg.copy(Bitmap.Config.ARGB_8888, true);
-        input_to_blur = Bitmap.createScaledBitmap(temp_input, 300, 300, false);
-        blurredBitmap = BlurBuilder.blur(this, input_to_blur);
-        blurredBitmap1 = BlurBuilder.blur(this, input_to_blur);
-
-        //BitmapDrawable background = new BitmapDrawable(context.getResources(),default_bg);
-        dr = new BitmapDrawable(blurredBitmap);
-        recyclerView.setBackground(dr);
-        dr = null;
-        temp_input = null;
-        input_to_blur = null;
-        blurredBitmap = null;
-        blurredBitmap1 = null;
-        //view.setBackgroundDrawable( new BitmapDrawable( getResources(), blurredBitmap ) );
-    }
-
 }

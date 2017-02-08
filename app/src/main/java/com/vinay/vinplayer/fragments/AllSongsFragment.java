@@ -1,17 +1,23 @@
 package com.vinay.vinplayer.fragments;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.adapters.AllSongsAdapter;
+import com.vinay.vinplayer.adapters.QueueAdapter;
+import com.vinay.vinplayer.helpers.VinMedia;
 
 
 import java.util.ArrayList;
@@ -25,6 +31,9 @@ public class AllSongsFragment extends Fragment {
     private int mColumnCount = 1;
     static ArrayList<HashMap<String,String>> allsongs;
     private OnListFragmentInteractionListener mListener;
+    private BroadcastReceiver broadcastReceiver;
+    private IntentFilter intentFilter;
+    private RecyclerView recyclerView;
 
     public AllSongsFragment() {
     }
@@ -55,10 +64,11 @@ public class AllSongsFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_allsongs, container, false);
 
+        setupBroadCastReceiver();
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+            recyclerView = (RecyclerView) view;
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
@@ -68,6 +78,32 @@ public class AllSongsFragment extends Fragment {
         }
         return view;
     }
+
+
+
+    private void setupBroadCastReceiver(){
+
+        Log.d("queuefrag","setup bcast listener");
+
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(getString(R.string.newSongLoaded));
+
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if (action.equals(getString(R.string.newSongLoaded))){
+                    newSongLoaded();
+                }
+            }
+        };
+        getActivity().registerReceiver(broadcastReceiver,intentFilter);
+    }
+
+    private void newSongLoaded() {
+        recyclerView.getAdapter().notifyDataSetChanged();
+    }
+
 
 
     @Override
@@ -85,6 +121,7 @@ public class AllSongsFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        getContext().unregisterReceiver(broadcastReceiver);
     }
 
     /**

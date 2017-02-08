@@ -174,8 +174,12 @@ public class VinMedia implements NotificationManager.NotificationCenterDelegate,
     }
 
     public void resumeMusic(Context context){
-        mediaPlayer.seekTo(pausePosition);
-        mediaPlayer.start();
+        try {
+            mediaPlayer.seekTo(pausePosition);
+            mediaPlayer.start();
+        }catch (Exception e){
+            startMusic(getPosition(),context);
+        }
         context.sendBroadcast(songResumedIntent);
         Log.d("Broadcast","music paused");
     }

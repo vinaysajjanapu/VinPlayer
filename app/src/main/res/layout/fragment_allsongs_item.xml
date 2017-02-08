@@ -22,23 +22,24 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp">
 
-        <ImageView
+        <ImageButton
             android:id="@+id/img_moreicon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:clickable="true"
             android:paddingBottom="8dp"
             android:paddingTop="8dp"
+            android:background="@android:color/transparent"
             android:scaleType="centerInside"
-            android:src="@android:drawable/ic_menu_add" />
+            android:src="@drawable/icon_threedots" />
 
 
         <ImageView
             android:id="@+id/img_playindic"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@+id/img_moreicon"
             android:clickable="true"
@@ -46,7 +47,7 @@
             android:paddingTop="8dp"
             android:scaleType="centerInside"
             android:visibility="gone"
-            android:src="@android:drawable/ic_media_play" />
+            android:src="@drawable/icon_playindicator" />
 
 
 
@@ -71,6 +72,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="4dp"
                 android:singleLine="true"
+                android:textColor="#b0c0b0"
                 android:text=""
                 android:textSize="12sp" />
         </LinearLayout>
