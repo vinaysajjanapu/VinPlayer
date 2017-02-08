@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.helpers.VinMedia;
 
@@ -59,12 +59,8 @@ public class AlbumArtFragment extends Fragment {
 
             /*Picasso.with(getActivity()).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
                     .into(albumArt);
-            */Glide.with(getActivity())
-                    .load(uri)
-                    .centerCrop()
-                    .placeholder(R.drawable.albumart_default)
-                    .crossFade()
-                    .into(albumArt);
+            */
+            ImageLoader.getInstance().displayImage(uri.toString(),albumArt);
 
         }catch (Exception e){
             e.printStackTrace();
