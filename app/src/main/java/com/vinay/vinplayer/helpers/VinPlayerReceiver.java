@@ -51,22 +51,23 @@ public class VinPlayerReceiver extends BroadcastReceiver {
 			}
 		} else {
 			if (intent.getAction().equals(VinMusicService.NOTIFY_PLAY)) {
-				if (!VinMedia.getInstance().isPlaying())VinMedia.getInstance().resumeMusic(context);
-				else VinMedia.getInstance().pauseMusic(context);
-			} else if (intent.getAction().equals(VinMusicService.NOTIFY_PAUSE)
-					|| intent.getAction().equals(android.media.AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
-
-				VinMedia.getInstance().pauseMusic(context);
-			} else if (intent.getAction().equals(VinMusicService.NOTIFY_NEXT)) {
+					if (!VinMedia.getInstance().isPlaying()){
+						VinMedia.getInstance().resumeMusic(context);
+					}else {
+						VinMedia.getInstance().pauseMusic(context);
+					}
+			}
+			else if (intent.getAction().equals(VinMusicService.NOTIFY_NEXT)) {
 				VinMedia.getInstance().nextSong(context);
-			} else if (intent.getAction().equals(VinMusicService.NOTIFY_CLOSE)) {
+			}
+			else if (intent.getAction().equals(VinMusicService.NOTIFY_CLOSE)) {
 				Log.d("notification","close it");
 				Intent intent1 = new Intent(VinPlayer.applicationContext, VinMusicService.class);
 				VinPlayer.applicationContext.stopService(intent1);
 				VinMedia.getInstance().releasePlayer();
-			} else if (intent.getAction().equals(VinMusicService.NOTIFY_PREVIOUS)) {
+			}
+			else if (intent.getAction().equals(VinMusicService.NOTIFY_PREVIOUS)) {
 				VinMedia.getInstance().previousSong(context);
-
 			}
 		}
 	}

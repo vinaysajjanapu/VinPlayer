@@ -3,22 +3,32 @@ package com.vinay.vinplayer.helpers;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.RemoteControlClient;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.media.MediaBrowserCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.VinPlayer;
 import com.vinay.vinplayer.views.MainActivity;
@@ -29,7 +39,7 @@ import java.util.HashMap;
  * Created by vinaysajjanapu on 5/2/17.
  */
 
-public class VinMusicService extends Service implements AudioManager.OnAudioFocusChangeListener, NotificationManager.NotificationCenterDelegate {
+public class VinMusicService extends Service implements AudioManager.OnAudioFocusChangeListener {
 
     AudioManager audioManager;
     RemoteControlClient remoteControlClient;
@@ -37,12 +47,22 @@ public class VinMusicService extends Service implements AudioManager.OnAudioFocu
     private static boolean supportLockScreenControls = Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
     private static boolean supportBigNotifications = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
     private RemoteViews listeners;
-    private static boolean ignoreAudioFocus = false;
+    private static boolean AudioFocus = false;
     public static final String NOTIFY_PREVIOUS = "musicplayer.previous";
     public static final String NOTIFY_CLOSE = "musicplayer.close";
     public static final String NOTIFY_PAUSE = "musicplayer.pause";
     public static final String NOTIFY_PLAY = "musicplayer.play";
     public static final String NOTIFY_NEXT = "musicplayer.next";
+    BroadcastReceiver broadcastReceiver;
+    IntentFilter intentFilter;
+    Notification notification;
+    static boolean sticky = true;
+    static Intent intent;
+    static int flags, startId;
+    android.app.NotificationManager notificationManager;
+    Bitmap pause,play;
+
+
 
     @Nullable
     @Override
@@ -52,7 +72,12 @@ public class VinMusicService extends Service implements AudioManager.OnAudioFocu
 
     @Override
     public void onCreate() {
+        sticky = true;
         Log.d("service","started");
+        setupBroadCastReceiver();
+        play = BitmapFactory.decodeResource(getResources(),R.drawable.icon_play);
+        pause = BitmapFactory.decodeResource(getResources(),R.drawable.icon_pause);
+        notificationManager = (android.app.NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         try {
             phoneStateListener = new PhoneStateListener() {
@@ -82,6 +107,12 @@ public class VinMusicService extends Service implements AudioManager.OnAudioFocu
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        Log.d("abcde","onstart command");
+        this.intent = intent;
+        this.flags = flags;
+        this.startId = startId;
+
         try {
             HashMap<String,String> messageObject = VinMedia.getInstance().getCurrentSongDetails();
             if (messageObject == null) {
@@ -91,8 +122,10 @@ public class VinMusicService extends Service implements AudioManager.OnAudioFocu
                         stopSelf();
                     }
                 });*/
-                return START_STICKY;
+
+                    return START_NOT_STICKY;
             }
+
             if (supportLockScreenControls) {
                 ComponentName remoteComponentName = new ComponentName(getApplicationContext(), "VinPlayer");
                 try {
@@ -135,9 +168,16 @@ public class VinMusicService extends Service implements AudioManager.OnAudioFocu
             intent.setAction("openplayer");
             intent.setFlags(32768);
             PendingIntent contentIntent = PendingIntent.getActivity(VinPlayer.applicationContext, 0, intent, 0);
+            PendingIntent deleteIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(NOTIFY_CLOSE),
+                    PendingIntent.FLAG_UPDATE_CURRENT);
 
-            Notification notification = new NotificationCompat.Builder(getApplicationContext()).setSmallIcon(R.drawable.icon_stop)
-                    .setContentIntent(contentIntent).setContentTitle(songName).build();
+            notification = new NotificationCompat.Builder(getApplicationContext())
+                    .setSmallIcon(R.drawable.icon_stop)
+                    .setContentIntent(contentIntent)
+                    .setDeleteIntent(deleteIntent)
+                    .setContentTitle(songName)
+                    .setOngoing(sticky)
+                    .build();
 
             notification.contentView = simpleContentView;
             if (supportBigNotifications) {
@@ -150,7 +190,8 @@ public class VinMusicService extends Service implements AudioManager.OnAudioFocu
             }
 
             Bitmap albumArt = audioInfo != null ? VinMediaLists.getInstance()
-                    .getAlbumart(Long.parseLong(audioInfo.get("album_id")),VinPlayer.applicationContext) : null;
+                    .getAlbumart(Long.parseLong(audioInfo.get("album_id")),
+                            VinPlayer.applicationContext) : null;
 
             if (albumArt != null) {
                 notification.contentView.setImageViewBitmap(R.id.player_album_art, albumArt);
@@ -163,6 +204,7 @@ public class VinMusicService extends Service implements AudioManager.OnAudioFocu
                     notification.bigContentView.setImageViewResource(R.id.player_album_art, R.drawable.albumart_default);
                 }
             }
+
             notification.contentView.setViewVisibility(R.id.player_progress_bar, View.GONE);
             notification.contentView.setViewVisibility(R.id.player_next, View.VISIBLE);
             notification.contentView.setViewVisibility(R.id.player_previous, View.VISIBLE);
@@ -172,22 +214,6 @@ public class VinMusicService extends Service implements AudioManager.OnAudioFocu
                 notification.bigContentView.setViewVisibility(R.id.player_progress_bar, View.GONE);
             }
 
-            if (!VinMedia.getInstance().isPlaying()) {
-                notification.contentView.setViewVisibility(R.id.player_pause, View.GONE);
-                notification.contentView.setViewVisibility(R.id.player_play, View.VISIBLE);
-                if (supportBigNotifications) {
-                    notification.bigContentView.setViewVisibility(R.id.player_pause, View.GONE);
-                    notification.bigContentView.setViewVisibility(R.id.player_play, View.VISIBLE);
-                }
-            } else {
-                notification.contentView.setViewVisibility(R.id.player_pause, View.VISIBLE);
-                notification.contentView.setViewVisibility(R.id.player_play, View.GONE);
-                if (supportBigNotifications) {
-                    notification.bigContentView.setViewVisibility(R.id.player_pause, View.VISIBLE);
-                    notification.bigContentView.setViewVisibility(R.id.player_play, View.GONE);
-                }
-            }
-
             notification.contentView.setTextViewText(R.id.player_song_name, songName);
             notification.contentView.setTextViewText(R.id.player_author_name, authorName);
             if (supportBigNotifications) {
@@ -195,8 +221,24 @@ public class VinMusicService extends Service implements AudioManager.OnAudioFocu
                 notification.bigContentView.setTextViewText(R.id.player_author_name, authorName);
 //                notification.bigContentView.setTextViewText(R.id.player_albumname, albumName);
             }
-            notification.flags |= Notification.FLAG_ONGOING_EVENT;
-            startForeground(5, notification);
+
+
+
+            if (VinMedia.getInstance().isPlaying()) {
+                notification.contentView.setImageViewBitmap(R.id.player_play, pause);
+                if (supportBigNotifications)
+                    notification.bigContentView.setImageViewBitmap(R.id.player_play,pause);
+            }
+            else {
+                notification.contentView.setImageViewBitmap(R.id.player_play,play);
+                if (supportBigNotifications)
+                    notification.bigContentView.setImageViewBitmap(R.id.player_play,play);
+            }
+
+            /*notification.flags |= Notification.FLAG_ONGOING_EVENT;
+            startForeground(5, notification);*/
+
+            notificationManager.notify(5,notification);
 
             if (remoteControlClient != null) {
                 RemoteControlClient.MetadataEditor metadataEditor = remoteControlClient.editMetadata(true);
@@ -215,9 +257,57 @@ public class VinMusicService extends Service implements AudioManager.OnAudioFocu
     }
 
 
-        @Override
+    private void setupBroadCastReceiver() {
+
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(getString(R.string.newSongLoaded));
+        intentFilter.addAction(getString(R.string.songPaused));
+        intentFilter.addAction(getString(R.string.songResumed));
+        intentFilter.addAction(getString(R.string.musicStopped));
+
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if (action.equals(getString(R.string.newSongLoaded))) {
+                    onNewSongLoaded();
+                } else if (action.equals(getString(R.string.songPaused))) {
+                    onSongPaused();
+                } else if (action.equals(getString(R.string.songResumed))) {
+                    onSongResumed();
+                } else if (action.equals(getString(R.string.musicStopped))) {
+                    onMusicStopped();
+                }
+            }
+        };
+        registerReceiver(broadcastReceiver, intentFilter);
+    }
+
+    private void onNewSongLoaded() {
+        sticky = true;
+    }
+
+    private void onSongPaused() {
+        Log.d("abcde","paused");
+        sticky = false;
+        onStartCommand(intent,flags,startId);
+      }
+
+    private void onSongResumed() {
+        sticky = true;
+        Log.d("abcde","resumed");
+        onStartCommand(intent,flags,startId);
+    }
+
+    private void onMusicStopped() {
+    }
+
+
+    @Override
         public void onDestroy() {
             super.onDestroy();
+
+        Log.d("vinmusicservice","destroyed");
             if (remoteControlClient != null) {
                 RemoteControlClient.MetadataEditor metadataEditor = remoteControlClient.editMetadata(true);
                 metadataEditor.clear();
@@ -235,26 +325,23 @@ public class VinMusicService extends Service implements AudioManager.OnAudioFocu
             }
             NotificationManager.getInstance().removeObserver(this, NotificationManager.audioProgressDidChanged);
             NotificationManager.getInstance().removeObserver(this, NotificationManager.audioPlayStateChanged);
-        }
+        unregisterReceiver(broadcastReceiver);
+    }
 
 
     public void setListeners(RemoteViews view) {
         try {
+
             PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(NOTIFY_PREVIOUS),
                     PendingIntent.FLAG_UPDATE_CURRENT);
             view.setOnClickPendingIntent(R.id.player_previous, pendingIntent);
-
-            pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(NOTIFY_CLOSE), PendingIntent.FLAG_UPDATE_CURRENT);
-            view.setOnClickPendingIntent(R.id.player_close, pendingIntent);
-
-            pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(NOTIFY_PAUSE), PendingIntent.FLAG_UPDATE_CURRENT);
-            view.setOnClickPendingIntent(R.id.player_pause, pendingIntent);
 
             pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(NOTIFY_NEXT), PendingIntent.FLAG_UPDATE_CURRENT);
             view.setOnClickPendingIntent(R.id.player_next, pendingIntent);
 
             pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(NOTIFY_PLAY), PendingIntent.FLAG_UPDATE_CURRENT);
             view.setOnClickPendingIntent(R.id.player_play, pendingIntent);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -262,37 +349,22 @@ public class VinMusicService extends Service implements AudioManager.OnAudioFocu
 
     @Override
     public void onAudioFocusChange(int focusChange) {
-        if (ignoreAudioFocus) {
-            ignoreAudioFocus = false;
-            return;
-        }
+
         if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
             if (VinMedia.getInstance().isPlaying()) {
-                VinMedia.getInstance().getInstance().pauseMusic(getApplicationContext());
+                /*VinMedia.getInstance().getInstance().pauseMusic(getApplicationContext());
+                setAudioFocus();*/
             }
         } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
-             VinMedia.getInstance().resumeMusic(getApplicationContext());
+             if (AudioFocus){/*
+                 VinMedia.getInstance().resumeMusic(getApplicationContext());
+                 AudioFocus = false;*/
+             }
         }
     }
 
-    public static void setIgnoreAudioFocus() {
-        ignoreAudioFocus = true;
+    public static void setAudioFocus() {
+        AudioFocus = true;
     }
 
-    @Override
-    public void didReceivedNotification(int id, Object... args) {
-        if (id == NotificationManager.audioPlayStateChanged) {
-            HashMap<String,String> mSongDetail = VinMedia.getInstance().getCurrentSongDetails();
-            if (mSongDetail != null) {
-                createNotification(mSongDetail);
-            } else {
-                stopSelf();
-            }
-        }
-    }
-
-    @Override
-    public void newSongLoaded(Object... args) {
-
-    }
 }

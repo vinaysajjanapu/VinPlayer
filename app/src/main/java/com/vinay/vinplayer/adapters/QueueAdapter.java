@@ -5,17 +5,21 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.fragments.QueueFragment;
+import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
 
 import java.util.HashMap;
@@ -29,8 +33,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.ViewHolder>  {
 
-    private final List<HashMap<String,String>> mValues;
-    private final QueueFragment.OnQueueFragmentInteractionListener mListener;
+    private  List<HashMap<String,String>> mValues;
+    private  QueueFragment.OnQueueFragmentInteractionListener mListener;
     Context context;
     private BroadcastReceiver broadcastReceiver;
     private IntentFilter intentFilter;
@@ -58,8 +62,18 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.ViewHolder> 
                     mValues.get(position).get("album") + "\t-\t" + mValues.get(position).get("artist") + ""
             );
         }
+        holder.img_playindic.setVisibility(View.GONE);
+        holder.mView.setBackgroundColor(Color.TRANSPARENT);
 
+        if (position == VinMedia.getInstance().getPosition()){
+            Log.d("queue position", position+"");
+            holder.img_playindic.setVisibility(View.VISIBLE);
+            holder.songname.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+            holder.ArtisName_duration.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+            holder.ArtisName_duration.setTextColor(Color.WHITE);
+            holder.mView.setBackgroundColor(context.getResources().getColor(R.color.transparentLightBlack));
 
+        }
        // setupBroadCastReceiver(holder,position);
 
 
@@ -79,8 +93,7 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.ViewHolder> 
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
+                    //VinMedia.getInstance().startMusic(position,context);
                     mListener.OnQueueFragmentInteraction(position);
                 }
             }
@@ -98,6 +111,7 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.ViewHolder> 
         public final TextView ArtisName_duration;
         public final CircleImageView circleImageView;
         public final ImageView img_playindic;
+        private ImageButton more_icon;
         public HashMap<String,String> mItem;
 
         public ViewHolder(View view) {
@@ -107,10 +121,14 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.ViewHolder> 
             ArtisName_duration = (TextView) view.findViewById(R.id.ArtisName_duration);
             circleImageView = (CircleImageView)view.findViewById(R.id.SongThumb);
             img_playindic = (ImageView)view.findViewById(R.id.img_playindic);
+            img_playindic.setVisibility(View.GONE);
+            more_icon = (ImageButton)view.findViewById(R.id.img_moreicon);
 
-            img_playindic.setColorFilter(Color.WHITE);
+            more_icon.setColorFilter(Color.argb(180,255,255,255));
+
+            img_playindic.setColorFilter(Color.GREEN);
             songname.setTextColor(Color.WHITE);
-            ArtisName_duration.setTextColor(Color.WHITE);
+
         }
 
 

@@ -20,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
+import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -34,6 +35,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
@@ -112,6 +114,8 @@ public class MainActivity extends AppCompatActivity implements
     SharedPreferences media_settings;
     SharedPreferences.Editor editor;
 
+    boolean firstback=false;
+    long firstback_t;
 
 
 //    String contentURI=null;
@@ -154,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements
         setupNowPlayingPager();
         setupBroadCastReceiver();
 
-        createBlurredBackground(null);
+        slider.setBackground(BlurBuilder.getInstance().drawable_img("null",this));
     }
 
     private void setupBroadCastReceiver() {
@@ -202,8 +206,7 @@ public class MainActivity extends AppCompatActivity implements
 
                 Picasso.with(this).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
                         .into(sliderPlayer_albumart);
-
-                createBlurredBackground(uri.toString());
+                slider.setBackground(BlurBuilder.getInstance().drawable_img(songDetails.get("album_id"),this));
 
             } catch (Exception e) {
              //   e.printStackTrace();
@@ -349,45 +352,6 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    private void createBlurredBackground(String url) {
-        //  Bitmap emptyBitmap = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), myBitmap.getConfig());
-        //default_bg = BitmapFactory.decodeFile(url);
-        if (url != null) {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = 1;
-            default_bg = null;
-            try {
-                Uri uri = Uri.parse(url);
-                ParcelFileDescriptor pfd = this.getContentResolver().openFileDescriptor(uri, "r");
-                if (pfd != null) {
-                    FileDescriptor fd = pfd.getFileDescriptor();
-                    default_bg = BitmapFactory.decodeFileDescriptor(fd);
-                }
-            } catch (IOException e) {
-
-            }
-            //default_bg = ((BitmapDrawable)songAlbumbg.getDrawable()).getBitmap();
-            if (default_bg == null) {
-                default_bg = BitmapFactory.decodeResource(getResources(), R.drawable.albumart_default);
-            }
-        } else {
-            default_bg = BitmapFactory.decodeResource(getResources(), R.drawable.albumart_default);
-        }
-        temp_input = default_bg.copy(Bitmap.Config.ARGB_8888, true);
-        input_to_blur = Bitmap.createScaledBitmap(temp_input, 300, 300, false);
-        blurredBitmap = BlurBuilder.blur(this, input_to_blur);
-        blurredBitmap1 = BlurBuilder.blur(this, input_to_blur);
-
-        //BitmapDrawable background = new BitmapDrawable(context.getResources(),default_bg);
-        dr = new BitmapDrawable(blurredBitmap);
-        slider.setBackground(dr);
-        dr = null;
-        temp_input = null;
-        input_to_blur = null;
-        blurredBitmap = null;
-        blurredBitmap1 = null;
-        //view.setBackgroundDrawable( new BitmapDrawable( getResources(), blurredBitmap ) );
-    }
 
     @Override
     public void onClick(View v) {
@@ -401,7 +365,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        addObserver();
         //vm.VinMediaInitialize();
         sendBroadcast(new Intent().setAction(getString(R.string.newSongLoaded)));
         registerReceiver(broadcastReceiver, intentFilter);
@@ -414,8 +377,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        removeObserver();
-
     }
 
     @Override
@@ -432,9 +393,19 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onBackPressed() {
-
-        super.onBackPressed();
-
+        if (slidingUpPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED){
+            slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        }else {
+            if (firstback){
+                if (System.currentTimeMillis()-firstback_t<1000){
+                    super.onBackPressed();
+                }
+                firstback = false;
+            }
+            firstback = true;
+            firstback_t = System.currentTimeMillis();
+            Toast.makeText(this,"Press again to quit",Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -583,22 +554,6 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             VinMedia.getInstance().startMusic(position,this);
         }
-    }
-
-    public void addObserver() {
-        NotificationManager.getInstance().addObserver(this, NotificationManager.audioDidReset);
-        NotificationManager.getInstance().addObserver(this, NotificationManager.audioPlayStateChanged);
-        NotificationManager.getInstance().addObserver(this, NotificationManager.audioDidStarted);
-        NotificationManager.getInstance().addObserver(this, NotificationManager.audioProgressDidChanged);
-        NotificationManager.getInstance().addObserver(this, NotificationManager.newaudioloaded);
-    }
-
-    public void removeObserver() {
-        NotificationManager.getInstance().removeObserver(this, NotificationManager.audioDidReset);
-        NotificationManager.getInstance().removeObserver(this, NotificationManager.audioPlayStateChanged);
-        NotificationManager.getInstance().removeObserver(this, NotificationManager.audioDidStarted);
-        NotificationManager.getInstance().removeObserver(this, NotificationManager.audioProgressDidChanged);
-        NotificationManager.getInstance().removeObserver(this, NotificationManager.newaudioloaded);
     }
 
     public  boolean isStoragePermissionGranted() {
