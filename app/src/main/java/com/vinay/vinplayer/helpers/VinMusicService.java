@@ -28,7 +28,6 @@ import android.view.View;
 import android.widget.RemoteViews;
 
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
-import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.VinPlayer;
 import com.vinay.vinplayer.views.MainActivity;
@@ -223,17 +222,17 @@ public class VinMusicService extends Service implements AudioManager.OnAudioFocu
             }
 
 
-
-            if (VinMedia.getInstance().isPlaying()) {
-                notification.contentView.setImageViewBitmap(R.id.player_play, pause);
-                if (supportBigNotifications)
-                    notification.bigContentView.setImageViewBitmap(R.id.player_play,pause);
-            }
-            else {
-                notification.contentView.setImageViewBitmap(R.id.player_play,play);
-                if (supportBigNotifications)
-                    notification.bigContentView.setImageViewBitmap(R.id.player_play,play);
-            }
+//
+//            if (VinMedia.getInstance().isPlaying()) {
+//                notification.contentView.setImageViewBitmap(R.id.player_play, pause);
+//                if (supportBigNotifications)
+//                    notification.bigContentView.setImageViewBitmap(R.id.player_play,pause);
+//            }
+//            else {
+//                notification.contentView.setImageViewBitmap(R.id.player_play,play);
+//                if (supportBigNotifications)
+//                    notification.bigContentView.setImageViewBitmap(R.id.player_play,play);
+//            }
 
             /*notification.flags |= Notification.FLAG_ONGOING_EVENT;
             startForeground(5, notification);*/

@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.helpers.VinMedia;
 
@@ -57,8 +57,15 @@ public class AlbumArtFragment extends Fragment {
                     .parse("content://media/external/audio/albumart");
             Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(songDetails.get("album_id")));
 
-            Picasso.with(getActivity()).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
+            /*Picasso.with(getActivity()).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
                     .into(albumArt);
+            */Glide.with(getActivity())
+                    .load(uri)
+                    .centerCrop()
+                    .placeholder(R.drawable.albumart_default)
+                    .crossFade()
+                    .into(albumArt);
+
         }catch (Exception e){
             e.printStackTrace();
         }

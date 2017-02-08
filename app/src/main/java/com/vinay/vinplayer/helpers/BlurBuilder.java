@@ -69,10 +69,11 @@ public class BlurBuilder {
             default_bg = VinMediaLists.getInstance().getAlbumart(Long.parseLong(album_id),context);
         }else default_bg = BitmapFactory.decodeResource(context.getResources(),R.drawable.albumart_default);
 
-        Bitmap temp_input = default_bg.copy(Bitmap.Config.ARGB_8888, true);
+        Bitmap temp_input = default_bg.copy(Bitmap.Config.ARGB_4444, true);
         Bitmap input_to_blur = Bitmap.createScaledBitmap(temp_input, 300, 300, false);
         Bitmap blurredBitmap = blur_bitmap(context, input_to_blur);
         Drawable dr = new BitmapDrawable(blurredBitmap);
+        default_bg= null;
         blurredBitmap = null;
         input_to_blur = null;
         temp_input = null;

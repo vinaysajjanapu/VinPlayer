@@ -6,5 +6,8 @@
     <dimen name="albumdetailswidth">420dp</dimen>
     <dimen name="albumdetailsheight">600dp</dimen>
 
+    <item name="albumspage_thumb_scale" type="dimen" format="float">0.5</item>
+    <item name="songlist_thumb_scale" type="dimen" format="float">0.5</item>
+
 
 </resources>

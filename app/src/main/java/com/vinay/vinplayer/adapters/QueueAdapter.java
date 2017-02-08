@@ -16,7 +16,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.fragments.QueueFragment;
 import com.vinay.vinplayer.helpers.VinMedia;
@@ -82,7 +82,18 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.ViewHolder> 
             final Uri sArtworkUri = Uri
                     .parse("content://media/external/audio/albumart");
             Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mValues.get(position).get("album_id")));
-            Picasso.with(context).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
+            /*Picasso.with(context).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
+                    .into(holder.circleImageView);
+            */
+
+            Glide.with(context)
+                    .load(uri)
+                    .centerCrop()
+                    .thumbnail(0.2f)
+                    .override(context.getResources().getInteger(R.integer.songlist_item_albumart_size),
+                            context.getResources().getInteger(R.integer.songlist_item_albumart_size))
+                    .placeholder(R.drawable.albumart_default)
+                    .crossFade()
                     .into(holder.circleImageView);
 
         } catch (Exception e) {
