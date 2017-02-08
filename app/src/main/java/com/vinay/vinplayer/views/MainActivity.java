@@ -37,9 +37,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
-import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.anim.ScaleInOutTransformer;
 import com.vinay.vinplayer.fragments.AlbumDetailsActivity;
@@ -205,8 +205,18 @@ public class MainActivity extends AppCompatActivity implements
                         .parse("content://media/external/audio/albumart");
                 Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(songDetails.get("album_id")));
 
-                Picasso.with(this).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
+                /*Picasso.with(this).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
                         .into(sliderPlayer_albumart);
+                */Glide.with(this)
+                        .load(uri)
+                        .centerCrop()
+                        .thumbnail(0.2f)
+                        .override((int)this.getResources().getInteger(R.integer.songlist_item_albumart_size),
+                                (int)this.getResources().getInteger(R.integer.songlist_item_albumart_size))
+                        .placeholder(R.drawable.albumart_default)
+                        .crossFade()
+                        .into(sliderPlayer_albumart);
+
                 slider.setBackground(BlurBuilder.getInstance().drawable_img(songDetails.get("album_id"),this));
 
             } catch (Exception e) {

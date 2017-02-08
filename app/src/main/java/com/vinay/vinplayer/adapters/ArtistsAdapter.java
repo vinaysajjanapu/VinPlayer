@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.fragments.ArtistsFragment;
 
@@ -49,7 +49,17 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ViewHold
             final Uri sArtworkUri = Uri
                     .parse("content://media/external/audio/albumart/0");
             //Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mValues.get(0).get("album_id")));
-            Picasso.with(context).load(sArtworkUri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
+          /*  Picasso.with(context).load(sArtworkUri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
+                    .into(holder.imageView);
+          */
+            Glide.with(context)
+                    .load(sArtworkUri)
+                    .centerCrop()/*
+                    .thumbnail(context.getResources().getDimension(R.dimen.albumspage_thumb_scale))*/
+                    .override(context.getResources().getInteger(R.integer.albums_page_albumart_size),
+                            context.getResources().getInteger(R.integer.albums_page_albumart_size))
+                    .placeholder(R.drawable.albumart_default)
+                    .crossFade()
                     .into(holder.imageView);
 
         } catch (Exception e) {
