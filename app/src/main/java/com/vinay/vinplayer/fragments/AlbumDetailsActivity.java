@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
@@ -18,8 +19,6 @@ import com.squareup.picasso.Target;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.adapters.AlbumSongsAdapter;
 import com.vinay.vinplayer.helpers.BlurBuilder;
-import com.vinay.vinplayer.views.MainActivity;
-
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -34,20 +33,19 @@ public class AlbumDetailsActivity extends SlidingActivity {
     Bitmap default_bg;
     public static Drawable dr;
     static ArrayList<HashMap<String,String>> allsongs;
+
         @Override
     public void init(Bundle savedInstanceState) {
 
             setTitle("jj");
+            setImage(R.drawable.albumart_default);
             setContent(R.layout.fragment_album_details);
 
             setPrimaryColors( getResources().getColor(R.color.transparentLightBlack),
                     getResources().getColor(R.color.transparentBlack));
 
-            expandFromPoints(0,0,0,0);
-           // addContentView();
-
-
-            allsongs= (ArrayList<HashMap<String, String>>) getIntent().getSerializableExtra("list");
+            //expandFromPoints(0,0,0,0);
+           allsongs= (ArrayList<HashMap<String, String>>) getIntent().getSerializableExtra("list");
 
 
         recyclerView = (RecyclerView) findViewById(R.id.album_details_list);
