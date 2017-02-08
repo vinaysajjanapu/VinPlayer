@@ -14,11 +14,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.Request;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SizeReadyCallback;
-import com.bumptech.glide.request.target.Target;
 import com.klinker.android.sliding.SlidingActivity;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.adapters.AlbumSongsAdapter;

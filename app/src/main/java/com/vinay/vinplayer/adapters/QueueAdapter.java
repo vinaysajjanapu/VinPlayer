@@ -15,8 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.bumptech.glide.Glide;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.fragments.QueueFragment;
 import com.vinay.vinplayer.helpers.VinMedia;
@@ -86,16 +85,8 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.ViewHolder> 
                     .into(holder.circleImageView);
             */
 
-            Glide.with(context)
-                    .load(uri)
-                    .centerCrop()
-                    .thumbnail(0.2f)
-                    .override(context.getResources().getInteger(R.integer.songlist_item_albumart_size),
-                            context.getResources().getInteger(R.integer.songlist_item_albumart_size))
-                    .placeholder(R.drawable.albumart_default)
-                    .crossFade()
-                    .into(holder.circleImageView);
 
+            ImageLoader.getInstance().displayImage(uri.toString(), holder.circleImageView);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -5,6 +5,10 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Handler;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+
+import static com.vinay.vinplayer.helpers.ImageLoaderOptions.config;
+
 /**
  * Created by vinaysajjanapu on 5/2/17.
  */
@@ -18,6 +22,8 @@ public class VinPlayer extends Application {
         super.onCreate();
         applicationContext = getApplicationContext();
         applicationHandler = new Handler(applicationContext.getMainLooper());
+
+        ImageLoader.getInstance().init(config); // Get singleton instance
 
     }
 

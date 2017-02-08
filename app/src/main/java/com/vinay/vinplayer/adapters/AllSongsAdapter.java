@@ -17,7 +17,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.fragments.AllSongsFragment.OnListFragmentInteractionListener;
 import com.vinay.vinplayer.helpers.VinMedia;
@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+
+import static com.vinay.vinplayer.helpers.ImageLoaderOptions.config;
 
 public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHolder> {
 
@@ -75,19 +77,11 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
                     .parse("content://media/external/audio/albumart");
             Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mValues.get(position).get("album_id")));
 
-
-            Glide.with(context)
-                    .load(uri)
-                    .centerCrop()
-                    .thumbnail(0.1f)
-                    .override(context.getResources().getInteger(R.integer.songlist_item_albumart_size),
-                            context.getResources().getInteger(R.integer.songlist_item_albumart_size))
-                    .placeholder(R.drawable.albumart_default)
-                    .crossFade()
-                    .into(holder.circleImageView);
+            ImageLoader.getInstance().displayImage(uri.toString(), holder.circleImageView);
 
         } catch (Exception e) {
             e.printStackTrace();
+
         }
 
         holder.mView.setOnClickListener(new View.OnClickListener() {

@@ -37,7 +37,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.vinay.vinplayer.R;
@@ -207,15 +207,9 @@ public class MainActivity extends AppCompatActivity implements
 
                 /*Picasso.with(this).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
                         .into(sliderPlayer_albumart);
-                */Glide.with(this)
-                        .load(uri)
-                        .centerCrop()
-                        .thumbnail(0.2f)
-                        .override((int)this.getResources().getInteger(R.integer.songlist_item_albumart_size),
-                                (int)this.getResources().getInteger(R.integer.songlist_item_albumart_size))
-                        .placeholder(R.drawable.albumart_default)
-                        .crossFade()
-                        .into(sliderPlayer_albumart);
+                */
+
+                ImageLoader.getInstance().displayImage(uri.toString(),sliderPlayer_albumart);
 
                 slider.setBackground(BlurBuilder.getInstance().drawable_img(songDetails.get("album_id"),this));
 
