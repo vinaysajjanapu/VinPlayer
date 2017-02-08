@@ -39,6 +39,7 @@ import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
+import com.vinay.vinplayer.anim.ScaleInOutTransformer;
 import com.vinay.vinplayer.fragments.AlbumDetailsActivity;
 import com.vinay.vinplayer.fragments.AlbumsFragment;
 import com.vinay.vinplayer.fragments.AllSongsFragment;
@@ -256,7 +257,8 @@ public class MainActivity extends AppCompatActivity implements
         librayViewPager.setAdapter(adapter);
         tabLayout = (SpringIndicator) findViewById(R.id.tabs);
         tabLayout.setViewPager(librayViewPager);
-
+        // set transitions
+        librayViewPager.setPageTransformer(true,new ScaleInOutTransformer());
 
     }
 
