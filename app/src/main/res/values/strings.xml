@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">VinPlayer</string>
+    <string name="db_name">VinPlayer</string>
+    <string name="db_version">1</string>
 
     <!--Broadcast Intent Names-->
     <string name="newSongLoaded">newSongLoaded</string>

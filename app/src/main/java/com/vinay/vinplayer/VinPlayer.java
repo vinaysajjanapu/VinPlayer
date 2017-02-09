@@ -16,6 +16,7 @@ public class VinPlayer extends Application {
 
     public static Context applicationContext = null;
     public static volatile Handler applicationHandler = null;
+    public static String default_art = "file:///android_asset/album_default.png";
 
     @Override
     public void onCreate() {

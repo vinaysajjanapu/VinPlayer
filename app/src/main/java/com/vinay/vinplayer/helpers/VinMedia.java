@@ -276,6 +276,10 @@ public class VinMedia implements NotificationManager.NotificationCenterDelegate,
         return position;
     }
 
+    public int getCurrentQueueSize(){
+        return (getCurrentList()!=null)?getCurrentList().size():0;
+    }
+
     public int getDuration(){
         return (getCurrentSongDetails()!=null)? Integer.parseInt(getCurrentSongDetails().get("duration")):0;
     }

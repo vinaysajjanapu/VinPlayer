@@ -14,17 +14,16 @@ android:layout_centerHorizontal="true"
     <LinearLayout
         android:layout_width="match_parent"
         android:orientation="vertical"
-        android:padding="15dp"
         android:gravity="center"
         android:layout_height="wrap_content">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="13dp"
+            android:textSize="@dimen/nowplaying_songdetails_textsize"
             android:textColor="@android:color/white"
             android:singleLine="true"
-            android:text="asdfghjklasdfghjkl;asdfghjk"
+            android:text="album and artist details"
             android:gravity="center_horizontal"
             android:id="@+id/nowplaying_songdetails"
             android:layout_marginBottom="5dp"/>
@@ -32,10 +31,10 @@ android:layout_centerHorizontal="true"
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
-            android:textSize="23dp"
+            android:textSize="@dimen/nowplaying_songname_textsize"
             android:singleLine="true"
-            android:text="Title of The Song"
+            android:text="Song Title"
+            android:layout_marginBottom="@dimen/nowplaying_songname_margin_bottom"
             android:gravity="center_horizontal"
             android:id="@+id/nowplaying_songtitle"/>
 
@@ -52,18 +51,9 @@ android:layout_centerHorizontal="true"
 
 <RelativeLayout
     android:layout_width="match_parent"
-    android:layout_height="450dp"
+    android:layout_marginTop="@dimen/nowplaying_albumart_margin_top"
+    android:layout_height="@dimen/nowplaying_albumart_height"
     >
-
-    <!--AlbumArt -->
-    <!--<ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/albumart_nowplaying"
-        android:src="@drawable/albumart_default"
-        android:scaleType="fitCenter"
-        />
--->
     <android.support.v4.view.ViewPager
         android:layout_width="match_parent"
         android:layout_height="match_parent"

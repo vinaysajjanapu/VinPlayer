@@ -1,4 +1,5 @@
 <LinearLayout android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_height="wrap_content"
     xmlns:android="http://schemas.android.com/apk/res/android">
@@ -13,11 +14,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:textSize="@dimen/nowplaying_progress_textsize"
             android:id="@+id/nowplaying_song_currentduration"
             android:text="02:36"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="@dimen/nowplaying_progress_textsize"
             android:layout_alignParentRight="true"
             android:id="@+id/nowplaying_song_duration"
             android:text="05:46"/>
@@ -28,73 +31,150 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:max="100"
-        android:progress="30"
+        android:progress="0"
         android:id="@+id/nowplaying_seekbar"
         />
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="160dp">
+        android:layout_height="@dimen/nowplaying_playercontrols_height"
+        android:layout_marginBottom="@dimen/nowplaying_playercontrols_margin_bottom">
 
+
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:id="@+id/ripple_play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:padding="@dimen/nowplaying_play_layout_margin"
+            app:mrl_rippleOverlay="true"
+            app:mrl_rippleColor="#fff"
+            app:mrl_rippleAlpha="0.1"
+            app:mrl_rippleHover="true"
+            app:mrl_rippleRoundedCorners="60dp"
+            app:mrl_rippleDuration="350"
+            app:mrl_rippleFadeDuration="75"
+            app:mrl_rippleDelayClick="true"
+            app:mrl_ripplePersistent="false">
         <ImageButton
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:layout_width="@dimen/nowplaying_play_button_size"
+            android:layout_height="@dimen/nowplaying_play_button_size"
             android:background="@android:color/transparent"
             android:id="@+id/nowplaying_button_play_pause"
             android:src="@drawable/icon_play"
             android:scaleType="fitXY"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
             />
+        </com.balysv.materialripple.MaterialRippleLayout>
+
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:id="@+id/ripple_prev"
+            android:layout_width="wrap_content"
+            android:layout_toLeftOf="@+id/ripple_play"
+            android:layout_centerVertical="true"
+            android:padding="@dimen/nowplaying_next_layout_margin"
+            android:layout_height="wrap_content"
+            app:mrl_rippleOverlay="true"
+            app:mrl_rippleColor="#fff"
+            app:mrl_rippleAlpha="0.1"
+            app:mrl_rippleHover="true"
+            app:mrl_rippleRoundedCorners="30dp"
+            app:mrl_rippleDuration="350"
+            app:mrl_rippleFadeDuration="75"
+            app:mrl_rippleDelayClick="true"
+            app:mrl_ripplePersistent="false">
 
         <ImageButton
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="@dimen/nowplaying_next_prev_button_size"
+            android:layout_height="@dimen/nowplaying_next_prev_button_size"
             android:background="@android:color/transparent"
             android:id="@+id/nowplaying_button_previous"
             android:src="@drawable/icon_previous"
             android:scaleType="fitXY"
-            android:layout_toLeftOf="@+id/nowplaying_button_play_pause"
-            android:layout_centerVertical="true"
-            android:layout_margin="20dp"
             />
+        </com.balysv.materialripple.MaterialRippleLayout>
+
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:id="@+id/ripple_next"
+            android:layout_width="wrap_content"
+            android:layout_toRightOf="@+id/ripple_play"
+            android:layout_centerVertical="true"
+            android:padding="@dimen/nowplaying_next_layout_margin"
+            android:layout_height="wrap_content"
+            app:mrl_rippleOverlay="true"
+            app:mrl_rippleColor="#fff"
+            app:mrl_rippleAlpha="0.1"
+            app:mrl_rippleHover="true"
+            app:mrl_rippleRoundedCorners="30dp"
+            app:mrl_rippleDuration="350"
+            app:mrl_rippleFadeDuration="75"
+            app:mrl_rippleDelayClick="true"
+            app:mrl_ripplePersistent="false">
 
         <ImageButton
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="@dimen/nowplaying_next_prev_button_size"
+            android:layout_height="@dimen/nowplaying_next_prev_button_size"
             android:background="@android:color/transparent"
             android:id="@+id/nowplaying_button_next"
             android:src="@drawable/icon_next"
             android:scaleType="fitXY"
-            android:layout_toRightOf="@+id/nowplaying_button_play_pause"
-            android:layout_centerVertical="true"
-            android:layout_margin="20dp"
             />
+        </com.balysv.materialripple.MaterialRippleLayout>
+
+
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:id="@+id/ripple_shuffle"
+            android:layout_width="wrap_content"
+            android:layout_toRightOf="@+id/ripple_next"
+            android:layout_centerVertical="true"
+            android:padding="@dimen/nowplaying_shuffle_layout_margin"
+            android:layout_height="wrap_content"
+            app:mrl_rippleOverlay="true"
+            app:mrl_rippleColor="#fff"
+            app:mrl_rippleAlpha="0.1"
+            app:mrl_rippleHover="true"
+            app:mrl_rippleRoundedCorners="20dp"
+            app:mrl_rippleDuration="350"
+            app:mrl_rippleFadeDuration="75"
+            app:mrl_rippleDelayClick="true"
+            app:mrl_ripplePersistent="false">
 
         <ImageButton
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="@dimen/nowplaying_shuffle_repeat_button_size"
+            android:layout_height="@dimen/nowplaying_shuffle_repeat_button_size"
             android:background="@android:color/transparent"
             android:id="@+id/nowplaying_button_shuffle"
             android:src="@drawable/icon_shuffle_music"
             android:scaleType="fitXY"
-            android:layout_toRightOf="@+id/nowplaying_button_next"
-            android:layout_centerVertical="true"
-            android:layout_margin="20dp"
             />
+        </com.balysv.materialripple.MaterialRippleLayout>
 
 
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:id="@+id/ripple_repeat"
+            android:layout_width="wrap_content"
+            android:layout_toLeftOf="@+id/ripple_prev"
+            android:layout_centerVertical="true"
+            android:padding="@dimen/nowplaying_shuffle_layout_margin"
+            android:layout_height="wrap_content"
+            app:mrl_rippleOverlay="true"
+            app:mrl_rippleColor="#fff"
+            app:mrl_rippleAlpha="0.1"
+            app:mrl_rippleHover="true"
+            app:mrl_rippleRoundedCorners="20dp"
+            app:mrl_rippleDuration="350"
+            app:mrl_rippleFadeDuration="75"
+            app:mrl_rippleDelayClick="true"
+            app:mrl_ripplePersistent="false">
         <ImageButton
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="@dimen/nowplaying_shuffle_repeat_button_size"
+            android:layout_height="@dimen/nowplaying_shuffle_repeat_button_size"
             android:background="@android:color/transparent"
             android:id="@+id/nowplaying_button_repeat"
             android:src="@drawable/icon_repeat_music"
             android:scaleType="fitXY"
-            android:layout_toLeftOf="@+id/nowplaying_button_previous"
-            android:layout_centerVertical="true"
-            android:layout_margin="20dp"
             />
+        </com.balysv.materialripple.MaterialRippleLayout>
 
 
     </RelativeLayout>

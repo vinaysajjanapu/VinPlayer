@@ -38,13 +38,14 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.vinay.vinplayer.R;
-import com.vinay.vinplayer.anim.ScaleInOutTransformer;
+import com.vinay.vinplayer.anim.AccordionTransformer;
 import com.vinay.vinplayer.fragments.AlbumDetailsActivity;
 import com.vinay.vinplayer.fragments.AlbumsFragment;
 import com.vinay.vinplayer.fragments.AllSongsFragment;
 import com.vinay.vinplayer.fragments.ArtistDetailsFragment;
 import com.vinay.vinplayer.fragments.ArtistsFragment;
 import com.vinay.vinplayer.fragments.GenreFragment;
+import com.vinay.vinplayer.fragments.HomeFragment;
 import com.vinay.vinplayer.fragments.NowPlayingFragment;
 import com.vinay.vinplayer.fragments.QueueFragment;
 import com.vinay.vinplayer.helpers.BlurBuilder;
@@ -95,11 +96,6 @@ public class MainActivity extends AppCompatActivity implements
     NowPlayingPagerAdapter nowPlayingPagerAdapter;
     List<Fragment> NowPlayingFragments = new ArrayList<>();
 
-    Bitmap blurredBitmap, blurredBitmap1;
-    Bitmap input_to_blur;
-    Bitmap temp_input;
-    Bitmap default_bg;
-    Drawable dr;
     IntentFilter intentFilter;
     BroadcastReceiver broadcastReceiver;
     SystemBarTintManager tintManager;
@@ -114,9 +110,6 @@ public class MainActivity extends AppCompatActivity implements
     long firstback_t;
 
     ImageView iv_search;
-
-
-//    String contentURI=null;
 
 
     @Override
@@ -159,6 +152,7 @@ public class MainActivity extends AppCompatActivity implements
         slider.setBackground(BlurBuilder.getInstance().drawable_img("null",this));
 
         iv_search= (ImageView) findViewById(R.id.iv_search);
+        iv_search.setColorFilter(Color.WHITE);
         iv_search.setOnClickListener(this);
     }
 
@@ -214,7 +208,8 @@ public class MainActivity extends AppCompatActivity implements
                 slider.setBackground(BlurBuilder.getInstance().drawable_img(songDetails.get("album_id"),this));
 
             } catch (Exception e) {
-             //   e.printStackTrace();
+             //   e.printStackTrace(
+//    String contentURI=null;);
             }
 
             sliderPlayer_progressBar.setMax(VinMedia.getInstance().getDuration()/1000);
@@ -250,10 +245,12 @@ public class MainActivity extends AppCompatActivity implements
     private void setupLibraryViewPager() {
 
         librayViewPager = (ViewPager) findViewById(R.id.viewpager);
+        mFragmentList.add(HomeFragment.newInstance());
         mFragmentList.add(AllSongsFragment.newInstance(1, VinMediaLists.getInstance().getAllSongsList(this)));
         mFragmentList.add(AlbumsFragment.newInstance(VinMediaLists.getInstance().getAlbumsList(this)));
         mFragmentList.add(ArtistsFragment.newInstance(VinMediaLists.getInstance().getArtistsList(this)));
         mFragmentList.add(GenreFragment.newInstance(VinMediaLists.getInstance().getGenresList(this)));
+        titles.add("home");
         titles.add("all");
         titles.add("album");
         titles.add("artist");
@@ -265,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements
         tabLayout = (SpringIndicator) findViewById(R.id.tabs);
         tabLayout.setViewPager(librayViewPager);
         // set transitions
-        librayViewPager.setPageTransformer(true,new ScaleInOutTransformer());
+        librayViewPager.setPageTransformer(true,new AccordionTransformer());
 
     }
 
@@ -355,6 +352,7 @@ public class MainActivity extends AppCompatActivity implements
         NowPlayingFragments.add(QueueFragment.newInstance(1));
         nowPlayingPagerAdapter = new NowPlayingPagerAdapter(getSupportFragmentManager());
         nowPlayingPager.setAdapter(nowPlayingPagerAdapter);
+        nowPlayingPager.setPageTransformer(true,new AccordionTransformer());
 
     }
 
@@ -592,34 +590,5 @@ public class MainActivity extends AppCompatActivity implements
             //resume tasks needing this permission
         }
     }
-
-    /*private void setStatusBarTint() {
-        try {
-            setTranslucentStatus(true);
-            TypedValue typedValueStatusBarColor = new TypedValue();
-            getTheme().resolveAttribute(R.attr.colorPrimaryDark, typedValueStatusBarColor, true);
-            final int colorStatusBar = typedValueStatusBarColor.data;
-
-            SystemBarTintManager tintManager = new SystemBarTintManager(this);
-            tintManager.setStatusBarTintEnabled(true);
-            tintManager.setStatusBarTintColor(colorStatusBar);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    private void setTranslucentStatus(boolean on) {
-        Window win = getWindow();
-        WindowManager.LayoutParams winParams = win.getAttributes();
-        final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
-        if (on) {
-            winParams.flags |= bits;
-        } else {
-            winParams.flags &= ~bits;
-        }
-        win.setAttributes(winParams);
-    }*/
-
-
 }
-
 

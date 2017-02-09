@@ -20,8 +20,11 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.vinay.vinplayer.R;
+import com.vinay.vinplayer.anim.AccordionTransformer;
+import com.vinay.vinplayer.anim.CubeInTransformer;
 import com.vinay.vinplayer.helpers.VinMedia;
 
 
@@ -137,7 +140,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
         albumArtPagerAdapter = new AlbumArtPagerAdapter(getActivity().getSupportFragmentManager());
 
         albumArtPager.setAdapter(albumArtPagerAdapter);
-
+        albumArtPager.setPageTransformer(true,new AccordionTransformer());
 
         playerSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -327,17 +330,21 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
 
                 case R.id.nowplaying_button_shuffle:
                     Log.d("shuffle button","clicked");
-                    if (media_settings.getBoolean(getActivity().getString(R.string.shuffle),true)){
-                        playerButtonShuffle.setColorFilter(Color.WHITE);
-                        editor.putBoolean(getActivity().getString(R.string.shuffle),false);
-                        editor.apply();
+                    if (VinMedia.getInstance().getCurrentQueueSize()!=0) {
+                        if (media_settings.getBoolean(getActivity().getString(R.string.shuffle), true)) {
+                            playerButtonShuffle.setColorFilter(Color.WHITE);
+                            editor.putBoolean(getActivity().getString(R.string.shuffle), false);
+                            editor.apply();
+                        } else {
+                            playerButtonShuffle.setColorFilter(Color.GREEN);
+                            editor.putBoolean(getActivity().getString(R.string.shuffle), true);
+                            editor.apply();
+                            VinMedia.getInstance().createShuffleQueue();
+                        }
                     }else {
-                        playerButtonShuffle.setColorFilter(Color.GREEN);
-                        editor.putBoolean(getActivity().getString(R.string.shuffle),true);
-                        editor.apply();
-                        VinMedia.getInstance().createShuffleQueue();
+                        Toast.makeText(getActivity(),"First Add few songs to the Queue",Toast.LENGTH_SHORT).show();
                     }
-                break;
+                    break;
 
                 case R.id.nowplaying_button_repeat:
                     Log.d("repeat button","clicked");

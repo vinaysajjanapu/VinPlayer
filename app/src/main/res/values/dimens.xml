@@ -3,6 +3,28 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+
+
+    <dimen name="nowplaying_albumart_height">400dp</dimen>
+    <dimen name="nowplaying_albumart_margin_top">23dp</dimen>
+
+    <dimen name="nowplaying_songname_margin_bottom">10dp</dimen>
+    <dimen name="nowplaying_songname_textsize">18dp</dimen>
+    <dimen name="nowplaying_songdetails_textsize">12dp</dimen>
+    <dimen name="nowplaying_progress_textsize">12dp</dimen>
+
+    <dimen name="nowplaying_playercontrols_height">100dp</dimen>
+    <dimen name="nowplaying_playercontrols_margin_bottom">10dp</dimen>
+    <dimen name="nowplaying_play_button_size">65dp</dimen>
+    <dimen name="nowplaying_next_prev_button_size">35dp</dimen>
+    <dimen name="nowplaying_shuffle_repeat_button_size">25dp</dimen>
+
+    <dimen name="nowplaying_shuffle_layout_margin">10dp</dimen>
+    <dimen name="nowplaying_play_layout_margin">5dp</dimen>
+    <dimen name="nowplaying_next_layout_margin">15dp</dimen>
+
+
+
     <dimen name="albumdetailswidth">420dp</dimen>
     <dimen name="albumdetailsheight">600dp</dimen>
 

@@ -15,8 +15,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.helpers.VinMedia;
+import com.vinay.vinplayer.helpers.VinMediaLists;
 
 import java.util.HashMap;
 
@@ -55,15 +57,21 @@ public class AlbumArtFragment extends Fragment {
         try {
             final Uri sArtworkUri = Uri
                     .parse("content://media/external/audio/albumart");
+
+
             Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(songDetails.get("album_id")));
 
-            /*Picasso.with(getActivity()).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
+            Picasso.with(getActivity()).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
                     .into(albumArt);
-            */
+            /*
             ImageLoader.getInstance().displayImage(uri.toString(),albumArt);
-
+*/
+            /*albumArt.setImageBitmap(
+                    VinMediaLists.getInstance().getAlbumart(
+                            Long.parseLong(songDetails.get("album_id")),getActivity()));
+        */
         }catch (Exception e){
-            e.printStackTrace();
+        //    e.printStackTrace();
         }
 
         return view;
