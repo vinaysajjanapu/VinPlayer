@@ -28,13 +28,16 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.MUSIC_PLAYER" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.APP_MUSIC" />
                 <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:scheme="content" />
                 <data android:host="media" />
                 <data android:mimeType="audio/*" />
@@ -55,8 +58,10 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data android:scheme="http" />
                 <data android:mimeType="audio/*" />
                 <data android:mimeType="application/ogg" />
@@ -65,15 +70,17 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="com.vinplayer.AUDIO_PLAYER" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <intent-filter>
                 <action android:name="com.cyanogenmod.eleven.AUDIO_PLAYER" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-
         </activity>
-        <activity android:name=".fragments.AlbumDetailsActivity"
+        <activity
+            android:name=".fragments.AlbumDetailsActivity"
             android:excludeFromRecents="true"
             android:taskAffinity=""
             android:theme="@style/Theme.Sliding.Light" />
@@ -95,6 +102,7 @@
             </intent-filter>
         </receiver>
 
+        <activity android:name=".views.SearchActivity"></activity>
     </application>
 
 </manifest>

@@ -10,17 +10,13 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.ParcelFileDescriptor;
-import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -32,6 +28,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -55,8 +52,6 @@ import com.vinay.vinplayer.helpers.NotificationManager;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
 
-import java.io.FileDescriptor;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -118,6 +113,8 @@ public class MainActivity extends AppCompatActivity implements
     boolean firstback=false;
     long firstback_t;
 
+    ImageView iv_search;
+
 
 //    String contentURI=null;
 
@@ -160,6 +157,9 @@ public class MainActivity extends AppCompatActivity implements
         setupBroadCastReceiver();
 
         slider.setBackground(BlurBuilder.getInstance().drawable_img("null",this));
+
+        iv_search= (ImageView) findViewById(R.id.iv_search);
+        iv_search.setOnClickListener(this);
     }
 
     private void setupBroadCastReceiver() {
@@ -365,6 +365,10 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.slider_playing_button_playpause:
                 playPauseAction();
                 break;
+            case R.id.iv_search:
+                startActivity(new Intent(getApplicationContext(),SearchActivity.class));
+                break;
+            default:break;
         }
     }
 
@@ -615,5 +619,7 @@ public class MainActivity extends AppCompatActivity implements
         win.setAttributes(winParams);
     }*/
 
+
 }
+
 

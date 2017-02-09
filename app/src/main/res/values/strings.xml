@@ -10,12 +10,11 @@
     <string name="queueUpdated">queueUpdated</string>
 
 
-
     <!--media settings-->
     <string name="media_settings">media_settings</string>
     <string name="shuffle">shuffle</string>
     <string name="repeat_mode">repeatmode</string>
-
+    <string name="action_search">search</string>
 
 
 </resources>

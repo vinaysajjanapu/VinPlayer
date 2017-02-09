@@ -1,15 +1,9 @@
 package com.vinay.vinplayer.fragments;
 
-import android.content.ContentUris;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.ParcelFileDescriptor;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,8 +14,6 @@ import com.vinay.vinplayer.adapters.AlbumSongsAdapter;
 import com.vinay.vinplayer.helpers.BlurBuilder;
 import com.vinay.vinplayer.helpers.VinMediaLists;
 
-import java.io.FileDescriptor;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -37,16 +29,15 @@ public class AlbumDetailsActivity extends SlidingActivity {
         @Override
     public void init(Bundle savedInstanceState) {
 
-            setTitle("jj");
-            setImage(R.drawable.albumart_default);
+            albumsongs= (ArrayList<HashMap<String, String>>) getIntent().getSerializableExtra("list");
+
+            setTitle(albumsongs.get(0).get("album"));
             setContent(R.layout.fragment_album_details);
 
             setPrimaryColors( getResources().getColor(R.color.transparentLightBlack),
                     getResources().getColor(R.color.transparentBlack));
 
-            //expandFromPoints(0,0,0,0);
-           albumsongs= (ArrayList<HashMap<String, String>>) getIntent().getSerializableExtra("list");
-
+            expandFromPoints(0,0,0,0);
 
         recyclerView = (RecyclerView) findViewById(R.id.album_details_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -132,4 +123,6 @@ public class AlbumDetailsActivity extends SlidingActivity {
             enableFullscreen();
 
     }
+
+
 }
