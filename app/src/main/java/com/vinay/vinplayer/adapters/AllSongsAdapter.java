@@ -3,7 +3,6 @@ package com.vinay.vinplayer.adapters;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -26,8 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-
-import static com.vinay.vinplayer.helpers.ImageLoaderOptions.config;
 
 public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHolder> {
 
