@@ -30,15 +30,15 @@ public class AlbumDetailsActivity extends SlidingActivity {
     public void init(Bundle savedInstanceState) {
 
             albumsongs= (ArrayList<HashMap<String, String>>) getIntent().getSerializableExtra("list");
-
-            setTitle(albumsongs.get(0).get("album"));
             setContent(R.layout.fragment_album_details);
+            if (albumsongs!=null) {
+                setTitle(albumsongs.get(0).get("album")+"");
 
-            setPrimaryColors( getResources().getColor(R.color.transparentLightBlack),
-                    getResources().getColor(R.color.transparentBlack));
+                setPrimaryColors(getResources().getColor(R.color.transparentLightBlack),
+                        getResources().getColor(R.color.transparentBlack));
 
-            expandFromPoints(0,0,0,0);
-
+                expandFromPoints(0, 0, 0, 0);
+            }
         recyclerView = (RecyclerView) findViewById(R.id.album_details_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(new AlbumSongsAdapter(this,albumsongs));

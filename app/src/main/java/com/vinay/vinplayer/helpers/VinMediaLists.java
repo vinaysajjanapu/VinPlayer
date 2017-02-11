@@ -9,6 +9,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaMetadata;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
@@ -96,6 +97,8 @@ public class VinMediaLists {
                     h.put("year",year);
                     h.put("bookmark",bookmark);
                     allSongsList.add(h);
+
+
                 }
             }
         }

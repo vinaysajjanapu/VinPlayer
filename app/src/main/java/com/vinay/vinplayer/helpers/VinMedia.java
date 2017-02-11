@@ -22,12 +22,15 @@ import android.util.Log;
 
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.VinPlayer;
+import com.vinay.vinplayer.fragments.QueueFragment;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
-public class VinMedia implements NotificationManager.NotificationCenterDelegate, SensorEventListener {
+public class VinMedia implements SensorEventListener {
 
     public static Boolean SHUFFLE_ON = true;
     public static Boolean SHUFFLE_OFF = false;
@@ -48,11 +51,11 @@ public class VinMedia implements NotificationManager.NotificationCenterDelegate,
     private static int[] shuffle_queue;
     static int shuffle_index;
 
-    Intent newSongLoadIntent,songPausedIntent,songResumedIntent,musicStoppedIntent;
+    Intent newSongLoadIntent,songPausedIntent,songResumedIntent,musicStoppedIntent,queueUpdatedIntent;
     SharedPreferences media_settings;
     int repeatmode;
     boolean is_shuffle;
-
+    OnMediaStateChangeListener listener;
 
 
     public static VinMedia getInstance() {
@@ -79,7 +82,7 @@ public class VinMedia implements NotificationManager.NotificationCenterDelegate,
         songPausedIntent.setAction(context.getString(R.string.songPaused));
         songResumedIntent.setAction(context.getString(R.string.songResumed));
         musicStoppedIntent.setAction(context.getString(R.string.musicStopped));
-    }
+          }
 
     public void updateTempQueue(int position,ArrayList<HashMap<String,String>> songList, Context context){
             tempQueue = songList;
@@ -90,6 +93,10 @@ public class VinMedia implements NotificationManager.NotificationCenterDelegate,
         if (position!=0){
             currentQueue = tempQueue;
         }else currentQueue = VinMediaLists.getInstance().getAllSongsList(context);
+
+        queueUpdatedIntent = new Intent();
+        queueUpdatedIntent.setAction(context.getString(R.string.queueUpdated));
+        context.sendBroadcast(queueUpdatedIntent);
     }
 
     public ArrayList<HashMap<String,String>> getCurrentList(){
@@ -99,6 +106,7 @@ public class VinMedia implements NotificationManager.NotificationCenterDelegate,
     private void setMediaSource(){
         try {
             mediaPlayer.setDataSource(currentQueue.get(position).get("data"));
+            Log.d("playing song url",currentQueue.get(position).get("data"));
             Log.d("mediaplayer status","starting music");
             mediaPlayer.prepareAsync();
 
@@ -149,8 +157,6 @@ public class VinMedia implements NotificationManager.NotificationCenterDelegate,
         newMediaPlayer(context);
         setMediaSource();
         context.sendBroadcast(newSongLoadIntent);
-       // mediaPlayer.start();
-
         NotificationManager.getInstance().postNotificationName(NotificationManager.audioDidStarted, getCurrentSongDetails());
 
 
@@ -164,7 +170,6 @@ public class VinMedia implements NotificationManager.NotificationCenterDelegate,
         NotificationManager.getInstance().notifyNewSongLoaded(NotificationManager.newaudioloaded, getCurrentSongDetails());
 
     }
-
 
     public void pauseMusic(Context context){
         mediaPlayer.pause();
@@ -329,16 +334,10 @@ public class VinMedia implements NotificationManager.NotificationCenterDelegate,
 
     }
 
-    @Override
-    public void didReceivedNotification(int id, Object... args) {
-
+    public interface OnMediaStateChangeListener {
+        // TODO: Update argument type and name
+        void OnNewSongLoaded();
     }
-
-    @Override
-    public void newSongLoaded(Object... args) {
-
-    }
-
 
 
 //    public int generateObserverTag() {

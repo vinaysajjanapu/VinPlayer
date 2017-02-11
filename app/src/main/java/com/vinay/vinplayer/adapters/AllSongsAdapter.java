@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.vinay.vinplayer.R;
+import com.vinay.vinplayer.VinPlayer;
 import com.vinay.vinplayer.fragments.AllSongsFragment.OnListFragmentInteractionListener;
 import com.vinay.vinplayer.helpers.VinMedia;
 
@@ -73,8 +75,10 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
             final Uri sArtworkUri = Uri
                     .parse("content://media/external/audio/albumart");
             Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mValues.get(position).get("album_id")));
-
-            ImageLoader.getInstance().displayImage(uri.toString(), holder.circleImageView);
+           /* ParcelFileDescriptor pfd = context.getContentResolver().openFileDescriptor(uri,"r");
+            String url = VinPlayer.default_art;
+            if (pfd!=null)url = uri.toString();
+          */  ImageLoader.getInstance().displayImage(uri.toString(), holder.circleImageView);
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -322,7 +322,6 @@ public class VinMusicService extends Service implements AudioManager.OnAudioFocu
             } catch (Exception e) {
                 Log.e("tmessages", e.toString());
             }
-            NotificationManager.getInstance().removeObserver(this, NotificationManager.audioProgressDidChanged);
             NotificationManager.getInstance().removeObserver(this, NotificationManager.audioPlayStateChanged);
         unregisterReceiver(broadcastReceiver);
     }

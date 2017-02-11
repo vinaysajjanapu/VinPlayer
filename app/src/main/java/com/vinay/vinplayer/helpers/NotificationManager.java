@@ -14,10 +14,6 @@ import java.util.ArrayList;
 public class NotificationManager {
     public static boolean DEBUG_VERSION = false;
     private static int totalEvents = 1;
-    public static final int didReceivedNewMessages = totalEvents++;
-    public static final int updateInterfaces = totalEvents++;
-    public static final int audioProgressDidChanged = totalEvents++;
-    public static final int audioDidReset = totalEvents++;
     public static final int audioPlayStateChanged = totalEvents++;
 
     public static final int screenshotTook = totalEvents++;

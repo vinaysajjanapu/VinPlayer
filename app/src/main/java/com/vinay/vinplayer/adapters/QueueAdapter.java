@@ -16,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.utils.L;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.fragments.QueueFragment;
 import com.vinay.vinplayer.helpers.VinMedia;
@@ -84,8 +85,6 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.ViewHolder> 
             /*Picasso.with(context).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
                     .into(holder.circleImageView);
             */
-
-
             ImageLoader.getInstance().displayImage(uri.toString(), holder.circleImageView);
         } catch (Exception e) {
             e.printStackTrace();
@@ -94,8 +93,11 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.ViewHolder> 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                Log.d("queue","interacted");
                 if (null != mListener) {
-                    //VinMedia.getInstance().startMusic(position,context);
+                    Log.d("queue","not null");
+                 //   VinMedia.getInstance().startMusic(position,context);
                     mListener.OnQueueFragmentInteraction(position);
                 }
             }

@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.anim.AccordionTransformer;
 import com.vinay.vinplayer.anim.CubeInTransformer;
+import com.vinay.vinplayer.helpers.NotificationManager;
 import com.vinay.vinplayer.helpers.VinMedia;
 
 
@@ -33,7 +34,7 @@ import java.util.Locale;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class NowPlayingFragment extends Fragment implements View.OnClickListener {
+public class NowPlayingFragment extends Fragment implements View.OnClickListener{
 
 
     ViewPager albumArtPager;
@@ -218,10 +219,19 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
         getActivity().registerReceiver(broadcastReceiver,intentFilter);
     }
 
-    private void onNewSongLoaded(){
+    private void onSongPaused(){
+        playerButtonPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
+    }
+    private void onSongResumed(){
+        playerButtonPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
+    }
+    private void onMusicStopped(){
 
+    }
+
+    private void onNewSongLoaded(){
         HashMap<String,String> songDetails = VinMedia.getInstance().getCurrentSongDetails();
-        Log.d("songdetails","null Data");
+        Log.d("nowplaying fragment","on onew song loaded");
         if (songDetails!=null) {
 
             nowPlayingSongTitle.setText(songDetails.get("title"));
@@ -257,15 +267,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
 
         }
     }
-    private void onSongPaused(){
-        playerButtonPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
-    }
-    private void onSongResumed(){
-        playerButtonPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
-    }
-    private void onMusicStopped(){
 
-    }
 
     class AlbumArtPagerAdapter extends FragmentPagerAdapter {
 

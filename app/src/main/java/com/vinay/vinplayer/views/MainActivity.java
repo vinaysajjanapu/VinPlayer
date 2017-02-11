@@ -44,6 +44,7 @@ import com.vinay.vinplayer.fragments.AlbumsFragment;
 import com.vinay.vinplayer.fragments.AllSongsFragment;
 import com.vinay.vinplayer.fragments.ArtistDetailsFragment;
 import com.vinay.vinplayer.fragments.ArtistsFragment;
+import com.vinay.vinplayer.fragments.FoldersFragment;
 import com.vinay.vinplayer.fragments.GenreFragment;
 import com.vinay.vinplayer.fragments.HomeFragment;
 import com.vinay.vinplayer.fragments.NowPlayingFragment;
@@ -52,14 +53,13 @@ import com.vinay.vinplayer.helpers.BlurBuilder;
 import com.vinay.vinplayer.helpers.NotificationManager;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
+import com.vinay.vinplayer.tablayout.SpringIndicator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import github.chenupt.springindicator.SpringIndicator;
-
 public class MainActivity extends AppCompatActivity implements
         AllSongsFragment.OnListFragmentInteractionListener,
         AlbumsFragment.OnAlbumFragmentInteractionListner,ArtistsFragment.OnArtistFragmentInteractionListner,
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements
         QueueFragment.OnQueueFragmentInteractionListener,
         ArtistDetailsFragment.OnArtistListFragmentInteractionListener,
         GenreFragment.OnGenreFragmentInteractionListner,
-        NotificationManager.NotificationCenterDelegate
+        FoldersFragment.OnFoldersFragmentInteractionListener
 {
 
     ArrayList<HashMap<String, String>> songs;
@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         getSupportActionBar().hide();
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
@@ -156,8 +157,8 @@ public class MainActivity extends AppCompatActivity implements
         iv_search.setOnClickListener(this);
     }
 
-    private void setupBroadCastReceiver() {
 
+    private void setupBroadCastReceiver() {
         intentFilter = new IntentFilter();
         intentFilter.addAction(getString(R.string.newSongLoaded));
         intentFilter.addAction(getString(R.string.songPaused));
@@ -248,11 +249,13 @@ public class MainActivity extends AppCompatActivity implements
         mFragmentList.add(HomeFragment.newInstance());
         mFragmentList.add(AllSongsFragment.newInstance(1, VinMediaLists.getInstance().getAllSongsList(this)));
         mFragmentList.add(AlbumsFragment.newInstance(VinMediaLists.getInstance().getAlbumsList(this)));
+        mFragmentList.add(FoldersFragment.newInstance());
         mFragmentList.add(ArtistsFragment.newInstance(VinMediaLists.getInstance().getArtistsList(this)));
         mFragmentList.add(GenreFragment.newInstance(VinMediaLists.getInstance().getGenresList(this)));
         titles.add("home");
         titles.add("all");
         titles.add("album");
+        titles.add("folders");
         titles.add("artist");
         titles.add("genre");
 
@@ -427,6 +430,12 @@ public class MainActivity extends AppCompatActivity implements
         playPauseAction(p);
     }
 
+
+    @Override
+    public void OnFoldersFragmentInteraction(int p) {
+
+    }
+
     @Override
     public void OnQueueFragmentInteraction(int p) {
 
@@ -476,7 +485,7 @@ public class MainActivity extends AppCompatActivity implements
     public void OnGenreFragmentInteraction(int pos) {
 
     }
-
+/*
     @Override
     public void didReceivedNotification(int id, Object... args) {
         if (id == NotificationManager.audioDidStarted || id == NotificationManager.audioPlayStateChanged || id == NotificationManager.audioDidReset) {
@@ -490,7 +499,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void newSongLoaded(Object... args) {
 
-    }
+    }*/
 
 
     public class ViewPagerAdapter extends FragmentPagerAdapter {

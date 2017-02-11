@@ -3,6 +3,7 @@
     package="com.vinay.vinplayer">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <supports-screens
         android:anyDensity="true"
@@ -14,9 +15,9 @@
     <application
         android:name=".VinPlayer"
         android:allowBackup="true"
-        android:largeHeap="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
@@ -103,7 +104,8 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".views.SearchActivity"></activity>
+        <activity android:name=".views.SearchActivity" />
+        <activity android:name=".views.test"></activity>
     </application>
 
 </manifest>
