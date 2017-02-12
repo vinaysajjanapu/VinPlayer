@@ -46,8 +46,8 @@ public class SearchActivity extends AppCompatActivity {
         alllist.addAll(VinMediaLists.allSongs);
 
 
-        artistadapter = new ArtistAdapter(getApplicationContext(), alllist);
-        albumadapter = new AlbumAdapter(getApplicationContext(), alllist);
+        artistadapter = new ArtistAdapter(getApplicationContext(), VinMediaLists.allArtists);
+        albumadapter = new AlbumAdapter(getApplicationContext(), VinMediaLists.allSongs);
 
         lv_album.setAdapter(albumadapter);
         lv_artist.setAdapter(artistadapter);
@@ -58,7 +58,7 @@ public class SearchActivity extends AppCompatActivity {
         layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         rv_album.setLayoutManager(layoutManager);
 
-        adapter = new MyAdapter(getApplicationContext(),alllist);
+        adapter = new MyAdapter(getApplicationContext(),VinMediaLists.allAlbums);
         rv_album.setAdapter(adapter);
         editsearch = (EditText) findViewById(R.id.search);
 
@@ -168,6 +168,11 @@ public class SearchActivity extends AppCompatActivity {
             } else {
                 for (HashMap<String,String> wp : arraylist) {
 
+                    if (wp.get("title").toLowerCase(Locale.getDefault()).startsWith(charText)) {
+                        if (!malHashMap.contains(wp))malHashMap.add(wp);
+                    }
+                }
+                for (HashMap<String,String> wp : arraylist) {
                     if (wp.get("title").toLowerCase(Locale.getDefault()).contains(charText)) {
                         if (!malHashMap.contains(wp))malHashMap.add(wp);
                     }
@@ -247,6 +252,12 @@ public class SearchActivity extends AppCompatActivity {
                 //mHashMap.clear();
             } else {
                 for (HashMap<String,String> wp : arraylist) {
+
+                    if (wp.get("artist").toLowerCase(Locale.getDefault()).startsWith(charText)) {
+                        if (!mHashMap.contains(wp))
+                            mHashMap.add(wp);
+                    }}
+                for (HashMap<String,String> wp : arraylist) {
                     if (wp.get("artist").toLowerCase(Locale.getDefault()).contains(charText)) {
                         if (!mHashMap.contains(wp))
                         mHashMap.add(wp);
@@ -306,6 +317,12 @@ public class SearchActivity extends AppCompatActivity {
             if (charText.length() ==0) {
                 //mHashMap.clear();
             } else {
+                for (HashMap<String,String> wp : arraylist) {
+
+                    if (wp.get("album").toLowerCase(Locale.getDefault()).startsWith(charText)) {
+                        if (!mHashMap.contains(wp))
+                            mHashMap.add(wp);
+                    }}
                 for (HashMap<String,String> wp : arraylist) {
                     if (wp.get("album").toLowerCase(Locale.getDefault()).contains(charText)) {
                         if (!mHashMap.contains(wp))

@@ -16,12 +16,10 @@ import android.view.ViewGroup;
 
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.adapters.AllSongsAdapter;
-import com.vinay.vinplayer.adapters.QueueAdapter;
-import com.vinay.vinplayer.helpers.VinMedia;
-
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
 
 public class AllSongsFragment extends Fragment {
 
