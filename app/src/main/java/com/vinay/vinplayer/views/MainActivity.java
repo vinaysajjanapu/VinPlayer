@@ -479,7 +479,15 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void OnGenreFragmentInteraction(int pos) {
+        VinMedia.getInstance().updateTempQueue(pos,VinMediaLists.getInstance()
+                .getGenreSongsList(pos,this),this);
 
+        FragmentManager fm = getSupportFragmentManager();
+
+        ArtistDetailsFragment  dFragment = ArtistDetailsFragment.newInstance(
+                VinMediaLists.getInstance().getGenreSongsList(pos,this));
+        // Show DialogFragment
+        dFragment.show(fm, "Dialog Fragment");
     }
 /*
     @Override

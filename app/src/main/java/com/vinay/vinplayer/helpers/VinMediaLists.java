@@ -16,6 +16,7 @@ import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.nostra13.universalimageloader.utils.L;
 import com.vinay.vinplayer.BuildConfig;
 import com.vinay.vinplayer.R;
 
@@ -77,6 +78,7 @@ public class VinMediaLists {
                     String duration = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));
                     String size = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE));
                     String title = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
+                    String display_name = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME));
                     String track = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK));
                     String year = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR));
                     String bookmark = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.BOOKMARK));
@@ -96,6 +98,7 @@ public class VinMediaLists {
                     h.put("track",track);
                     h.put("year",year);
                     h.put("bookmark",bookmark);
+                    h.put("display_name",display_name);
                     allSongsList.add(h);
 
 
@@ -128,7 +131,19 @@ public class VinMediaLists {
     public ArrayList<HashMap<String, String>> getArtistSongsList(String artist_key,Context context){
         return getListByKey("artist",artist_key,context);
     }
-
+    public ArrayList<HashMap<String, String>> getGenreSongsList(int pos,Context context){
+        ArrayList<HashMap<String,String>> list = new ArrayList<>();
+        for(int itr =0;itr<allSongs.size();itr++){
+            for(int z=0;z<allgenres.get(pos).size();z++) {
+                if (allSongs.get(itr).get("display_name").equals(allgenres.get(pos).get("display_name_"+z))){
+                    list.add(allSongs.get(itr));
+                    Log.d("genre_song","added "+z);
+                }
+            }
+        }
+        Log.d("genre_list",list.size()+"   "+list.toString());
+        return list;
+    }
 
     public ArrayList<HashMap<String, String>> getAlbumsList(Context context){
         ArrayList<HashMap<String,String>> list = new ArrayList<>();
@@ -209,6 +224,7 @@ public class VinMediaLists {
         ArrayList<HashMap<String,String>> genres = new ArrayList<HashMap<String, String>>();
 
 
+
         if (genrecursor!=null && genrecursor.moveToFirst()) {
             do {
                 genre = new HashMap<>();
@@ -224,16 +240,32 @@ public class VinMediaLists {
                 uri = MediaStore.Audio.Genres.Members.getContentUri("external", genreId);
 
                 tempcursor =  context.getContentResolver().query(uri, proj2, null, null, null);
-                if (BuildConfig.DEBUG)  Log.i("Tag-Number of s", tempcursor.getCount()+"");
-                genre.put("nos", String.valueOf(tempcursor.getCount()));
-
-
-                if (!genres.contains(genre)) {
-                    genres.add(genre);
-
+                if (BuildConfig.DEBUG) if (tempcursor != null) {
+                    Log.i("Tag-Number of s", tempcursor.getCount()+"");
                 }
-            } while(genrecursor.moveToNext());
+                int i;
+                if (tempcursor != null && tempcursor.moveToFirst()) {
+                    i=0;
+                    do {
+                        index = tempcursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
+                        Log.i("Tag-Song name", tempcursor.getString(index));
+                        genre.put("display_name_"+i, tempcursor.getString(index));
+                        Log.d("genre","song added to genre "+"   "+i+"   "+tempcursor.getString(index));
+                        i++;
+                    } while (tempcursor.moveToNext());
+                }
+
+                    //genre.put("nos", String.valueOf(tempcursor.getCount()));
+
+
+                    if (!genres.contains(genre)) {
+                        genres.add(genre);
+
+                    }
+                }
+                while(genrecursor.moveToNext());
         }
+        Log.d("genres_list",genres.size()+"   "+genres.toString());
         allgenres=genres;
      return genres;
     }
