@@ -17,6 +17,7 @@
     android:id="@+id/slider"
     android:layout_height="match_parent">
 
+
     <include
         layout="@layout/slidingpanel"
         android:layout_width="match_parent"

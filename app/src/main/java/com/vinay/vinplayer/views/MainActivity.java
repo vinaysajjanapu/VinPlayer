@@ -9,8 +9,13 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.media.Image;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,6 +37,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
@@ -44,27 +53,43 @@ import com.vinay.vinplayer.fragments.ArtistsFragment;
 import com.vinay.vinplayer.fragments.FoldersFragment;
 import com.vinay.vinplayer.fragments.GenreFragment;
 import com.vinay.vinplayer.fragments.HomeFragment;
+import com.vinay.vinplayer.fragments.NowPlayingDetailsFragment;
 import com.vinay.vinplayer.fragments.NowPlayingFragment;
 import com.vinay.vinplayer.fragments.QueueFragment;
 import com.vinay.vinplayer.helpers.BlurBuilder;
 import com.vinay.vinplayer.helpers.VinMedia;
+import com.vinay.vinplayer.helpers.VinMediaDataManager;
 import com.vinay.vinplayer.helpers.VinMediaLists;
 import com.vinay.vinplayer.tablayout.SpringIndicator;
 
+import org.cmc.music.common.ID3WriteException;
+import org.cmc.music.metadata.IMusicMetadata;
+import org.cmc.music.metadata.ImageData;
+import org.cmc.music.metadata.MusicMetadata;
+import org.cmc.music.metadata.MusicMetadataSet;
+import org.cmc.music.myid3.MyID3;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Vector;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+
 public class MainActivity extends AppCompatActivity implements
         AllSongsFragment.OnListFragmentInteractionListener,
-        AlbumsFragment.OnAlbumFragmentInteractionListner,ArtistsFragment.OnArtistFragmentInteractionListner,
+        AlbumsFragment.OnAlbumFragmentInteractionListner, ArtistsFragment.OnArtistFragmentInteractionListner,
         View.OnClickListener,
         QueueFragment.OnQueueFragmentInteractionListener,
         ArtistDetailsFragment.OnArtistListFragmentInteractionListener,
         GenreFragment.OnGenreFragmentInteractionListner,
-        FoldersFragment.OnFoldersFragmentInteractionListener
-{
+        FoldersFragment.OnFoldersFragmentInteractionListener {
 
     ArrayList<HashMap<String, String>> songs;
 
@@ -84,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements
     TextView sliderPlayer_songdetails;
     ImageButton sliderPlayer_playpause;
 
-    RelativeLayout sliderDragger;
+    RelativeLayout sliderDragger, nowPlaying_statusBar;
 
     RelativeLayout slider;
 
@@ -96,16 +121,21 @@ public class MainActivity extends AppCompatActivity implements
     BroadcastReceiver broadcastReceiver;
     SystemBarTintManager tintManager;
 
-    RelativeLayout.LayoutParams lp_now,lp_que;
+    RelativeLayout.LayoutParams lp_now, lp_que;
     Handler handler;
 
     SharedPreferences media_settings;
     SharedPreferences.Editor editor;
 
-    boolean firstback=false;
+    boolean firstback = false;
     long firstback_t;
 
     ImageView iv_search;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
 
     @Override
@@ -117,13 +147,7 @@ public class MainActivity extends AppCompatActivity implements
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 
-
-       /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                setStatusBarTint();
-        }
-
-
-*/      getWindow().getDecorView().setSystemUiVisibility(
+        getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
@@ -131,9 +155,7 @@ public class MainActivity extends AppCompatActivity implements
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
 
-        isStoragePermissionGranted();
-
-        media_settings = getSharedPreferences(getString(R.string.media_settings),MODE_PRIVATE);
+        media_settings = getSharedPreferences(getString(R.string.media_settings), MODE_PRIVATE);
         editor = media_settings.edit();
         editor.putInt(getString(R.string.repeat_mode), VinMedia.REPEAT_NONE);
         editor.putBoolean(getString(R.string.shuffle), VinMedia.SHUFFLE_OFF);
@@ -145,14 +167,15 @@ public class MainActivity extends AppCompatActivity implements
         setupSlidingPanelLayout();
         setupNowPlayingPager();
         setupBroadCastReceiver();
+        slider.setBackground(BlurBuilder.getInstance().drawable_img("null", this));
 
-        slider.setBackground(BlurBuilder.getInstance().drawable_img("null",this));
-
-        iv_search= (ImageView) findViewById(R.id.iv_search);
+        iv_search = (ImageView) findViewById(R.id.iv_search);
         iv_search.setColorFilter(Color.WHITE);
         iv_search.setOnClickListener(this);
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
-
 
     private void setupBroadCastReceiver() {
         intentFilter = new IntentFilter();
@@ -161,22 +184,26 @@ public class MainActivity extends AppCompatActivity implements
         intentFilter.addAction(getString(R.string.songResumed));
         intentFilter.addAction(getString(R.string.musicStopped));
         intentFilter.addAction(getString(R.string.closePanel));
+        intentFilter.addAction(getString(R.string.mediaListChanged));
 
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
                 if (action.equals(getString(R.string.newSongLoaded))) {
-                       onNewSongLoaded();
+                    onNewSongLoaded();
                 } else if (action.equals(getString(R.string.songPaused))) {
                     onSongPaused();
                 } else if (action.equals(getString(R.string.songResumed))) {
                     onSongResumed();
                 } else if (action.equals(getString(R.string.musicStopped))) {
                     onMusicStopped();
-                } else if(action.equals(getString(R.string.closePanel))){
-                    Log.d("slider","closepanel");
+                } else if (action.equals(getString(R.string.closePanel))) {
+                    Log.d("slider", "closepanel");
                     slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                }else if(action.equals(getString(R.string.mediaListChanged))){
+                    finish();
+                    startActivity(new Intent(MainActivity.this,MainActivity.class));
                 }
             }
         };
@@ -200,16 +227,16 @@ public class MainActivity extends AppCompatActivity implements
                         .into(sliderPlayer_albumart);
                 */
 
-                ImageLoader.getInstance().displayImage(uri.toString(),sliderPlayer_albumart);
+                ImageLoader.getInstance().displayImage(uri.toString(), sliderPlayer_albumart);
 
-                slider.setBackground(BlurBuilder.getInstance().drawable_img(songDetails.get("album_id"),this));
+                slider.setBackground(BlurBuilder.getInstance().drawable_img(songDetails.get("album_id"), this));
 
             } catch (Exception e) {
-             //   e.printStackTrace(
+                //   e.printStackTrace(
 //    String contentURI=null;);
             }
 
-            sliderPlayer_progressBar.setMax(VinMedia.getInstance().getDuration()/1000);
+            sliderPlayer_progressBar.setMax(VinMedia.getInstance().getDuration() / 1000);
             handler = new Handler();
             this.runOnUiThread(new Runnable() {
 
@@ -261,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements
         tabLayout = (SpringIndicator) findViewById(R.id.tabs);
         tabLayout.setViewPager(librayViewPager);
         // set transitions
-        librayViewPager.setPageTransformer(true,new AccordionTransformer());
+        librayViewPager.setPageTransformer(true, new AccordionTransformer());
 
     }
 
@@ -274,26 +301,24 @@ public class MainActivity extends AppCompatActivity implements
         sliderPlayer_songtitle = (TextView) findViewById(R.id.slider_playingsong_songname);
         sliderPlayer_songdetails = (TextView) findViewById(R.id.slider_playing_songdetails);
         sliderPlayer_playpause = (ImageButton) findViewById(R.id.slider_playing_button_playpause);
-
+        nowPlaying_statusBar = (RelativeLayout) findViewById(R.id.nowplaying_status_bar);
+        nowPlaying_statusBar.setVisibility(View.INVISIBLE);
         slider = (RelativeLayout) findViewById(R.id.slider);
-        sliderDragger = (RelativeLayout)findViewById(R.id.slider_dragger);
+        sliderDragger = (RelativeLayout) findViewById(R.id.slider_dragger);
 
         sliderPlayer_progressBar.getIndeterminateDrawable().setColorFilter(Color.GREEN, PorterDuff.Mode.MULTIPLY);
 
         lp_now = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
         TypedValue tv = new TypedValue();
-        int actionBarHeight=0;
-        if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
-        {
-            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,getResources().getDisplayMetrics());
+        int actionBarHeight = 0;
+        if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
         }
         lp_que = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 actionBarHeight);
 
 
-
-        Log.d("actionBar height",actionBarHeight+"");
         slidingUpPanelLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
@@ -301,8 +326,12 @@ public class MainActivity extends AppCompatActivity implements
                     sliderPlayer.setAlpha(1.0f - 2 * slideOffset);
                     sliderPlayer.setVisibility(View.VISIBLE);
 
+                    nowPlaying_statusBar.setVisibility(View.INVISIBLE);
+
                 } else if (slideOffset > 0.5f && slideOffset < 1.0f) {
                     sliderPlayer.setVisibility(View.INVISIBLE);
+                    nowPlaying_statusBar.setAlpha(slideOffset);
+                    nowPlaying_statusBar.setVisibility(View.VISIBLE);
                 } else {
 
                 }
@@ -310,10 +339,10 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
-                if (previousState== SlidingUpPanelLayout.PanelState.DRAGGING){
-                    if (newState== SlidingUpPanelLayout.PanelState.COLLAPSED){
-                        Log.d("panel","collapsed");
-                        nowPlayingPager.setCurrentItem(0);
+                if (previousState == SlidingUpPanelLayout.PanelState.DRAGGING) {
+                    if (newState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+                        Log.d("panel", "collapsed");
+                        nowPlayingPager.setCurrentItem(1);
                     }
                 }
             }
@@ -335,11 +364,11 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public void onPageSelected(int position) {
-                    if (position==1){
-                        sliderDragger.setLayoutParams(lp_que);
-                    }else {
-                        sliderDragger.setLayoutParams(lp_now);
-                    }
+                if (position == 2) {
+                    sliderDragger.setLayoutParams(lp_que);
+                } else {
+                    sliderDragger.setLayoutParams(lp_now);
+                }
             }
 
             @Override
@@ -347,11 +376,14 @@ public class MainActivity extends AppCompatActivity implements
 
             }
         });
+
+        NowPlayingFragments.add(NowPlayingDetailsFragment.newInstance());
         NowPlayingFragments.add(NowPlayingFragment.newInstance());
         NowPlayingFragments.add(QueueFragment.newInstance(1));
         nowPlayingPagerAdapter = new NowPlayingPagerAdapter(getSupportFragmentManager());
         nowPlayingPager.setAdapter(nowPlayingPagerAdapter);
-        nowPlayingPager.setPageTransformer(true,new AccordionTransformer());
+        nowPlayingPager.setCurrentItem(1);
+        nowPlayingPager.setPageTransformer(true, new AccordionTransformer());
 
     }
 
@@ -363,9 +395,10 @@ public class MainActivity extends AppCompatActivity implements
                 playPauseAction();
                 break;
             case R.id.iv_search:
-                startActivity(new Intent(getApplicationContext(),SearchActivity.class));
+                startActivity(new Intent(getApplicationContext(), SearchActivity.class));
                 break;
-            default:break;
+            default:
+                break;
         }
     }
 
@@ -388,30 +421,35 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onStop() {
-        super.onStop();
-        unregisterReceiver(broadcastReceiver);
+        super.onStop();// ATTENTION: This was auto-generated to implement the App Indexing API.
+// See https://g.co/AppIndexing/AndroidStudio for more information.
+      //  AppIndex.AppIndexApi.end(client, getIndexApiAction());
+      //  unregisterReceiver(broadcastReceiver);
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        //client.disconnect();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-       // VinMedia.getInstance().releasePlayer();
+        // VinMedia.getInstance().releasePlayer();
     }
 
     @Override
     public void onBackPressed() {
-        if (slidingUpPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED){
+        if (slidingUpPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
             slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-        }else {
-            if (firstback){
-                if (System.currentTimeMillis()-firstback_t<1000){
+        } else {
+            if (firstback) {
+                if (System.currentTimeMillis() - firstback_t < 1000) {
                     super.onBackPressed();
                 }
                 firstback = false;
             }
             firstback = true;
             firstback_t = System.currentTimeMillis();
-            Toast.makeText(this,"Press again to quit",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Press again to quit", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -421,7 +459,7 @@ public class MainActivity extends AppCompatActivity implements
         if (VinMedia.getInstance().isPlaying()) {
             VinMedia.getInstance().resetPlayer();
         }
-        VinMedia.getInstance().updateQueue(0,this);
+        VinMedia.getInstance().updateQueue(0, this);
         sendBroadcast(new Intent().setAction(getString(R.string.queueUpdated)));
         playPauseAction(p);
     }
@@ -435,34 +473,35 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void OnQueueFragmentInteraction(int p) {
 
-        Log.d("queue","fragment interation  "+p);
+        Log.d("queue", "fragment interation  " + p);
         if (VinMedia.getInstance().isPlaying()) {
             VinMedia.getInstance().resetPlayer();
         }
         playPauseAction(p);
     }
+
     @Override
     public void OnAlbumFragmentInteraction(int pos) {
 
-        VinMedia.getInstance().updateTempQueue(pos,VinMediaLists.getInstance()
+        VinMedia.getInstance().updateTempQueue(pos, VinMediaLists.getInstance()
                 .getAlbumSongsList(VinMediaLists.getInstance().getAlbumsList(this)
-                 .get(pos).get("album"),this),this);
+                        .get(pos).get("album"), this), this);
 
-      startActivity(new Intent(getApplicationContext(),AlbumDetailsActivity.class).putExtra("list",
-              VinMediaLists.getInstance().getAlbumSongsList((VinMediaLists.allAlbums.get(pos).get("album")),this)));
+        startActivity(new Intent(getApplicationContext(), AlbumDetailsActivity.class).putExtra("list",
+                VinMediaLists.getInstance().getAlbumSongsList((VinMediaLists.allAlbums.get(pos).get("album")), this)));
     }
 
     @Override
     public void OnArtistFragmentInteraction(int pos) {
 
-        VinMedia.getInstance().updateTempQueue(pos,VinMediaLists.getInstance()
+        VinMedia.getInstance().updateTempQueue(pos, VinMediaLists.getInstance()
                 .getArtistSongsList(VinMediaLists.getInstance().getArtistsList(this)
-                        .get(pos).get("artist"),this),this);
+                        .get(pos).get("artist"), this), this);
 
         FragmentManager fm = getSupportFragmentManager();
 
-        ArtistDetailsFragment  dFragment = ArtistDetailsFragment.newInstance(
-                VinMediaLists.getInstance().getArtistSongsList((VinMediaLists.allArtists.get(pos).get("artist")),this));
+        ArtistDetailsFragment dFragment = ArtistDetailsFragment.newInstance(
+                VinMediaLists.getInstance().getArtistSongsList((VinMediaLists.allArtists.get(pos).get("artist")), this));
         // Show DialogFragment
         dFragment.show(fm, "Dialog Fragment");
     }
@@ -472,22 +511,48 @@ public class MainActivity extends AppCompatActivity implements
         if (VinMedia.getInstance().isPlaying()) {
             VinMedia.getInstance().resetPlayer();
         }
-        VinMedia.getInstance().updateQueue(1,this);
+        VinMedia.getInstance().updateQueue(1, this);
         sendBroadcast(new Intent().setAction(getString(R.string.queueUpdated)));
         playPauseAction(i);
     }
 
     @Override
     public void OnGenreFragmentInteraction(int pos) {
-        VinMedia.getInstance().updateTempQueue(pos,VinMediaLists.getInstance()
-                .getGenreSongsList(pos,this),this);
+        VinMedia.getInstance().updateTempQueue(pos, VinMediaLists.getInstance()
+                .getGenreSongsList(pos, this), this);
 
         FragmentManager fm = getSupportFragmentManager();
 
-        ArtistDetailsFragment  dFragment = ArtistDetailsFragment.newInstance(
-                VinMediaLists.getInstance().getGenreSongsList(pos,this));
+        ArtistDetailsFragment dFragment = ArtistDetailsFragment.newInstance(
+                VinMediaLists.getInstance().getGenreSongsList(pos, this));
         // Show DialogFragment
         dFragment.show(fm, "Dialog Fragment");
+    }
+
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    public Action getIndexApiAction() {
+        Thing object = new Thing.Builder()
+                .setName("Main Page") // TODO: Define a title for the content shown.
+                // TODO: Make sure this auto-generated URL is correct.
+                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .build();
+        return new Action.Builder(Action.TYPE_VIEW)
+                .setObject(object)
+                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                .build();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        AppIndex.AppIndexApi.start(client, getIndexApiAction());
     }
 /*
     @Override
@@ -541,7 +606,7 @@ public class MainActivity extends AppCompatActivity implements
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
 
         @Override
@@ -554,12 +619,12 @@ public class MainActivity extends AppCompatActivity implements
         if (VinMedia.getInstance().isPlaying()) {
             VinMedia.getInstance().pauseMusic(this);
         } else {
-            if (VinMedia.getInstance().getCurrentList()!=null) {
+            if (VinMedia.getInstance().getCurrentList() != null) {
                 if (VinMedia.getInstance().getCurrentList().size() != 0) {
                     if (!VinMedia.getInstance().isClean()) {
                         VinMedia.getInstance().resumeMusic(this);
                     } else {
-                        VinMedia.getInstance().startMusic(VinMedia.getInstance().getPosition(),this);
+                        VinMedia.getInstance().startMusic(VinMedia.getInstance().getPosition(), this);
                     }
                 }
             }
@@ -571,37 +636,11 @@ public class MainActivity extends AppCompatActivity implements
         VinMedia.getInstance().setPosition(position);
         if (VinMedia.getInstance().isPlaying() || !VinMedia.getInstance().isClean()) {
             VinMedia.getInstance().resetPlayer();
-            VinMedia.getInstance().startMusic(position,this);
+            VinMedia.getInstance().startMusic(position, this);
         } else {
-            VinMedia.getInstance().startMusic(position,this);
+            VinMedia.getInstance().startMusic(position, this);
         }
     }
 
-    public  boolean isStoragePermissionGranted() {
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED) {
-                Log.v("Storage Permisson","granted");
-                return true;
-            } else {
-
-                Log.v("Storage Permisson","revoked");
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-                return false;
-            }
-        }
-        else { //permission is automatically granted on sdk<23 upon installation
-            Log.v("Storage Permisson","granted");
-            return true;
-        }
-    }
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
-            Log.v("Storage Permisson","Permission: "+permissions[0]+ "was "+grantResults[0]);
-            //resume tasks needing this permission
-        }
-    }
 }
 

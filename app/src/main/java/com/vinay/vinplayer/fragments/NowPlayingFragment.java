@@ -333,13 +333,13 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
                 case R.id.nowplaying_button_shuffle:
                     Log.d("shuffle button","clicked");
                     if (VinMedia.getInstance().getCurrentQueueSize()!=0) {
-                        if (media_settings.getBoolean(getActivity().getString(R.string.shuffle), true)) {
+                        if (media_settings.getBoolean(getActivity().getString(R.string.shuffle), VinMedia.SHUFFLE_ON)) {
                             playerButtonShuffle.setColorFilter(Color.WHITE);
-                            editor.putBoolean(getActivity().getString(R.string.shuffle), false);
+                            editor.putBoolean(getActivity().getString(R.string.shuffle), VinMedia.SHUFFLE_OFF);
                             editor.apply();
                         } else {
                             playerButtonShuffle.setColorFilter(Color.GREEN);
-                            editor.putBoolean(getActivity().getString(R.string.shuffle), true);
+                            editor.putBoolean(getActivity().getString(R.string.shuffle), VinMedia.SHUFFLE_ON);
                             editor.apply();
                             VinMedia.getInstance().createShuffleQueue();
                         }
@@ -350,23 +350,23 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
 
                 case R.id.nowplaying_button_repeat:
                     Log.d("repeat button","clicked");
-                    switch (media_settings.getInt(getActivity().getString(R.string.repeat_mode),0)){
+                    switch (media_settings.getInt(getActivity().getString(R.string.repeat_mode),VinMedia.REPEAT_NONE)){
                         case 0:
                             playerButtonRepeat.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.icon_repeat_music));
                             playerButtonRepeat.setColorFilter(Color.GREEN);
-                            editor.putInt(getActivity().getString(R.string.repeat_mode),1);
+                            editor.putInt(getActivity().getString(R.string.repeat_mode),VinMedia.REPEAT_QUEUE);
                             editor.apply();
                             break;
                         case 1:
                             playerButtonRepeat.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.icon_repeat_track));
                             playerButtonRepeat.setColorFilter(Color.GREEN);
-                            editor.putInt(getActivity().getString(R.string.repeat_mode),2);
+                            editor.putInt(getActivity().getString(R.string.repeat_mode),VinMedia.REPEAT_TRACK);
                             editor.apply();
                             break;
                         case 2:
                             playerButtonRepeat.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.icon_repeat_music));
                             playerButtonRepeat.setColorFilter(Color.WHITE);
-                            editor.putInt(getActivity().getString(R.string.repeat_mode),0);
+                            editor.putInt(getActivity().getString(R.string.repeat_mode),VinMedia.REPEAT_NONE);
                             editor.apply();
                             break;
                     }
@@ -374,7 +374,6 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
                 break;
 
         }
-          //  updatePlayPauseButton();
     }
 
     private void playPauseAction(){

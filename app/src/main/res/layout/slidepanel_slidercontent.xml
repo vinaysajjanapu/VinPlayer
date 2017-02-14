@@ -18,6 +18,12 @@
         android:layout_height="match_parent"
         android:id="@+id/nowplaying_pager"/>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/nowplaying_margin_top"
+        android:background="@color/transparentBlack"
+        android:id="@+id/nowplaying_status_bar"
+    />
 
     <RelativeLayout
         android:layout_width="match_parent"

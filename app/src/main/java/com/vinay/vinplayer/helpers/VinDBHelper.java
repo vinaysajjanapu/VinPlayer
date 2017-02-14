@@ -38,7 +38,6 @@ public class VinDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         try {
             db.execSQL("");
-            db.execSQL("");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -47,7 +46,6 @@ public class VinDBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         try {
-            db.execSQL("DROP TABLE IF EXISTS " );
             db.execSQL("DROP TABLE IF EXISTS " );
             onCreate(db);
         } catch (SQLException e) {

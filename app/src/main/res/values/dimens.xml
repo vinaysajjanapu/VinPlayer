@@ -5,8 +5,8 @@
     <dimen name="text_margin">16dp</dimen>
 
 
-    <dimen name="nowplaying_albumart_height">400dp</dimen>
-    <dimen name="nowplaying_albumart_margin_top">23dp</dimen>
+    <dimen name="nowplaying_albumart_height">420dp</dimen>
+    <dimen name="nowplaying_margin_top">24dp</dimen>
 
     <dimen name="nowplaying_songname_margin_bottom">10dp</dimen>
     <dimen name="nowplaying_songname_textsize">18dp</dimen>

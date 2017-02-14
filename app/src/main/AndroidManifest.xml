@@ -3,7 +3,11 @@
     package="com.vinay.vinplayer">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
     <supports-screens
         android:anyDensity="true"
@@ -105,6 +109,38 @@
         </receiver>
 
         <activity android:name=".views.SearchActivity" />
+        <activity android:name=".views.SplashScreen" />
+        <!--
+ ATTENTION: This was auto-generated to add Google Play services to your project for
+     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information.
+        -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <activity android:name=".views.MetaDataEditor"></activity>
+
+
+        <activity android:name=".ringdroid.RingdroidSelectActivity"
+            android:label="@string/main_activity_label">
+            <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.OPENABLE"/>
+                <data android:mimeType="audio/*"/></intent-filter>
+        </activity>
+
+        <activity android:name=".ringdroid.RingdroidEditActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:windowSoftInputMode="adjustResize"
+            android:hardwareAccelerated="true">
+            <intent-filter android:label="@string/edit_intent">
+                <action android:name="android.intent.action.EDIT"/>
+            <data android:mimeType="audio/*"/></intent-filter>
+        </activity>
+
+        <activity android:name=".ringdroid.ChooseContactActivity" android:configChanges="orientation|keyboardHidden">
+        </activity>
     </application>
 
 </manifest>

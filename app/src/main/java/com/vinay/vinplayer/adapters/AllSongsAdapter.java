@@ -3,14 +3,16 @@ package com.vinay.vinplayer.adapters;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.ParcelFileDescriptor;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -19,10 +21,14 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.vinay.vinplayer.R;
-import com.vinay.vinplayer.VinPlayer;
 import com.vinay.vinplayer.fragments.AllSongsFragment.OnListFragmentInteractionListener;
 import com.vinay.vinplayer.helpers.VinMedia;
+import com.vinay.vinplayer.helpers.VinMediaLists;
+import com.vinay.vinplayer.ringdroid.RingdroidSelectActivity;
+import com.vinay.vinplayer.views.MainActivity;
+import com.vinay.vinplayer.views.MetaDataEditor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -93,6 +99,61 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
                 }
             }
         });
+
+        holder.more_icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopupMenu popup = new PopupMenu(context, holder.more_icon);
+                popup.inflate(R.menu.options_menu_allsongs);
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.play:
+                                ArrayList<HashMap<String, String>> song =  new ArrayList<>();
+                                song.add(VinMediaLists.allSongs.get(position));
+                                VinMedia.getInstance().updateTempQueue(2, song,context);
+                                VinMedia.getInstance().updateQueue(2,context);
+                                VinMedia.getInstance().startMusic(0,context);
+                                break;
+                            case R.id.play_next:
+                                ArrayList<HashMap<String,String>> q = new ArrayList<HashMap<String, String>>();
+                                q = VinMedia.getInstance().getCurrentList();
+
+                                break;
+                            case R.id.add_to_queue:
+                                ArrayList<HashMap<String,String>> arrayList = VinMedia.getInstance().getCurrentList();
+                                arrayList.add(VinMediaLists.allSongs.get(position));/*
+                                VinMedia.getInstance().updateTempQueue(2, arrayList,context);
+                                VinMedia.getInstance().updateQueue(2,context);*/
+                                break;
+                            case R.id.edit_info:
+                                Intent intent = new Intent(context.getApplicationContext(), MetaDataEditor.class);
+                                intent.putExtra("album_art_availalbe",
+                                        VinMediaLists.getInstance().isAlbumArtAvailable(
+                                                VinMediaLists.allSongs.get(position).get("album_id"),context));
+                                intent.putExtra("data",VinMediaLists.allSongs.get(position).get("data"));
+                                intent.putExtra("title",VinMediaLists.allSongs.get(position).get("title"));
+                                intent.putExtra("album",VinMediaLists.allSongs.get(position).get("album"));
+                                intent.putExtra("artist",VinMediaLists.allSongs.get(position).get("artist"));
+                               // intent.putExtra("genre",VinMediaLists.allSongs.get(position).get("genre"));
+                                intent.putExtra("album_id",VinMediaLists.allSongs.get(position).get("album_id"));
+
+                                context.startActivity(intent);
+                                break;
+                            case R.id.edit:
+                                context.startActivity(new Intent(context.getApplicationContext(), RingdroidSelectActivity.class));
+                                break;
+                        }
+                        return false;
+                    }
+                });
+                popup.show();
+
+            }
+        });
+
+
     }
 
 
@@ -122,8 +183,8 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
             more_icon.setColorFilter(Color.argb(180,255,255,255));
             songname.setTextColor(Color.WHITE);
             img_playindic.setColorFilter(Color.GREEN);
-        }
 
+        }
 
     }
 }

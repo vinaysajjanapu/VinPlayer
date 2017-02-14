@@ -191,13 +191,14 @@ public class VinMedia implements SensorEventListener {
 
     public void nextSong(Context context){
         media_settings = context.getSharedPreferences(context.getString(R.string.media_settings),Context.MODE_PRIVATE);
-        repeatmode = media_settings.getInt(context.getString(R.string.repeat_mode),2);
-        is_shuffle = media_settings.getBoolean(context.getString(R.string.shuffle),false);
+        repeatmode = media_settings.getInt(context.getString(R.string.repeat_mode),REPEAT_NONE);
+        is_shuffle = media_settings.getBoolean(context.getString(R.string.shuffle),SHUFFLE_OFF);
         if (!is_shuffle){
             if (position==currentQueue.size()-1){
-                if (repeatmode==1)position=0;
+                if (repeatmode==REPEAT_NONE)return;
+                if (repeatmode==REPEAT_QUEUE)position=0;
             }else if ((position+1)<currentQueue.size()){
-                if (repeatmode!=2)position++;
+                if (repeatmode!=REPEAT_TRACK)position++;
             }
            // startMusic(position,context);
         }else {
@@ -212,13 +213,13 @@ public class VinMedia implements SensorEventListener {
 
     public void previousSong(Context context){
         media_settings = context.getSharedPreferences(context.getString(R.string.media_settings),Context.MODE_PRIVATE);
-        repeatmode = media_settings.getInt(context.getString(R.string.repeat_mode),1);
+        repeatmode = media_settings.getInt(context.getString(R.string.repeat_mode),0);
         is_shuffle = media_settings.getBoolean(context.getString(R.string.shuffle),false);
         if (!is_shuffle) {
             if (position == 0) {
-                if (repeatmode == 1) position = currentQueue.size() - 1;
+                if (repeatmode == REPEAT_QUEUE) position = currentQueue.size() - 1;
             } else if ((position - 1) >= 0) {
-                if (repeatmode != 2) position--;
+                if (repeatmode != REPEAT_TRACK) position--;
             }
            // startMusic(position,context);
         }else {

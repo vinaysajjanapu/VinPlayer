@@ -41,4 +41,7 @@ dependencies {
     compile 'com.balysv:material-ripple:1.0.2'
     compile 'com.mxn.soul:flowingdrawer-core:2.0.0'
     compile 'com.nineoldandroids:library:2.4.0'
+    compile files('libs/MyID3_for_Android.jar')
+    compile 'com.google.android.gms:play-services-appindexing:8.4.0'
+    compile 'com.rengwuxian.materialedittext:library:2.1.4'
 }

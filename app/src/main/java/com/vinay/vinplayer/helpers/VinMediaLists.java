@@ -83,7 +83,7 @@ public class VinMediaLists {
                     String year = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR));
                     String bookmark = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.BOOKMARK));
 
-                    HashMap<String,String> h=new HashMap<>();
+                    HashMap<String,String> h = new HashMap<>();
                     h.put("data",data);
                     h.put("id",id);
                     h.put("album",album);
@@ -99,6 +99,7 @@ public class VinMediaLists {
                     h.put("year",year);
                     h.put("bookmark",bookmark);
                     h.put("display_name",display_name);
+                    h.put("index",cur.getPosition()+"");
                     allSongsList.add(h);
 
 
@@ -137,11 +138,11 @@ public class VinMediaLists {
             for(int z=0;z<allgenres.get(pos).size();z++) {
                 if (allSongs.get(itr).get("display_name").equals(allgenres.get(pos).get("display_name_"+z))){
                     list.add(allSongs.get(itr));
-                    Log.d("genre_song","added "+z);
+                 //   Log.d("genre_song","added "+z);
                 }
             }
         }
-        Log.d("genre_list",list.size()+"   "+list.toString());
+       // Log.d("genre_list",list.size()+"   "+list.toString());
         return list;
     }
 
@@ -241,7 +242,7 @@ public class VinMediaLists {
 
                 tempcursor =  context.getContentResolver().query(uri, proj2, null, null, null);
                 if (BuildConfig.DEBUG) if (tempcursor != null) {
-                    Log.i("Tag-Number of s", tempcursor.getCount()+"");
+  //                  Log.i("Tag-Number of s", tempcursor.getCount()+"");
                 }
                 int i;
                 if (tempcursor != null && tempcursor.moveToFirst()) {
@@ -253,7 +254,9 @@ public class VinMediaLists {
                         Log.d("genre","song added to genre "+"   "+i+"   "+tempcursor.getString(index));
                         i++;
                     } while (tempcursor.moveToNext());
+                    tempcursor.close();
                 }
+
 
                     //genre.put("nos", String.valueOf(tempcursor.getCount()));
 
@@ -265,7 +268,8 @@ public class VinMediaLists {
                 }
                 while(genrecursor.moveToNext());
         }
-        Log.d("genres_list",genres.size()+"   "+genres.toString());
+        genrecursor.close();
+//        Log.d("genres_list",genres.size()+"   "+genres.toString());
         allgenres=genres;
      return genres;
     }
@@ -274,6 +278,7 @@ public class VinMediaLists {
 
     public Bitmap getAlbumart(Long album_id,Context context)
     {
+
         Bitmap bm = null;
         try
         {
@@ -296,5 +301,29 @@ public class VinMediaLists {
             bm = BitmapFactory.decodeResource(context.getResources(),R.drawable.albumart_default);
         }
         return bm;
+    }
+
+    public Boolean isAlbumArtAvailable(String album_id,Context context){
+        Long album = Long.parseLong(album_id);
+        try
+        {
+            final Uri sArtworkUri = Uri
+                    .parse("content://media/external/audio/albumart");
+
+            Uri uri = ContentUris.withAppendedId(sArtworkUri, album);
+
+            ParcelFileDescriptor pfd = context.getContentResolver()
+                    .openFileDescriptor(uri, "r");
+
+            if (pfd != null)
+            {
+                return true;
+            }else {
+                return false;
+            }
+        } catch (Exception e) {
+
+        }
+        return false;
     }
 }
