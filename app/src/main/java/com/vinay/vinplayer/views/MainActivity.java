@@ -617,6 +617,7 @@ public class MainActivity extends AppCompatActivity implements
                             return;
                         }
                 }
+
                 else Toast.makeText(this,"please grant permissions",Toast.LENGTH_LONG).show();
 
             }
