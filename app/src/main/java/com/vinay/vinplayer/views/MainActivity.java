@@ -1,6 +1,7 @@
 package com.vinay.vinplayer.views;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.Context;
@@ -15,12 +16,15 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.test.mock.MockPackageManager;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -54,6 +58,7 @@ import com.vinay.vinplayer.tablayout.SpringIndicator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 public class MainActivity extends AppCompatActivity implements
@@ -577,31 +582,46 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    public  boolean isStoragePermissionGranted() {
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED) {
-                Log.v("Storage Permisson","granted");
-                return true;
-            } else {
+    public  void isStoragePermissionGranted() {
+        if (Build.VERSION.SDK_INT >= 16) {
 
-                Log.v("Storage Permisson","revoked");
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-                return false;
+            if (ActivityCompat.checkSelfPermission
+                    (this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                    &&
+                    ActivityCompat.checkSelfPermission
+                    (this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+            {
+
+                ActivityCompat
+                        .requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE}, 200);
+
             }
         }
         else { //permission is automatically granted on sdk<23 upon installation
             Log.v("Storage Permisson","granted");
-            return true;
         }
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
-            Log.v("Storage Permisson","Permission: "+permissions[0]+ "was "+grantResults[0]);
-            //resume tasks needing this permission
+        if (requestCode == 200) {
+
+            if (grantResults.length > 0) {
+                if (grantResults[0] == MockPackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                    if (Objects.equals(permissions[0], Manifest.permission.READ_EXTERNAL_STORAGE))
+                        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            return;
+                        }
+                }
+                else Toast.makeText(this,"please grant permissions",Toast.LENGTH_LONG).show();
+
+            }
         }
+
     }
 }
 
