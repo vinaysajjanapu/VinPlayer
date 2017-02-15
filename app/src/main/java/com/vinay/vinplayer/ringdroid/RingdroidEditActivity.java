@@ -31,6 +31,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -59,7 +60,7 @@ import java.io.RandomAccessFile;
  * the waveform display, current horizontal offset, marker handles,
  * start / end text boxes, and handles all of the buttons and controls.
  */
-public class RingdroidEditActivity extends Activity
+public class RingdroidEditActivity extends AppCompatActivity
     implements MarkerView.MarkerListener,
                WaveformView.WaveformListener
 {
@@ -141,6 +142,8 @@ public class RingdroidEditActivity extends Activity
         Log.v("Ringdroid", "EditActivity OnCreate");
         super.onCreate(icicle);
 
+        getSupportActionBar().show();
+
         mPlayer = null;
         mIsPlaying = false;
 
@@ -214,6 +217,11 @@ public class RingdroidEditActivity extends Activity
             mPlayer.release();
             mPlayer = null;
         }
+
+
+        Intent intent = new Intent();
+        intent.setAction(getString(R.string.mediaListChanged));
+        sendBroadcast(intent);
 
         super.onDestroy();
     }
@@ -1490,8 +1498,8 @@ public class RingdroidEditActivity extends Activity
         try {
             Intent intent = new Intent(Intent.ACTION_EDIT, uri);
             intent.setClassName(
-                "com.ringdroid",
-                "com.ringdroid.ChooseContactActivity");
+                "com.vinay.vinplayer.ringdroid",
+                "com.vinay.vinplayer.ringdroid.ChooseContactActivity");
             startActivityForResult(intent, REQUEST_CODE_CHOOSE_CONTACT);
         } catch (Exception e) {
             Log.e("Ringdroid", "Couldn't open Choose Contact window");

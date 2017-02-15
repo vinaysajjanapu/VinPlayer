@@ -142,7 +142,17 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
                                 context.startActivity(intent);
                                 break;
                             case R.id.edit:
-                                context.startActivity(new Intent(context.getApplicationContext(), RingdroidSelectActivity.class));
+
+                                String filename = VinMediaLists.allSongs.get(position).get("data");
+                                try {
+                                    Intent intent1 = new Intent(Intent.ACTION_EDIT, Uri.parse(filename));
+                                    intent1.setClassName( "com.vinay.vinplayer", "com.vinay.vinplayer.ringdroid.RingdroidEditActivity");
+                                    context.startActivity(intent1);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    Log.e("Ringdroid", "Couldn't start editor");
+                                }/*
+                                context.startActivity(new Intent(context.getApplicationContext(), RingdroidSelectActivity.class));*/
                                 break;
                         }
                         return false;

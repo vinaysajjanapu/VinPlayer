@@ -101,7 +101,7 @@ public class VinMediaLists {
                     h.put("display_name",display_name);
                     h.put("index",cur.getPosition()+"");
                     allSongsList.add(h);
-
+Log.d("song id", id);
 
                 }
             }
@@ -118,7 +118,7 @@ public class VinMediaLists {
         allSongs = getAllSongsList(context);
         for(int itr =0;itr<allSongs.size();itr++){
             if (allSongs.get(itr).get(key).equals(value)){
-                Log.d("matched",allSongs.get(itr).get(key));
+               // Log.d("matched",allSongs.get(itr).get(key));
                 list.add(allSongs.get(itr));
             }
         }
@@ -230,7 +230,7 @@ public class VinMediaLists {
             do {
                 genre = new HashMap<>();
                 index = genrecursor.getColumnIndexOrThrow(MediaStore.Audio.Genres.NAME);
-                if (BuildConfig.DEBUG)  Log.i("Tag-Genre name", genrecursor.getString(index));
+                if (BuildConfig.DEBUG) // Log.i("Tag-Genre name", genrecursor.getString(index));
                 genre.put("genre",genrecursor.getString(index));
                 if(genre.get("genre").equalsIgnoreCase("")) {
                     genre.put("genre","no-genre");
@@ -249,9 +249,9 @@ public class VinMediaLists {
                     i=0;
                     do {
                         index = tempcursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
-                        Log.i("Tag-Song name", tempcursor.getString(index));
+         //               Log.i("Tag-Song name", tempcursor.getString(index));
                         genre.put("display_name_"+i, tempcursor.getString(index));
-                        Log.d("genre","song added to genre "+"   "+i+"   "+tempcursor.getString(index));
+         //               Log.d("genre","song added to genre "+"   "+i+"   "+tempcursor.getString(index));
                         i++;
                     } while (tempcursor.moveToNext());
                     tempcursor.close();

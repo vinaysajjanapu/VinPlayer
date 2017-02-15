@@ -1,5 +1,6 @@
 package com.vinay.vinplayer.views;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -83,6 +84,9 @@ public class MetaDataEditor extends AppCompatActivity {
         albumart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (album.getText().toString().equals(album_name))
+                    Toast.makeText(getBaseContext(),"change album name to proceed",Toast.LENGTH_SHORT).show();
+                else
                 showFileChooser();
             }
         });
