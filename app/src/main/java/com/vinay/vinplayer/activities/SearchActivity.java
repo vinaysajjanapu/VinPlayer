@@ -1,4 +1,4 @@
-package com.vinay.vinplayer.views;
+package com.vinay.vinplayer.activities;
 
 import android.content.Context;
 import android.os.Bundle;

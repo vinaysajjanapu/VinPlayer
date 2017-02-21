@@ -1,21 +1,16 @@
-package com.vinay.vinplayer.views;
+package com.vinay.vinplayer.activities;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.vinay.vinplayer.R;
-import com.vinay.vinplayer.helpers.VinMedia;
-
-import java.lang.ref.WeakReference;
 
 public class SplashScreen extends AppCompatActivity {
 

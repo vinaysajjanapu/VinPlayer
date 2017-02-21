@@ -24,9 +24,7 @@ import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.fragments.AllSongsFragment.OnListFragmentInteractionListener;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
-import com.vinay.vinplayer.ringdroid.RingdroidSelectActivity;
-import com.vinay.vinplayer.views.MainActivity;
-import com.vinay.vinplayer.views.MetaDataEditor;
+import com.vinay.vinplayer.activities.MetaDataEditor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,8 +56,9 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 
+        String title = mValues.get(position).get("title");
         holder.mItem = mValues.get(position);
-        holder.songname.setText(mValues.get(position).get("title"));
+        holder.songname.setText(title);
         holder.ArtisName_duration.setText(
                 mValues.get(position).get("album") + "\t-\t" + mValues.get(position).get("artist") + ""
         );
@@ -67,16 +66,15 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
 
         holder.img_playindic.setVisibility(View.GONE);
         holder.mView.setBackgroundColor(Color.TRANSPARENT);
-
-        if (position == VinMedia.getInstance().getPosition()){
-            Log.d("queue position", position+"");
-            holder.img_playindic.setVisibility(View.VISIBLE);
-            holder.songname.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-            holder.ArtisName_duration.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-            holder.ArtisName_duration.setTextColor(Color.WHITE);
-            holder.mView.setBackgroundColor(context.getResources().getColor(R.color.transparentLightBlack));
+        if (VinMedia.getInstance().getCurrentSongDetails()!=null) {
+            if (VinMedia.getInstance().getCurrentSongDetails().get("title").equals(title)){
+                holder.img_playindic.setVisibility(View.VISIBLE);
+                holder.songname.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                holder.ArtisName_duration.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                holder.ArtisName_duration.setTextColor(Color.WHITE);
+                holder.mView.setBackgroundColor(context.getResources().getColor(R.color.transparentLightBlack));
+            }
         }
-
         try {
             final Uri sArtworkUri = Uri
                     .parse("content://media/external/audio/albumart");

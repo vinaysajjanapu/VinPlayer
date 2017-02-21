@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layoutManager="LinearLayoutManager"
-    tools:context="com.vinay.vinplayer.views.AlbumDetailsActivity"
+    tools:context="com.vinay.vinplayer.activities.AlbumDetailsActivity"
     tools:listitem="@layout/fragment_allsongs_item"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"

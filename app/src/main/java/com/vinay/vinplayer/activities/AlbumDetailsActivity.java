@@ -1,4 +1,4 @@
-package com.vinay.vinplayer.views;
+package com.vinay.vinplayer.activities;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;

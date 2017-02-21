@@ -93,7 +93,7 @@ public class RecentAddedTable {
     }
 
     ///////////////////give total number less than 0 for full list;
-    public ArrayList<HashMap<String,String>> getRecentAddedListList(int list_size){
+    public ArrayList<HashMap<String,String>> getRecentAddedList(int list_size){
         ArrayList<HashMap<String,String>> RecentAddedLists = new ArrayList<>();
         Cursor cursor = null;
         try {

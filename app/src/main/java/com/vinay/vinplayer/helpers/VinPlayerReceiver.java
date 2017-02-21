@@ -50,23 +50,23 @@ public class VinPlayerReceiver extends BroadcastReceiver {
 				break;
 			}
 		} else {
-			if (intent.getAction().equals(VinMusicService.NOTIFY_PLAY)) {
+			if (intent.getAction().equals(VinMedia.NOTIFY_PLAY)) {
 					if (!VinMedia.getInstance().isPlaying()){
 						VinMedia.getInstance().resumeMusic(context);
 					}else {
 						VinMedia.getInstance().pauseMusic(context);
 					}
 			}
-			else if (intent.getAction().equals(VinMusicService.NOTIFY_NEXT)) {
+			else if (intent.getAction().equals(VinMedia.NOTIFY_NEXT)) {
 				VinMedia.getInstance().nextSong(context);
 			}
-			else if (intent.getAction().equals(VinMusicService.NOTIFY_CLOSE)) {
+			else if (intent.getAction().equals(VinMedia.NOTIFY_CLOSE)) {
 				Log.d("notification","close it");
-				Intent intent1 = new Intent(VinPlayer.applicationContext, VinMusicService.class);
+				Intent intent1 = new Intent(VinPlayer.applicationContext, VinMedia.class);
 				VinPlayer.applicationContext.stopService(intent1);
 				VinMedia.getInstance().releasePlayer();
 			}
-			else if (intent.getAction().equals(VinMusicService.NOTIFY_PREVIOUS)) {
+			else if (intent.getAction().equals(VinMedia.NOTIFY_PREVIOUS)) {
 				VinMedia.getInstance().previousSong(context);
 			}
 		}

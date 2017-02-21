@@ -1,4 +1,4 @@
-package com.vinay.vinplayer.views.minimal_ui;
+package com.vinay.vinplayer.activities.minimal_ui;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

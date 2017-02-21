@@ -5,7 +5,7 @@
     android:id="@+id/activity_meta_data_editor"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.vinay.vinplayer.views.MetaDataEditor">
+    tools:context="com.vinay.vinplayer.activities.MetaDataEditor">
     <ScrollView
         android:layout_width="match_parent"
         android:background="@color/transparentLightBlack"

@@ -47,15 +47,15 @@ import static com.vinay.vinplayer.database.VinDBHelper.usageDataTable;
 
 public class RecommendedTable {
 
-    public long THIS_TIME_WEIGHT = 2;
-    public long TOTAL_TIMES_WEIGHT = 2;
-    public long HEADP_WEIGHT = 1;
-    public long RECENT_PLAY_WEIGHT = 1;
-    public long RECENT_ADDED_WEIGHT = 1;
-    public long FAVOURITE_WEIGHT = 1;
-    public long AS_FIRST_WEIGHT = 1;
-    public long AS_LAST_WEIGHT = 1;
-    public long PLAYED_PERCENT_WEIGHT = 1;
+    public long THIS_TIME_WEIGHT = 15;
+    public long TOTAL_TIMES_WEIGHT = 10;
+    public long HEADP_WEIGHT = 20;
+    public long RECENT_PLAY_WEIGHT = 10;
+    public long RECENT_ADDED_WEIGHT = 10;
+    public long FAVOURITE_WEIGHT = 20;
+    public long AS_FIRST_WEIGHT = 25;
+    public long AS_LAST_WEIGHT = 25;
+    public long PLAYED_PERCENT_WEIGHT = 10;
 
     int NEXT_SONG_ITERATIONS = 5;
 
@@ -593,7 +593,7 @@ public class RecommendedTable {
         ArrayList<HashMap<String,String>> recommendedList = new ArrayList<>();
         Cursor cursor = null;
         try {
-            String sqlQuery = "Select * from " + scoreTable + " ORDER BY SCORE DESC" ;
+            String sqlQuery = "Select * from " + scoreTable + " ORDER BY SCORE ASC" ;
             database = dbHelper.getDb();
             cursor = database.rawQuery(sqlQuery, null);
             if (cursor != null && cursor.getCount() >= 1) {
@@ -622,6 +622,7 @@ public class RecommendedTable {
         }
 
         for (int q = 0; q < recommendedList.size()-(NEXT_SONG_ITERATIONS+2);q++){
+            if (q>50)break;
             for (int w = 2; w < NEXT_SONG_ITERATIONS+2; w++){
                 long to = NextSongDataTable.getInstance(context)
                         .getPreferredId(Long.parseLong(recommendedList.get(q).get("id")));
@@ -630,7 +631,6 @@ public class RecommendedTable {
                 }
             }
         }
-
         return recommendedList;
     }
 
