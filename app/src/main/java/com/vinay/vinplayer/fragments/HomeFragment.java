@@ -77,6 +77,7 @@ public class HomeFragment extends Fragment {
                     list_name = (TextView) view1.findViewById(R.id.list_name);
                     list_button = (Button) view1.findViewById(R.id.list_button);
                     list_button.setText("play all");
+                    list_button.setTextColor(Color.WHITE);
 
                     LinearLayoutManager layoutManager = new LinearLayoutManager(context);
                     layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
