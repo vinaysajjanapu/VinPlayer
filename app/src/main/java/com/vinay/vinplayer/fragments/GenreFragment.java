@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.vinay.vinplayer.R;
-import com.vinay.vinplayer.adapters.ArtistsAdapter;
 import com.vinay.vinplayer.adapters.GenreAdapter;
 
 import java.util.ArrayList;

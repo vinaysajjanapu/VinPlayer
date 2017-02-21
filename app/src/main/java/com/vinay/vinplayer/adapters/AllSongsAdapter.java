@@ -19,7 +19,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.fragments.AllSongsFragment.OnListFragmentInteractionListener;
 import com.vinay.vinplayer.helpers.VinMedia;
@@ -82,7 +82,8 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
            /* ParcelFileDescriptor pfd = context.getContentResolver().openFileDescriptor(uri,"r");
             String url = VinPlayer.default_art;
             if (pfd!=null)url = uri.toString();
-          */  ImageLoader.getInstance().displayImage(uri.toString(), holder.circleImageView);
+          */ // ImageLoader.getInstance().displayImage(uri.toString(), holder.circleImageView);
+            Picasso.with(context).load(uri).fit().into(holder.circleImageView);
 
         } catch (Exception e) {
             e.printStackTrace();

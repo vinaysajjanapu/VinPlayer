@@ -1,6 +1,5 @@
 package com.vinay.vinplayer.adapters;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
@@ -10,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.fragments.ArtistsFragment;
 
@@ -49,10 +48,10 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ViewHold
             final Uri sArtworkUri = Uri
                     .parse("content://media/external/audio/albumart/0");
             //Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mValues.get(0).get("album_id")));
-          /*  Picasso.with(context).load(sArtworkUri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
+            Picasso.with(context).load(sArtworkUri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
                     .into(holder.imageView);
-          */
-            ImageLoader.getInstance().displayImage(sArtworkUri.toString(), holder.imageView);
+
+            //ImageLoader.getInstance().displayImage(sArtworkUri.toString(), holder.imageView);
         } catch (Exception e) {
             e.printStackTrace();
         }

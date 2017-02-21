@@ -20,7 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.VinPlayer;
 import com.vinay.vinplayer.database.FavouriteTable;
@@ -29,7 +29,6 @@ import com.vinay.vinplayer.database.RecentAddedTable;
 import com.vinay.vinplayer.database.RecentPlayTable;
 import com.vinay.vinplayer.database.RecommendedTable;
 import com.vinay.vinplayer.database.UsageDataTable;
-import com.vinay.vinplayer.database.VinDBHelper;
 import com.vinay.vinplayer.helpers.VinMedia;
 
 import java.util.ArrayList;
@@ -169,8 +168,8 @@ public class HomeFragment extends Fragment {
                 if (position!= MAX_LIST_SIZE){
                     uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(list.get(position).get("album_id")));
                 }else uri = sArtworkUri;
-                ImageLoader.getInstance().displayImage(uri.toString(), holder.imageView);
-
+                //ImageLoader.getInstance().displayImage(uri.toString(), holder.imageView);
+                Picasso.with(context).load(uri).into(holder.imageView);
 
             } catch (Exception e) {
                 e.printStackTrace();

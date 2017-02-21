@@ -1,9 +1,9 @@
 package com.vinay.vinplayer.helpers;
 
-import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
+/*import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;*/
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.VinPlayer;
 
@@ -13,7 +13,7 @@ import com.vinay.vinplayer.VinPlayer;
 
 public class ImageLoaderOptions {
 
-    public static DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
+   /* public static DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
             .cacheOnDisc(true)
             .cacheInMemory(false)
             .showImageOnFail(R.drawable.albumart_default)
@@ -29,6 +29,6 @@ public class ImageLoaderOptions {
             .defaultDisplayImageOptions(defaultOptions)
             .memoryCache(new WeakMemoryCache())
             .discCacheSize(100 * 1024 * 1024)
-            .build();
+            .build();*/
 
 }

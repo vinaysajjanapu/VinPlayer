@@ -2,22 +2,22 @@ package com.vinay.vinplayer.activities;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
-import com.klinker.android.sliding.SlidingActivity;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.adapters.AlbumSongsAdapter;
-import com.vinay.vinplayer.helpers.BlurBuilder;
-import com.vinay.vinplayer.helpers.VinMediaLists;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class AlbumDetailsActivity extends SlidingActivity {
+public class AlbumDetailsActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     Bitmap blurredBitmap, blurredBitmap1;
     Bitmap input_to_blur;
@@ -26,88 +26,50 @@ public class AlbumDetailsActivity extends SlidingActivity {
     public static Drawable dr;
     static ArrayList<HashMap<String,String>> albumsongs;
 
-        @Override
-    public void init(Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        albumsongs= (ArrayList<HashMap<String, String>>) getIntent().getSerializableExtra("list");
 
-            albumsongs= (ArrayList<HashMap<String, String>>) getIntent().getSerializableExtra("list");
-            setContent(R.layout.fragment_album_details);
-            if (albumsongs!=null) {
-                setTitle(albumsongs.get(0).get("album")+"");
+        if (albumsongs!=null) {
+            setTitle(albumsongs.get(0).get("album")+"");
 
-                setPrimaryColors(getResources().getColor(R.color.transparentLightBlack),
-                        getResources().getColor(R.color.transparentBlack));
-
-                expandFromPoints(0, 0, 0, 0);
-            }
+        }
         recyclerView = (RecyclerView) findViewById(R.id.album_details_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(new AlbumSongsAdapter(this,albumsongs));
-            try{
-                Log.d("albumsongs","image loaded");
-                setImage(VinMediaLists.getInstance().getAlbumart(
-                        Long.parseLong(albumsongs.get(0).get("album_id")),getApplicationContext()));
-                final Uri sArtworkUri = Uri
-                        .parse("content://media/external/audio/albumart");
+ /*       try{
+            Log.d("albumsongs","image loaded");
+            //setImage(VinMediaLists.getInstance().getAlbumart(
+                    Long.parseLong(albumsongs.get(0).get("album_id")),getApplicationContext()));
+            final Uri sArtworkUri = Uri
+                    .parse("content://media/external/audio/albumart");
 
-                recyclerView.setBackground(BlurBuilder.getInstance().drawable_img(albumsongs.get(0).get("album_id"),getApplicationContext()));
+            recyclerView.setBackground(BlurBuilder.getInstance().drawable_img(albumsongs.get(0).get("album_id"),getApplicationContext()));
 
-            }catch (Exception e){
+        }catch (Exception e){
 
-            }
+        }*/
 
-/*
+
             new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
 
                         Target target = new Target() {
                             @Override
-                            public void onStart() {
+                            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
 
                             }
 
                             @Override
-                            public void onStop() {
+                            public void onBitmapFailed(Drawable errorDrawable) {
 
                             }
 
                             @Override
-                            public void onDestroy() {
+                            public void onPrepareLoad(Drawable placeHolderDrawable) {
 
-                            }
-
-                            @Override
-                            public void onLoadStarted(Drawable placeholder) {
-
-                            }
-
-                            @Override
-                            public void onLoadFailed(Exception e, Drawable errorDrawable) {
-
-                            }
-
-                            @Override
-                            public void onResourceReady(Object resource, GlideAnimation glideAnimation) {
-                            }
-
-                            @Override
-                            public void onLoadCleared(Drawable placeholder) {
-                                setImage(((BitmapDrawable)placeholder).getBitmap());
-                            }
-
-                            @Override
-                            public void getSize(SizeReadyCallback cb) {
-
-                            }
-
-                            @Override
-                            public void setRequest(Request request) {
-
-                            }
-
-                            @Override
-                            public Request getRequest() {
-                                return null;
                             }
 
                         };
@@ -118,11 +80,13 @@ public class AlbumDetailsActivity extends SlidingActivity {
                         }
                    }
 
-                    }, 500);*/
+                    }, 500);
 
-            enableFullscreen();
+
 
     }
+
+
 
 
 }

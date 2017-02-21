@@ -16,8 +16,6 @@ import android.view.ViewGroup;
 
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.adapters.AllSongsAdapter;
-import com.vinay.vinplayer.database.NextSongDataTable;
-import com.vinay.vinplayer.database.RecentAddedTable;
 
 import java.util.ArrayList;
 import java.util.HashMap;

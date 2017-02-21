@@ -5,10 +5,10 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Handler;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+
 import com.vinay.vinplayer.database.VinDBHelper;
 
-import static com.vinay.vinplayer.helpers.ImageLoaderOptions.config;
+
 
 /**
  * Created by vinaysajjanapu on 5/2/17.
@@ -27,7 +27,7 @@ public class VinPlayer extends Application {
 
         initilizeDB();
 
-        ImageLoader.getInstance().init(config); // Get singleton instance
+        //ImageLoader.getInstance().init(config); // Get singleton instance
 
     }
 

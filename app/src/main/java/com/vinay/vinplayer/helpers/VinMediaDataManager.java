@@ -2,15 +2,11 @@ package com.vinay.vinplayer.helpers;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.util.Log;
 
-import com.vinay.vinplayer.R;
-
 import org.cmc.music.common.ID3WriteException;
-import org.cmc.music.metadata.IMusicMetadata;
 import org.cmc.music.metadata.ImageData;
 import org.cmc.music.metadata.MusicMetadata;
 import org.cmc.music.metadata.MusicMetadataSet;

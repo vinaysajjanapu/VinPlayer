@@ -16,7 +16,6 @@ import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import com.nostra13.universalimageloader.utils.L;
 import com.vinay.vinplayer.BuildConfig;
 import com.vinay.vinplayer.R;
 

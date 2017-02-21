@@ -1,16 +1,16 @@
 package com.vinay.vinplayer.fragments;
 
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.support.v4.app.FragmentManager;
-import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -24,10 +24,7 @@ import android.widget.Toast;
 
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.anim.AccordionTransformer;
-import com.vinay.vinplayer.anim.CubeInTransformer;
-import com.vinay.vinplayer.helpers.NotificationManager;
 import com.vinay.vinplayer.helpers.VinMedia;
-
 
 import java.util.HashMap;
 import java.util.Locale;

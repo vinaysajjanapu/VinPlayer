@@ -30,13 +30,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.nostra13.universalimageloader.core.ImageLoader;
+
+
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.anim.AccordionTransformer;
 import com.vinay.vinplayer.fragments.AlbumsFragment;
@@ -109,12 +107,6 @@ public class MainActivity extends AppCompatActivity implements
     long firstback_t;
 
     ImageView iv_search;
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,12 +143,10 @@ public class MainActivity extends AppCompatActivity implements
         iv_search = (ImageView) findViewById(R.id.iv_search);
         iv_search.setColorFilter(Color.WHITE);
         iv_search.setOnClickListener(this);
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     private void setupBroadCastReceiver() {
+
         intentFilter = new IntentFilter();
         intentFilter.addAction(getString(R.string.newSongLoaded));
         intentFilter.addAction(getString(R.string.songPaused));
@@ -202,11 +192,11 @@ public class MainActivity extends AppCompatActivity implements
                         .parse("content://media/external/audio/albumart");
                 Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(songDetails.get("album_id")));
 
-                /*Picasso.with(this).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
+                Picasso.with(this).load(uri).fit().placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
                         .into(sliderPlayer_albumart);
-                */
 
-                ImageLoader.getInstance().displayImage(uri.toString(), sliderPlayer_albumart);
+
+                //ImageLoader.getInstance().displayImage(uri.toString(), sliderPlayer_albumart);
 
                 slider.setBackground(BlurBuilder.getInstance().drawable_img(songDetails.get("album_id"), this));
 
@@ -536,31 +526,7 @@ public class MainActivity extends AppCompatActivity implements
         dFragment.show(fm, "Dialog Fragment");
     }
 
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    public Action getIndexApiAction() {
-        Thing object = new Thing.Builder()
-                .setName("Main Page") // TODO: Define a title for the content shown.
-                // TODO: Make sure this auto-generated URL is correct.
-                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
-                .build();
-        return new Action.Builder(Action.TYPE_VIEW)
-                .setObject(object)
-                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
-                .build();
-    }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        AppIndex.AppIndexApi.start(client, getIndexApiAction());
-    }
 /*
     @Override
     public void didReceivedNotification(int id, Object... args) {
