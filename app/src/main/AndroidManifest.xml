@@ -25,7 +25,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".views.MainActivity"
+            android:name=".activities.MainActivity"
             android:theme="@style/Base.Theme.AppCompat.Light">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -86,13 +86,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".views.AlbumDetailsActivity"
+            android:name=".activities.AlbumDetailsActivity"
             android:excludeFromRecents="true"
-            android:taskAffinity=""
-            android:theme="@style/Theme.Sliding.Light" />
+            android:taskAffinity="" />
 
         <service
-            android:name=".helpers.VinMusicService"
+            android:name=".helpers.VinMedia"
             android:enabled="true"
             android:exported="true" />
 
@@ -108,9 +107,9 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".views.SearchActivity" />
-        <activity android:name=".views.SplashScreen" />
-        <activity android:name=".views.MetaDataEditor" />
+        <activity android:name=".activities.SearchActivity" />
+        <activity android:name=".activities.SplashScreen" />
+        <activity android:name=".activities.MetaDataEditor" />
         <activity
             android:name=".ringdroid.RingdroidSelectActivity"
             android:label="@string/main_activity_label">
@@ -137,7 +136,7 @@
         <activity
             android:name=".ringdroid.ChooseContactActivity"
             android:configChanges="orientation|keyboardHidden"/>
-        <activity android:name=".views.minimal_ui.Minimal_NowPlaying"/>
+        <activity android:name=".activities.minimal_ui.Minimal_NowPlaying"/>
     </application>
 
 </manifest>

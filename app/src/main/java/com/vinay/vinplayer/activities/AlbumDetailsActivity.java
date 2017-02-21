@@ -2,17 +2,20 @@ package com.vinay.vinplayer.activities;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.adapters.AlbumSongsAdapter;
+import com.vinay.vinplayer.helpers.BlurBuilder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +32,9 @@ public class AlbumDetailsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.fragment_album_details);
         albumsongs= (ArrayList<HashMap<String, String>>) getIntent().getSerializableExtra("list");
+
 
         if (albumsongs!=null) {
             setTitle(albumsongs.get(0).get("album")+"");
@@ -38,10 +43,10 @@ public class AlbumDetailsActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.album_details_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(new AlbumSongsAdapter(this,albumsongs));
- /*       try{
+        try{
             Log.d("albumsongs","image loaded");
             //setImage(VinMediaLists.getInstance().getAlbumart(
-                    Long.parseLong(albumsongs.get(0).get("album_id")),getApplicationContext()));
+               //     Long.parseLong(albumsongs.get(0).get("album_id")),getApplicationContext()));
             final Uri sArtworkUri = Uri
                     .parse("content://media/external/audio/albumart");
 
@@ -49,7 +54,7 @@ public class AlbumDetailsActivity extends AppCompatActivity {
 
         }catch (Exception e){
 
-        }*/
+        }
 
 
             new Handler().postDelayed(new Runnable() {

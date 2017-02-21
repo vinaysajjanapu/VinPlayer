@@ -238,13 +238,13 @@ public class MainActivity extends AppCompatActivity implements
     private void setupLibraryViewPager() {
 
         librayViewPager = (ViewPager) findViewById(R.id.viewpager);
-        mFragmentList.add(HomeFragment.newInstance());
+        //mFragmentList.add(HomeFragment.newInstance());
         mFragmentList.add(AllSongsFragment.newInstance(1, VinMediaLists.getInstance().getAllSongsList(this)));
         mFragmentList.add(AlbumsFragment.newInstance(VinMediaLists.getInstance().getAlbumsList(this)));
         mFragmentList.add(FoldersFragment.newInstance());
         mFragmentList.add(ArtistsFragment.newInstance(VinMediaLists.getInstance().getArtistsList(this)));
         mFragmentList.add(GenreFragment.newInstance(VinMediaLists.getInstance().getGenresList(this)));
-        titles.add("home");
+        //titles.add("home");
         titles.add("all");
         titles.add("album");
         titles.add("folders");
@@ -416,16 +416,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onPause();
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();// ATTENTION: This was auto-generated to implement the App Indexing API.
-// See https://g.co/AppIndexing/AndroidStudio for more information.
-      //  AppIndex.AppIndexApi.end(client, getIndexApiAction());
-      //  unregisterReceiver(broadcastReceiver);
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        //client.disconnect();
-    }
+
 
     @Override
     protected void onDestroy() {
