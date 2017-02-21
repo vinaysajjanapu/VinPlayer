@@ -350,13 +350,13 @@ public class VinMusicService extends Service implements AudioManager.OnAudioFocu
 
         if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
             if (VinMedia.getInstance().isPlaying()) {
-                /*VinMedia.getInstance().getInstance().pauseMusic(getApplicationContext());
-                setAudioFocus();*/
+                VinMedia.getInstance().getInstance().pauseMusic(getApplicationContext());
+                setAudioFocus();
             }
         } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
-             if (AudioFocus){/*
+             if (AudioFocus){
                  VinMedia.getInstance().resumeMusic(getApplicationContext());
-                 AudioFocus = false;*/
+                 AudioFocus = false;
              }
         }
     }

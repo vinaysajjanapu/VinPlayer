@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.os.Handler;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.vinay.vinplayer.database.VinDBHelper;
 
 import static com.vinay.vinplayer.helpers.ImageLoaderOptions.config;
 
@@ -24,6 +25,8 @@ public class VinPlayer extends Application {
         applicationContext = getApplicationContext();
         applicationHandler = new Handler(applicationContext.getMainLooper());
 
+        initilizeDB();
+
         ImageLoader.getInstance().init(config); // Get singleton instance
 
     }
@@ -33,5 +36,33 @@ public class VinPlayer extends Application {
         super.onConfigurationChanged(newConfig);
     }
 
+
+    public VinDBHelper DB_HELPER;
+
+    @Override
+    public void onTerminate() {
+        closeDB();
+        super.onTerminate();
+    }
+
+    private void initilizeDB() {
+        if (DB_HELPER == null) {
+            DB_HELPER = new VinDBHelper(VinPlayer.this);
+        }
+        try {
+            DB_HELPER.getWritableDatabase();
+            DB_HELPER.openDataBase();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void closeDB() {
+        try {
+            DB_HELPER.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

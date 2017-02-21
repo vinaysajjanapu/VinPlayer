@@ -1159,18 +1159,17 @@ public class RingdroidEditActivity extends AppCompatActivity
         switch(mNewFileKind) {
         default:
         case FileSaveDialog.FILE_KIND_MUSIC:
-            // TODO(nfaralli): can directly use Environment.getExternalStoragePublicDirectory(
             // Environment.DIRECTORY_MUSIC).getPath() instead
-            subdir = "media/audio/music/";
+            subdir = "VinPlayer/Edited/music/";
             break;
         case FileSaveDialog.FILE_KIND_ALARM:
-            subdir = "media/audio/alarms/";
+            subdir = "VinPlayer/Edited/alarms/";
             break;
         case FileSaveDialog.FILE_KIND_NOTIFICATION:
-            subdir = "media/audio/notifications/";
+            subdir = "VinPlayer/Edited/notifications/";
             break;
         case FileSaveDialog.FILE_KIND_RINGTONE:
-            subdir = "media/audio/ringtones/";
+            subdir = "VinPlayer/Edited/ringtones/";
             break;
         }
         String parentdir = externalRootDir + subdir;

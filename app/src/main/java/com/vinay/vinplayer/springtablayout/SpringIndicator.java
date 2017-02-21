@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.vinay.vinplayer.tablayout;
+package com.vinay.vinplayer.springtablayout;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.content.Context;

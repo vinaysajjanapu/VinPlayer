@@ -144,7 +144,7 @@ public class FoldersFragment extends Fragment {
                     h.put("root",path[j]);
                 else h.put(path[j-1],path[j]);
 
-                Log.d("path",h.toString());
+              //  Log.d("path",h.toString());
             }
             file_structure.add(h);
         }
@@ -203,7 +203,7 @@ public class FoldersFragment extends Fragment {
     }
 
     private void addtoPlayableQueue(int position) {
-        Log.d("playable queue","updated  "+position);
+        //Log.d("playable queue","updated  "+position);
         playable_queue.add(VinMediaLists.allSongs.get(position));
     }
 
@@ -296,8 +296,8 @@ public class FoldersFragment extends Fragment {
                     public void onClick(View v) {
 
                         if (isAudio(mValues.get(position).get("name"))){
-                            VinMedia.getInstance().updateTempQueue(1,playable_queue,getActivity());
-                            VinMedia.getInstance().updateQueue(1,getActivity());
+                            VinMedia.getInstance().updateTempQueue(playable_queue,getActivity());
+                            VinMedia.getInstance().updateQueue(false,getActivity());
                             VinMedia.getInstance().startMusic(position-no_albums_inpage,getActivity());
                         }else {
                             foldersAdapter = new FoldersAdapter(

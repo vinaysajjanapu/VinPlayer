@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.vinay.vinplayer.tablayout;
+package com.vinay.vinplayer.springtablayout;
 
 /**
  * Created by chenupt@gmail.com on 2015/1/31.

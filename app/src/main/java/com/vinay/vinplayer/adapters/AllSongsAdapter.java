@@ -112,8 +112,8 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
                             case R.id.play:
                                 ArrayList<HashMap<String, String>> song =  new ArrayList<>();
                                 song.add(VinMediaLists.allSongs.get(position));
-                                VinMedia.getInstance().updateTempQueue(2, song,context);
-                                VinMedia.getInstance().updateQueue(2,context);
+                                VinMedia.getInstance().updateTempQueue( song,context);
+                                VinMedia.getInstance().updateQueue(false,context);
                                 VinMedia.getInstance().startMusic(0,context);
                                 break;
                             case R.id.play_next:

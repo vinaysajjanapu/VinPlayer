@@ -7,20 +7,28 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.vinay.vinplayer.views.SearchActivity">
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:background="@color/colorPrimary"
+    android:gravity="center"
+    android:layout_height="?actionBarSize">
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/search"
         android:hint="@string/action_search"/>
-<TextView
+
+</RelativeLayout>
+
+
+    <TextView
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:text="titles"/>
     <ListView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_height="200dp"
         android:id="@+id/lv_album"
         android:background="@color/colorAccent"/>
 <TextView

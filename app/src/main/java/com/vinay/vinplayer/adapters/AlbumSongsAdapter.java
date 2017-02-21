@@ -79,7 +79,7 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
                 if (VinMedia.getInstance().isPlaying()) {
                     VinMedia.getInstance().resetPlayer();
                 }
-                VinMedia.getInstance().updateQueue(1,context);
+                VinMedia.getInstance().updateQueue(false,context);
                 context.sendBroadcast(new Intent().setAction(context.getString(R.string.queueUpdated)));
                 playPauseAction(position);
                // Toast.makeText(context,"Playing Album",Toast.LENGTH_SHORT).show();

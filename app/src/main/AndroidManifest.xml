@@ -3,11 +3,11 @@
     package="com.vinay.vinplayer">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_CONTACTS"/>
-    <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
-    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <supports-screens
         android:anyDensity="true"
@@ -110,30 +110,34 @@
 
         <activity android:name=".views.SearchActivity" />
         <activity android:name=".views.SplashScreen" />
-
-        <activity android:name=".views.MetaDataEditor"></activity>
-
-
-        <activity android:name=".ringdroid.RingdroidSelectActivity"
+        <activity android:name=".views.MetaDataEditor" />
+        <activity
+            android:name=".ringdroid.RingdroidSelectActivity"
             android:label="@string/main_activity_label">
             <intent-filter>
-                <action android:name="android.intent.action.GET_CONTENT"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.OPENABLE"/>
-                <data android:mimeType="audio/*"/></intent-filter>
-        </activity>
+                <action android:name="android.intent.action.GET_CONTENT" />
 
-        <activity android:name=".ringdroid.RingdroidEditActivity"
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.OPENABLE" />
+
+                <data android:mimeType="audio/*" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ringdroid.RingdroidEditActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
-            android:windowSoftInputMode="adjustResize"
-            android:hardwareAccelerated="true">
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter android:label="@string/edit_intent">
-                <action android:name="android.intent.action.EDIT"/>
-            <data android:mimeType="audio/*"/></intent-filter>
-        </activity>
+                <action android:name="android.intent.action.EDIT" />
 
-        <activity android:name=".ringdroid.ChooseContactActivity" android:configChanges="orientation|keyboardHidden">
+                <data android:mimeType="audio/*" />
+            </intent-filter>
         </activity>
+        <activity
+            android:name=".ringdroid.ChooseContactActivity"
+            android:configChanges="orientation|keyboardHidden"></activity>
+        <activity android:name=".views.minimal_ui.Minimal_NowPlaying"></activity>
     </application>
 
 </manifest>

@@ -1,5 +1,5 @@
 
-package com.vinay.vinplayer.tablayout;
+package com.vinay.vinplayer.springtablayout;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;

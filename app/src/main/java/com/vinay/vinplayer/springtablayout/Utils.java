@@ -1,4 +1,4 @@
-package com.vinay.vinplayer.tablayout;
+package com.vinay.vinplayer.springtablayout;
 
 /**
  * Created by vinaysajjanapu on 10/2/17.

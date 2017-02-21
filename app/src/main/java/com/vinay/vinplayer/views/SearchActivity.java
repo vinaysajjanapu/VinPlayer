@@ -38,9 +38,11 @@ public class SearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
+        getSupportActionBar().hide();
+              /*
         getSupportActionBar().setTitle("search");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+*/
         lv_album = (ListView) findViewById(R.id.lv_album);
         lv_artist = (ListView) findViewById(R.id.lv_artist);
         alllist.addAll(VinMediaLists.allSongs);

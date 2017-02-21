@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.vinay.vinplayer.tablayout.viewpager;
+package com.vinay.vinplayer.springtablayout.viewpager;
 
 import android.content.Context;
 import android.view.animation.Interpolator;

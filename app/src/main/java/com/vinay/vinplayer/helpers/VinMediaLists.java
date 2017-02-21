@@ -50,7 +50,6 @@ public class VinMediaLists {
     }
 
 
-
     public ArrayList<HashMap<String,String>> getAllSongsList(Context context){
         ArrayList<HashMap<String,String>> allSongsList = new ArrayList<>();
         ContentResolver contentResolver = context.getContentResolver();
@@ -67,12 +66,10 @@ public class VinMediaLists {
                 while(cur.moveToNext())
                 {
                     String data = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.DATA));
-                    // Add code to get more column here
                     String id=cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
                     String album = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM));
                     String album_id = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID));
                     String artist = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
-                    String artist_key = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST_KEY));
                     String artist_id = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST_ID));
                     String date_added = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED));
                     String duration = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));
@@ -89,7 +86,6 @@ public class VinMediaLists {
                     h.put("album",album);
                     h.put("album_id",album_id);
                     h.put("artist",artist);
-                    h.put("artist_key",artist_key);
                     h.put("artist_id",artist_id);
                     h.put("date_added",date_added);
                     h.put("duration",duration);
@@ -101,13 +97,14 @@ public class VinMediaLists {
                     h.put("display_name",display_name);
                     h.put("index",cur.getPosition()+"");
                     allSongsList.add(h);
-Log.d("song id", id);
+
+                  Log.d("song data", data);
 
                 }
             }
         }
-
-        cur.close();
+        if (cur!=null)
+               cur.close();
         allSongs=allSongsList;
         return allSongsList;
     }

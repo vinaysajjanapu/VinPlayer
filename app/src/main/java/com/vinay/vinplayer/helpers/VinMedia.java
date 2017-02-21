@@ -16,18 +16,24 @@ import android.hardware.SensorEventListener;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.VinPlayer;
-import com.vinay.vinplayer.fragments.QueueFragment;
+import com.vinay.vinplayer.database.FavouriteTable;
+import com.vinay.vinplayer.database.LastPlayTable;
+import com.vinay.vinplayer.database.NextSongDataTable;
+import com.vinay.vinplayer.database.PlaylistTable;
+import com.vinay.vinplayer.database.RecentAddedTable;
+import com.vinay.vinplayer.database.RecentPlayTable;
+import com.vinay.vinplayer.database.RecommendedTable;
+import com.vinay.vinplayer.database.UsageDataTable;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 
 public class VinMedia implements SensorEventListener {
@@ -50,6 +56,8 @@ public class VinMedia implements SensorEventListener {
     private ContentResolver contentResolver;
     private static int[] shuffle_queue;
     static int shuffle_index;
+    public static int playPercentThreshold = 10;
+
 
     Intent newSongLoadIntent,songPausedIntent,songResumedIntent,musicStoppedIntent,queueUpdatedIntent;
     SharedPreferences media_settings;
@@ -84,13 +92,13 @@ public class VinMedia implements SensorEventListener {
         musicStoppedIntent.setAction(context.getString(R.string.musicStopped));
           }
 
-    public void updateTempQueue(int position,ArrayList<HashMap<String,String>> songList, Context context){
+    public void updateTempQueue(ArrayList<HashMap<String,String>> songList, Context context){
             tempQueue = songList;
         //VinMediaLists.getInstance().getArtistSongsList(VinMediaLists.getInstance().getArtistsList(context).get(position).get("artist"),context);
     }
 
-    public void updateQueue(int position,Context context){
-        if (position!=0){
+    public void updateQueue(boolean allsongs,Context context){
+        if (!allsongs){
             currentQueue = tempQueue;
         }else currentQueue = VinMediaLists.getInstance().getAllSongsList(context);
 
@@ -114,6 +122,9 @@ public class VinMedia implements SensorEventListener {
             e.printStackTrace();
         }
     }
+
+
+
 
     void newMediaPlayer(final Context context){
         mediaPlayer = new MediaPlayer();
@@ -157,18 +168,17 @@ public class VinMedia implements SensorEventListener {
         newMediaPlayer(context);
         setMediaSource();
         context.sendBroadcast(newSongLoadIntent);
+
+        RecentPlayTable.getInstance(context).addSongToRecentPlayList(currentSongDetails);
+
+        //UsageDataTable.getInstance(context).updateUsageData(currentSongDetails);
+
         NotificationManager.getInstance().postNotificationName(NotificationManager.audioDidStarted, getCurrentSongDetails());
 
 
             Intent intent = new Intent(VinPlayer.applicationContext, VinMusicService.class);
             VinPlayer.applicationContext.startService(intent);
-//        } else {
-//            Intent intent = new Intent(VinPlayer.applicationContext, VinMusicService.class);
-//            VinPlayer.applicationContext.stopService(intent);
-//        }
-
         NotificationManager.getInstance().notifyNewSongLoaded(NotificationManager.newaudioloaded, getCurrentSongDetails());
-
     }
 
     public void pauseMusic(Context context){
@@ -208,7 +218,20 @@ public class VinMedia implements SensorEventListener {
                     position = getShuffleQueue()[++shuffle_index];
               }
         }
+
         startMusic(position,context);
+
+        FavouriteTable.getInstance(context).addSongToFavourite(currentSongDetails);
+        LastPlayTable.getInstance(context).storeLastPlayQueue(currentQueue,getPosition());
+       // NextSongDataTable.getInstance(context).initializeNextSongData();
+
+        PlaylistTable.getInstance(context).addSongToPlaylist(currentSongDetails, "MyPlaylist");
+
+        UsageDataTable.getInstance(context).updateUsageData(currentSongDetails,3,30,true,false,true);
+
+        NextSongDataTable.getInstance(context).addNextSongData(Long.parseLong(15623+""),Long.parseLong(15625+""));
+
+
     }
 
     public void previousSong(Context context){
@@ -230,6 +253,9 @@ public class VinMedia implements SensorEventListener {
             }
         }
         startMusic(position,context);
+
+        new createRecommendedList().execute("");
+
     }
     public int[] getShuffleQueue(){
         return shuffle_queue;
@@ -325,6 +351,10 @@ public class VinMedia implements SensorEventListener {
         }else return null;
     }
 
+    public boolean isHeadPhonePlugged(){
+        return false;
+    }
+
     @Override
     public void onSensorChanged(SensorEvent event) {
 
@@ -340,10 +370,31 @@ public class VinMedia implements SensorEventListener {
         void OnNewSongLoaded();
     }
 
+    private class createRecommendedList extends AsyncTask<String, Void, String> {
 
-//    public int generateObserverTag() {
-//        return lastTag++;
-//    }
-//
-//
+        @Override
+        protected String doInBackground(String... params) {
+            RecommendedTable.getInstance(VinPlayer.applicationContext).createRecommendationsList();
+            return "Executed";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            // might want to change "executed" for the returned string passed
+            // into onPostExecute() but that is upto yo
+            // u
+            Log.d("asynk task","post execute");
+        }
+
+        @Override
+        protected void onPreExecute() {
+                Log.d("asynk task","pre execute");
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            Log.d("creating list",values.toString()+"\t");
+        }
+    }
+
 }

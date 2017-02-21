@@ -46,7 +46,7 @@
     app:tabGravity="fill"/>
 -->
 
-    <com.vinay.vinplayer.tablayout.SpringIndicator
+    <com.vinay.vinplayer.springtablayout.SpringIndicator
 
     android:id="@+id/tabs"
         android:layout_width="match_parent"

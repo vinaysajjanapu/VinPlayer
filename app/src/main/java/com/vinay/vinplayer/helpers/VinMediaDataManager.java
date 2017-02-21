@@ -62,12 +62,15 @@ public class VinMediaDataManager {
             try {
                 new MyID3().update(src, src_set, meta);
             } catch (UnsupportedEncodingException e) {
+                Log.d("metadata","UnsupportedEncodingException");
                 e.printStackTrace();
                 return false;
             } catch (ID3WriteException e) {
+                Log.d("metadata","ID3WriteException");
                 e.printStackTrace();
                 return false;
             } catch (IOException e) {
+                Log.d("metadata","IOException");
                 e.printStackTrace();
                 return false;
             }

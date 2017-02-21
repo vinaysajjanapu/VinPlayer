@@ -1,6 +1,5 @@
 package com.vinay.vinplayer.views;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.Context;
@@ -8,24 +7,18 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.media.Image;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -58,27 +51,12 @@ import com.vinay.vinplayer.fragments.NowPlayingFragment;
 import com.vinay.vinplayer.fragments.QueueFragment;
 import com.vinay.vinplayer.helpers.BlurBuilder;
 import com.vinay.vinplayer.helpers.VinMedia;
-import com.vinay.vinplayer.helpers.VinMediaDataManager;
 import com.vinay.vinplayer.helpers.VinMediaLists;
-import com.vinay.vinplayer.tablayout.SpringIndicator;
+import com.vinay.vinplayer.springtablayout.SpringIndicator;
 
-import org.cmc.music.common.ID3WriteException;
-import org.cmc.music.metadata.IMusicMetadata;
-import org.cmc.music.metadata.ImageData;
-import org.cmc.music.metadata.MusicMetadata;
-import org.cmc.music.metadata.MusicMetadataSet;
-import org.cmc.music.myid3.MyID3;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Vector;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -168,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements
         setupNowPlayingPager();
         setupBroadCastReceiver();
         slider.setBackground(BlurBuilder.getInstance().drawable_img("null", this));
+
 
         iv_search = (ImageView) findViewById(R.id.iv_search);
         iv_search.setColorFilter(Color.WHITE);
@@ -292,6 +271,33 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
+
+    private void getIntentData() {
+        try {
+            Uri data = getIntent().getData();
+            if (data != null) {
+                if (data.getScheme().equalsIgnoreCase("file")) {
+                    String path = data.getPath();
+                    path = path.replace("file:/","");
+                    if (!TextUtils.isEmpty(path)){
+                        ArrayList<HashMap<String,String>> arrayList;
+                        arrayList = VinMediaLists.getInstance().getListByKey("data",path,this);
+                        if (!arrayList.isEmpty()) {
+                            VinMedia.getInstance().updateTempQueue(arrayList, this);
+                            VinMedia.getInstance().updateQueue(false, this);
+                            VinMedia.getInstance().setPosition(0);
+                            playPauseAction(0);
+                            slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
     private void setupSlidingPanelLayout() {
 
         slidingUpPanelLayout = (SlidingUpPanelLayout) findViewById(R.id.slidingpanel_layout);
@@ -405,6 +411,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        getIntentData();
         //vm.VinMediaInitialize();
         sendBroadcast(new Intent().setAction(getString(R.string.newSongLoaded)));
         registerReceiver(broadcastReceiver, intentFilter);
@@ -459,7 +466,7 @@ public class MainActivity extends AppCompatActivity implements
         if (VinMedia.getInstance().isPlaying()) {
             VinMedia.getInstance().resetPlayer();
         }
-        VinMedia.getInstance().updateQueue(0, this);
+        VinMedia.getInstance().updateQueue(true, this);
         sendBroadcast(new Intent().setAction(getString(R.string.queueUpdated)));
         playPauseAction(p);
     }
@@ -483,7 +490,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void OnAlbumFragmentInteraction(int pos) {
 
-        VinMedia.getInstance().updateTempQueue(pos, VinMediaLists.getInstance()
+        VinMedia.getInstance().updateTempQueue(VinMediaLists.getInstance()
                 .getAlbumSongsList(VinMediaLists.getInstance().getAlbumsList(this)
                         .get(pos).get("album"), this), this);
 
@@ -494,7 +501,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void OnArtistFragmentInteraction(int pos) {
 
-        VinMedia.getInstance().updateTempQueue(pos, VinMediaLists.getInstance()
+        VinMedia.getInstance().updateTempQueue(VinMediaLists.getInstance()
                 .getArtistSongsList(VinMediaLists.getInstance().getArtistsList(this)
                         .get(pos).get("artist"), this), this);
 
@@ -511,14 +518,14 @@ public class MainActivity extends AppCompatActivity implements
         if (VinMedia.getInstance().isPlaying()) {
             VinMedia.getInstance().resetPlayer();
         }
-        VinMedia.getInstance().updateQueue(1, this);
+        VinMedia.getInstance().updateQueue(false, this);
         sendBroadcast(new Intent().setAction(getString(R.string.queueUpdated)));
         playPauseAction(i);
     }
 
     @Override
     public void OnGenreFragmentInteraction(int pos) {
-        VinMedia.getInstance().updateTempQueue(pos, VinMediaLists.getInstance()
+        VinMedia.getInstance().updateTempQueue(VinMediaLists.getInstance()
                 .getGenreSongsList(pos, this), this);
 
         FragmentManager fm = getSupportFragmentManager();

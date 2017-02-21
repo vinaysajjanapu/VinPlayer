@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.adapters.AllSongsAdapter;
+import com.vinay.vinplayer.database.NextSongDataTable;
+import com.vinay.vinplayer.database.RecentAddedTable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,6 +56,12 @@ public class AllSongsFragment extends Fragment {
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
 
+        }
+        try {
+          //  NextSongDataTable.getInstance(getActivity()).initializeNextSongData();
+           // RecentAddedTable.getInstance(getActivity()).updateRecentAddedList();
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
