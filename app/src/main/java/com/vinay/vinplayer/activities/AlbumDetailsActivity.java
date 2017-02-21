@@ -43,18 +43,7 @@ public class AlbumDetailsActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.album_details_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(new AlbumSongsAdapter(this,albumsongs));
-        try{
-            Log.d("albumsongs","image loaded");
-            //setImage(VinMediaLists.getInstance().getAlbumart(
-               //     Long.parseLong(albumsongs.get(0).get("album_id")),getApplicationContext()));
-            final Uri sArtworkUri = Uri
-                    .parse("content://media/external/audio/albumart");
 
-            recyclerView.setBackground(BlurBuilder.getInstance().drawable_img(albumsongs.get(0).get("album_id"),getApplicationContext()));
-
-        }catch (Exception e){
-
-        }
 
 
             new Handler().postDelayed(new Runnable() {
@@ -92,6 +81,20 @@ public class AlbumDetailsActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        try{
+            Log.d("albumsongs","image loaded");
+            //setImage(VinMediaLists.getInstance().getAlbumart(
+            //     Long.parseLong(albumsongs.get(0).get("album_id")),getApplicationContext()));
+            final Uri sArtworkUri = Uri
+                    .parse("content://media/external/audio/albumart");
 
+            recyclerView.setBackground(BlurBuilder.getInstance().drawable_img(albumsongs.get(0).get("album_id"),getApplicationContext()));
 
+        }catch (Exception e){
+
+        }
+    }
 }

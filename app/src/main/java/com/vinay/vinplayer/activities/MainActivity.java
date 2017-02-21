@@ -477,6 +477,7 @@ public class MainActivity extends AppCompatActivity implements
 
         startActivity(new Intent(getApplicationContext(), AlbumDetailsActivity.class).putExtra("list",
                 VinMediaLists.getInstance().getAlbumSongsList((VinMediaLists.allAlbums.get(pos).get("album")), this)));
+        overridePendingTransition(0,0);
     }
 
     @Override
