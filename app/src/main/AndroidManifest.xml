@@ -88,11 +88,9 @@
         </activity>
         <activity
             android:name=".activities.AlbumDetailsActivity"
-            android:excludeFromRecents="true"
-            android:taskAffinity="" />
+            android:theme="@style/Theme.AppCompat.NoActionBar"/>
 
-        <service
-            android:name=".helpers.VinMedia"
+        <service android:name=".helpers.VinMedia"
             android:enabled="true"
             android:exported="true" />
 
@@ -111,8 +109,7 @@
         <activity android:name=".activities.SearchActivity" />
         <activity android:name=".activities.SplashScreen" />
         <activity android:name=".activities.MetaDataEditor" />
-        <activity
-            android:name=".ringdroid.RingdroidSelectActivity"
+        <activity android:name=".ringdroid.RingdroidSelectActivity"
             android:label="@string/main_activity_label">
             <intent-filter>
                 <action android:name="android.intent.action.GET_CONTENT" />

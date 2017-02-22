@@ -10,8 +10,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.vinay.vinplayer.R;
+import com.vinay.vinplayer.helpers.MessageEvent;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 /**
  * Created by vinaysajjanapu on 14/2/17.
@@ -48,7 +54,7 @@ public class NowPlayingDetailsFragment extends Fragment {
     }
     private void setupBroadCastReceiver(){
 
-        intentFilter = new IntentFilter();
+        /*intentFilter = new IntentFilter();
         intentFilter.addAction(getString(R.string.queueUpdated));
         intentFilter.addAction(getString(R.string.newSongLoaded));
 
@@ -64,7 +70,7 @@ public class NowPlayingDetailsFragment extends Fragment {
                 }
             }
         };
-        getActivity().registerReceiver(broadcastReceiver,intentFilter);
+        getActivity().registerReceiver(broadcastReceiver,intentFilter);*/
     }
 
     private void newSongLoaded() {
@@ -84,7 +90,29 @@ public class NowPlayingDetailsFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        getActivity().unregisterReceiver(broadcastReceiver);
+      //  getActivity().unregisterReceiver(broadcastReceiver);
     }
 
+    // This method will be called when a MessageEvent is posted (in the UI thread for Toast)
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event) {
+        Toast.makeText(getActivity(), event.message, Toast.LENGTH_SHORT).show();
+        if (event.message.equals(getString(R.string.queueUpdated))){
+            queueUpdated();
+        }else {
+            newSongLoaded();
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
 }
