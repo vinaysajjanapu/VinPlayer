@@ -13,7 +13,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:textColor="@android:color/white"
-            android:layout_marginLeft="5dp"
+            android:layout_marginLeft="15dp"
             android:layout_alignParentLeft="true"
             android:id="@+id/list_name"/>
         <Button
@@ -28,5 +28,5 @@
         android:layout_margin="5dp"
         android:layout_below="@+id/rl_list"
         android:layout_width="match_parent"
-        android:layout_height="100dp" />
+        android:layout_height="wrap_content" />
 </RelativeLayout>

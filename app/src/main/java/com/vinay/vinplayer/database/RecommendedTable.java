@@ -47,15 +47,15 @@ import static com.vinay.vinplayer.database.VinDBHelper.usageDataTable;
 
 public class RecommendedTable {
 
-    public long THIS_TIME_WEIGHT = 15;
-    public long TOTAL_TIMES_WEIGHT = 10;
-    public long HEADP_WEIGHT = 20;
-    public long RECENT_PLAY_WEIGHT = 10;
-    public long RECENT_ADDED_WEIGHT = 10;
-    public long FAVOURITE_WEIGHT = 20;
-    public long AS_FIRST_WEIGHT = 25;
-    public long AS_LAST_WEIGHT = 25;
-    public long PLAYED_PERCENT_WEIGHT = 10;
+    public long THIS_TIME_WEIGHT = 1;
+    public long TOTAL_TIMES_WEIGHT = 3;
+    public long HEADP_WEIGHT = 1;
+    public long RECENT_PLAY_WEIGHT = 4;
+    public long RECENT_ADDED_WEIGHT = 4;
+    public long FAVOURITE_WEIGHT = 5;
+    public long AS_FIRST_WEIGHT = 2;
+    public long AS_LAST_WEIGHT = 2;
+    public long PLAYED_PERCENT_WEIGHT = 3;
 
     int NEXT_SONG_ITERATIONS = 5;
 
