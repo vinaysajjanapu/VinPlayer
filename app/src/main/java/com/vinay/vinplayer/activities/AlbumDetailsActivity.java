@@ -1,18 +1,19 @@
 package com.vinay.vinplayer.activities;
 
+import android.content.ContentUris;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.adapters.AlbumSongsAdapter;
 import com.vinay.vinplayer.helpers.BlurBuilder;
@@ -28,56 +29,23 @@ public class AlbumDetailsActivity extends AppCompatActivity {
     Bitmap default_bg;
     public static Drawable dr;
     static ArrayList<HashMap<String,String>> albumsongs;
+    ImageView imageView;
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_album_details);
+        toolbar= (Toolbar) findViewById(R.id.toolbar);
+        imageView= (ImageView) findViewById(R.id.toolbarImage);
+        setSupportActionBar(toolbar);
         albumsongs= (ArrayList<HashMap<String, String>>) getIntent().getSerializableExtra("list");
+        toolbar.setTitle(albumsongs.get(0).get("album")+"");
 
 
-        if (albumsongs!=null) {
-            setTitle(albumsongs.get(0).get("album")+"");
-
-        }
         recyclerView = (RecyclerView) findViewById(R.id.album_details_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(new AlbumSongsAdapter(this,albumsongs));
-
-
-
-            new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        Target target = new Target() {
-                            @Override
-                            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-
-                            }
-
-                            @Override
-                            public void onBitmapFailed(Drawable errorDrawable) {
-
-                            }
-
-                            @Override
-                            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                            }
-
-                        };
-
-                        try {
-                             } catch (Exception e) {
-                           // e.printStackTrace();
-                        }
-                   }
-
-                    }, 500);
-
-
-
     }
 
 
@@ -85,12 +53,12 @@ public class AlbumDetailsActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         try{
-            Log.d("albumsongs","image loaded");
-            //setImage(VinMediaLists.getInstance().getAlbumart(
-            //     Long.parseLong(albumsongs.get(0).get("album_id")),getApplicationContext()));
+            Log.d("albumsonsrecycler","set image");
             final Uri sArtworkUri = Uri
                     .parse("content://media/external/audio/albumart");
-
+            Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(albumsongs.get(0).get("album_id")));
+            Picasso.with(this).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
+                    .into(imageView);
             recyclerView.setBackground(BlurBuilder.getInstance().drawable_img(albumsongs.get(0).get("album_id"),getApplicationContext()));
 
         }catch (Exception e){

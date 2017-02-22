@@ -19,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.futuremind.recyclerviewfastscroll.SectionTitleProvider;
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.fragments.AllSongsFragment.OnListFragmentInteractionListener;
@@ -32,7 +33,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHolder> {
+public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHolder> implements SectionTitleProvider {
 
     private final List<HashMap<String, String>> mValues;
     private final OnListFragmentInteractionListener mListener;
@@ -169,6 +170,13 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
     @Override
     public int getItemCount() {
         return mValues.size();
+    }
+
+    @Override
+    public String getSectionTitle(int position) {
+
+        //this String will be shown in a bubble for specified position
+        return mValues.get(position).get("title").substring(0, 1);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

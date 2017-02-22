@@ -15,7 +15,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+           // proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
@@ -35,8 +35,7 @@ dependencies {
     compile 'com.sothree.slidinguppanel:library:3.3.1'
     testCompile 'junit:junit:4.12'
     compile 'com.readystatesoftware.systembartint:systembartint:1.0.3'
-    compile 'com.klinkerapps:sliding-activity:1.4.4'
-    //compile files('libs/universal-image-loader-1.9.5.jar')
+    //compile 'com.klinkerapps:sliding-activity:1.4.4'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.balysv:material-ripple:1.0.2'
     compile 'com.mxn.soul:flowingdrawer-core:2.0.0'
@@ -45,4 +44,4 @@ dependencies {
     compile 'com.rengwuxian.materialedittext:library:2.1.4'
     compile 'com.marshalchen.ultimaterecyclerview:library:0.7.0'
     compile 'org.greenrobot:eventbus:3.0.0'
-}
+    compile 'com.futuremind.recyclerfastscroll:fastscroll:0.2.5'}

@@ -48,16 +48,20 @@ import com.vinay.vinplayer.fragments.NowPlayingDetailsFragment;
 import com.vinay.vinplayer.fragments.NowPlayingFragment;
 import com.vinay.vinplayer.fragments.QueueFragment;
 import com.vinay.vinplayer.helpers.BlurBuilder;
+import com.vinay.vinplayer.helpers.MessageEvent;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
 import com.vinay.vinplayer.springtablayout.SpringIndicator;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-
 public class MainActivity extends AppCompatActivity implements
         AllSongsFragment.OnListFragmentInteractionListener,
         AlbumsFragment.OnAlbumFragmentInteractionListner, ArtistsFragment.OnArtistFragmentInteractionListner,
@@ -146,6 +150,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void setupBroadCastReceiver() {
+
+
 
         intentFilter = new IntentFilter();
         intentFilter.addAction(getString(R.string.newSongLoaded));
@@ -501,7 +507,8 @@ public class MainActivity extends AppCompatActivity implements
             VinMedia.getInstance().resetPlayer();
         }
         VinMedia.getInstance().updateQueue(false, this);
-        sendBroadcast(new Intent().setAction(getString(R.string.queueUpdated)));
+        //sendBroadcast(new Intent().setAction(getString(R.string.queueUpdated)));
+        EventBus.getDefault().post(new MessageEvent(getString(R.string.queueUpdated)));
         playPauseAction(i);
     }
 
@@ -606,6 +613,10 @@ public class MainActivity extends AppCompatActivity implements
             VinMedia.getInstance().startMusic(position, this);
         }
     }
+
+  
+
+
 
 }
 
