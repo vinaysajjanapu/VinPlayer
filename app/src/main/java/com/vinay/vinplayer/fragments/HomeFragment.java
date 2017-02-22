@@ -45,7 +45,7 @@ public class HomeFragment extends Fragment {
     private Button list_button;
     private LinearLayout home_container;
     private RecyclerView.LayoutParams layoutParams;
-    private int MAX_LIST_SIZE = 10;
+    private int MAX_LIST_SIZE = 5;
     private int NUM_OF_LISTS = 6;
     private static ArrayList<HashMap<String,String>> songsList;
 
@@ -76,7 +76,7 @@ public class HomeFragment extends Fragment {
                     list1 = (RecyclerView) view1.findViewById(R.id.list);
                     list_name = (TextView) view1.findViewById(R.id.list_name);
                     list_button = (Button) view1.findViewById(R.id.list_button);
-                    list_button.setText("play all");
+                    list_button.setText("");
                     list_button.setTextColor(Color.WHITE);
 
                     LinearLayoutManager layoutManager = new LinearLayoutManager(context);
@@ -170,7 +170,7 @@ public class HomeFragment extends Fragment {
                     uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(list.get(position).get("album_id")));
                 }else uri = sArtworkUri;
                 //ImageLoader.getInstance().displayImage(uri.toString(), holder.imageView);
-                Picasso.with(context).load(uri).into(holder.imageView);
+                Picasso.with(context).load(uri).fit().error(R.drawable.albumart_default).into(holder.imageView);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -201,7 +201,7 @@ public class HomeFragment extends Fragment {
                 mView = view;
                 mIdView = (TextView) view.findViewById(R.id.tv_album_title);
                 imageView = (ImageView) view.findViewById(R.id.albumart_albums);
-                mIdView.setTextColor(Color.WHITE);
+                mIdView.setTextColor(Color.argb(120,255,255,255));
             }
         }
     }

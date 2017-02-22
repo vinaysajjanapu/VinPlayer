@@ -1,38 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="100dp"
+    android:layout_width="85dp"
     android:layout_height="wrap_content"
     android:layout_margin="1dp"
     android:orientation="vertical">
 
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="85dp"
         android:scaleType="centerCrop"
+        android:layout_margin="2dp"
         android:id="@+id/albumart_albums"
         />
     <LinearLayout
         android:layout_width="match_parent"
         android:orientation="vertical"
         android:gravity="center_horizontal"
-        android:padding="10dp"
-        android:background="@color/transparentBlack"
+        android:background="@android:color/transparent"
+        android:layout_below="@+id/albumart_albums"
         android:layout_alignParentBottom="true"
+        android:padding="3dp"
         android:layout_height="wrap_content">
         <TextView
             android:id="@+id/tv_album_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:singleLine="true"
-            android:textColor="@android:color/white"
+            android:textSize="13dp"
+            android:textColor="@android:color/darker_gray"
             android:textAppearance="?attr/textAppearanceListItem" />
-
-        <!-- <TextView
-             android:id="@+id/content"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:textColor="@android:color/white"
-
-             android:textAppearance="?attr/textAppearanceListItem" />-->
     </LinearLayout>
 </RelativeLayout>

@@ -79,11 +79,7 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
             final Uri sArtworkUri = Uri
                     .parse("content://media/external/audio/albumart");
             Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mValues.get(position).get("album_id")));
-           /* ParcelFileDescriptor pfd = context.getContentResolver().openFileDescriptor(uri,"r");
-            String url = VinPlayer.default_art;
-            if (pfd!=null)url = uri.toString();
-          */ // ImageLoader.getInstance().displayImage(uri.toString(), holder.circleImageView);
-            Picasso.with(context).load(uri).fit().into(holder.circleImageView);
+           Picasso.with(context).load(uri).fit().into(holder.circleImageView);
 
         } catch (Exception e) {
             e.printStackTrace();
