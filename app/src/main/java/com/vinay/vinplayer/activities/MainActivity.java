@@ -353,6 +353,8 @@ public class MainActivity extends AppCompatActivity implements
                 actionBarHeight);
 
 
+
+
         slidingUpPanelLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
