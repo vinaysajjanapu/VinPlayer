@@ -29,13 +29,9 @@ public class AlbumArtFragment extends Fragment {
     HashMap<String,String> songDetails;
     public AlbumArtFragment() {    }
 
-    public static AlbumArtFragment newInstance(int position, Context mContext) {
+    public static AlbumArtFragment newInstance(int position, Context mContext,String album_id) {
         AlbumArtFragment fragment = new AlbumArtFragment();
-        if (VinMedia.getInstance().getCurrentList()==null){
-            fragment.songDetails = null;
-        }else {
-            fragment.songDetails = VinMedia.getInstance().getCurrentList().get(position);
-        }
+        fragment.album_id = album_id;
         return fragment;
     }
 
@@ -50,24 +46,14 @@ public class AlbumArtFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_albumart, container, false);
         albumArt = (ImageView)view.findViewById(R.id.albumart_nowplaying);
 
-        if (VinMedia.getInstance().getCurrentList()!=null)songDetails= VinMedia.getInstance().getCurrentList().get(VinMedia.getInstance().getPosition());
-
         try {
             final Uri sArtworkUri = Uri
                     .parse("content://media/external/audio/albumart");
 
 
-            Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(songDetails.get("album_id")));
-
+            Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(album_id));
             Picasso.with(getActivity()).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
                     .into(albumArt);
-            /*
-            ImageLoader.getInstance().displayImage(uri.toString(),albumArt);
-*/
-            /*albumArt.setImageBitmap(
-                    VinMediaLists.getInstance().getAlbumart(
-                            Long.parseLong(songDetails.get("album_id")),getActivity()));
-        */
         }catch (Exception e){
         //    e.printStackTrace();
         }

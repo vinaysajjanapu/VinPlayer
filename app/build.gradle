@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '25.0.2'
     defaultConfig {
         applicationId "com.vinay.vinplayer"
         minSdkVersion 17
@@ -36,6 +36,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.readystatesoftware.systembartint:systembartint:1.0.3'
     compile 'com.klinkerapps:sliding-activity:1.4.4'
+    compile 'com.h6ah4i.android:openslmediaplayer:0.7.2'
     //compile files('libs/universal-image-loader-1.9.5.jar')
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.balysv:material-ripple:1.0.2'

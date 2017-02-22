@@ -36,6 +36,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
+import com.h6ah4i.android.media.IBasicMediaPlayer;
+import com.h6ah4i.android.media.IMediaPlayerFactory;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.VinPlayer;
 import com.vinay.vinplayer.activities.MainActivity;
@@ -86,6 +88,9 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     private static ArrayList<HashMap<String,String>> allSongs,currentQueue,tempQueue;
     private static volatile VinMedia Instance = null;
     private Cursor cur;
+
+    //private MediaPlayer mediaPlayer;
+    private IMediaPlayerFactory factory;
     private MediaPlayer mediaPlayer;
     public static int pausePosition;
     public static int position=-1;
@@ -96,6 +101,8 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     static int shuffle_index;
     public static int playPercentThreshold = 10;
 
+
+    public int CROSS_FADE_DURATION = 1000; //in milli seconds
 
     Intent newSongLoadIntent,songPausedIntent,songResumedIntent,musicStoppedIntent,queueUpdatedIntent;
     SharedPreferences media_settings;
@@ -110,7 +117,8 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
                 localInstance = Instance;
                 if (localInstance == null) {
                     Instance = localInstance = new VinMedia();
-                }
+                    VinPlayer.applicationContext.startService(new Intent(VinPlayer.applicationContext, VinMedia.class));
+                 }
             }
         }
         return localInstance;
@@ -151,33 +159,24 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     private void setMediaSource(){
         try {
             mediaPlayer.setDataSource(currentQueue.get(position).get("data"));
-            Log.d("playing song url",currentQueue.get(position).get("data"));
-            Log.d("mediaplayer status","starting music");
+//            Log.d("playing song url",currentQueue.get(position).get("data"));
+  //          Log.d("mediaplayer status","starting music");
             mediaPlayer.prepareAsync();
 
         } catch (IOException e) {
             e.printStackTrace();
+        }catch (IllegalStateException e){
+            //e1.printStackTrace();
         }
     }
-
-
 
 
     void newMediaPlayer(final Context context){
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
-        mediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
-            @Override
-            public void onSeekComplete(MediaPlayer mp) {
-                Log.d("mediaplayer","seek complete");
-            }
-        });
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                context.sendBroadcast(musicStoppedIntent);
-                Log.d("Broadcast","song complete");
                 if (!isClean()&&!isPlaying()){
                       nextSong(context);
                 }
@@ -189,33 +188,27 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
             public void onPrepared(MediaPlayer mp)
             {
                 mediaPlayer.start();
+                context.sendBroadcast(newSongLoadIntent);
             }
         });
     }
 
+
+
     public void startMusic(int index,Context context){
         Log.d("Broadcast","music started");
         this.position  = index;
+        iniatializeBroadcasts(VinPlayer.applicationContext);
         if (mediaPlayer!=null){
             if(isPlaying()||!isClean()){
-                resetPlayer();
+                resetPlayer(mediaPlayer);
             }
         }
-        iniatializeBroadcasts(context);
         newMediaPlayer(context);
         setMediaSource();
-        context.sendBroadcast(newSongLoadIntent);
 
-        RecentPlayTable.getInstance(context).addSongToRecentPlayList(currentSongDetails);
-
-        //UsageDataTable.getInstance(context).updateUsageData(currentSongDetails);
-
-        NotificationManager.getInstance().postNotificationName(NotificationManager.audioDidStarted, getCurrentSongDetails());
-
-
-            Intent intent = new Intent(VinPlayer.applicationContext, VinMedia.class);
-            VinPlayer.applicationContext.startService(intent);
-        NotificationManager.getInstance().notifyNewSongLoaded(NotificationManager.newaudioloaded, getCurrentSongDetails());
+        //NotificationManager.getInstance().postNotificationName(NotificationManager.audioDidStarted, getCurrentSongDetails());
+         //NotificationManager.getInstance().notifyNewSongLoaded(NotificationManager.newaudioloaded, getCurrentSongDetails());
     }
 
     public void pauseMusic(Context context){
@@ -258,7 +251,7 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
 
         startMusic(position,context);
 
-        FavouriteTable.getInstance(context).addSongToFavourite(currentSongDetails);
+       /* FavouriteTable.getInstance(context).addSongToFavourite(currentSongDetails);
         LastPlayTable.getInstance(context).storeLastPlayQueue(currentQueue,getPosition());
        // NextSongDataTable.getInstance(context).initializeNextSongData();
 
@@ -267,10 +260,13 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         UsageDataTable.getInstance(context).updateUsageData(currentSongDetails,3,30,true,false,true);
 
         NextSongDataTable.getInstance(context).addNextSongData(Long.parseLong(15623+""),Long.parseLong(15625+""));
-
+*/
 
     }
 
+    public MediaPlayer getMediaPlayer(){
+        return mediaPlayer;
+    }
     public void previousSong(Context context){
         media_settings = context.getSharedPreferences(context.getString(R.string.media_settings),Context.MODE_PRIVATE);
         repeatmode = media_settings.getInt(context.getString(R.string.repeat_mode),0);
@@ -291,9 +287,10 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         }
         startMusic(position,context);
 
-        new createRecommendedList().execute("");
+       // new createRecommendedList().execute("");
 
     }
+
     public int[] getShuffleQueue(){
         return shuffle_queue;
     }
@@ -316,12 +313,30 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
 
     }
 
-    public void resetPlayer(){
+    public void resetPlayer(final MediaPlayer mediaPlayer){
         Log.d("mediaplayer status","reset player");
         try {
-            mediaPlayer.stop();
-            mediaPlayer.reset();
-            mediaPlayer.release();
+          //  mediaPlayer.stop();
+            //mediaPlayer.reset();
+            //mediaPlayer.setVolume(5,);
+           Runnable timerRun = new Runnable() {
+
+                    @Override
+                    public void run() {
+                        int i;
+                        for ( i=50; i>0;i--) {
+                            try {
+                                Thread.sleep(CROSS_FADE_DURATION/50);
+                                mediaPlayer.setVolume(((float) i)/50,((float) i)/50);
+                            }catch (Exception e){
+
+                            }
+                        }
+                        mediaPlayer.release();
+                    }
+                };
+            Thread thread = new Thread(timerRun);
+            if (!thread.isAlive())thread.start();
         }catch (Exception e){
 
         }
@@ -330,11 +345,17 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
 
     public void setAudioProgress(int seekBarProgress){
         if(!isPlaying())pausePosition = seekBarProgress;
-        mediaPlayer.seekTo(seekBarProgress);
+        if(mediaPlayer!=null)mediaPlayer.seekTo(seekBarProgress);
     }
 
     public int getAudioProgress(){
-        return mediaPlayer.getCurrentPosition()/1000;
+        int pos;
+        try {
+            pos = mediaPlayer.getCurrentPosition()/1000;
+        }catch (Exception e){
+            pos = 0;
+        }
+        return pos;
     }
 
     public void setPosition(int position){
@@ -358,7 +379,7 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     public void releasePlayer(){
         if (mediaPlayer!=null){
             mediaPlayer.release();
-            Intent intent = new Intent(VinPlayer.applicationContext, VinMedia.class);
+     //       Intent intent = new Intent(VinPlayer.applicationContext, VinMedia.class);
             //VinPlayer.applicationContext.stopService(intent);
             }
     }

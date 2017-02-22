@@ -9,10 +9,13 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -37,6 +40,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.anim.AccordionTransformer;
+import com.vinay.vinplayer.database.LastPlayTable;
 import com.vinay.vinplayer.fragments.AlbumsFragment;
 import com.vinay.vinplayer.fragments.AllSongsFragment;
 import com.vinay.vinplayer.fragments.ArtistDetailsFragment;
@@ -89,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements
 
     RelativeLayout slider;
 
+    Thread thread;
     ViewPager nowPlayingPager;
     NowPlayingPagerAdapter nowPlayingPagerAdapter;
     List<Fragment> NowPlayingFragments = new ArrayList<>();
@@ -99,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements
 
     RelativeLayout.LayoutParams lp_now, lp_que;
     Handler handler;
+    Runnable timerRun;
 
     SharedPreferences media_settings;
     SharedPreferences.Editor editor;
@@ -179,6 +185,15 @@ public class MainActivity extends AppCompatActivity implements
         registerReceiver(broadcastReceiver, intentFilter);
     }
 
+    private Drawable background;
+    private class loadBackground extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            background = BlurBuilder.getInstance().drawable_img(params[0],getApplicationContext());
+            return "Executed";
+        }
+    }
+
     private void onNewSongLoaded() {
         HashMap<String, String> songDetails = VinMedia.getInstance().getCurrentSongDetails();
 
@@ -186,6 +201,33 @@ public class MainActivity extends AppCompatActivity implements
             sliderPlayer_playpause.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
             sliderPlayer_songtitle.setText(songDetails.get("title"));
             sliderPlayer_songdetails.setText(songDetails.get("artist") + "\t\t" + songDetails.get("album"));
+            sliderPlayer_progressBar.setMax(VinMedia.getInstance().getDuration() / 1000);
+
+            if (handler==null)
+            handler = new Handler(){
+
+                @Override
+                public void handleMessage(Message msg) {
+             //       Log.d("handler","running");
+                    sliderPlayer_progressBar.setProgress(VinMedia.getInstance().getAudioProgress());
+                }
+            };
+            if (timerRun==null)
+            timerRun = new Runnable() {
+                @Override
+                public void run() {
+                    while (true) {
+                        try {
+                            Thread.sleep(1000);
+                            handler.sendEmptyMessage(0);
+                        }catch (Exception e){
+
+                        }
+                    }
+                }
+            };
+            if (thread==null)thread = new Thread(timerRun);
+            if (!thread.isAlive())thread.start();
 
             try {
                 final Uri sArtworkUri = Uri
@@ -195,31 +237,21 @@ public class MainActivity extends AppCompatActivity implements
                 Picasso.with(this).load(uri).fit().placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
                         .into(sliderPlayer_albumart);
 
+                new loadBackground(){
+                    @Override
+                    protected void onCancelled() {
+                        slider.setBackground(background);
+                    }
 
-                //ImageLoader.getInstance().displayImage(uri.toString(), sliderPlayer_albumart);
-
-                slider.setBackground(BlurBuilder.getInstance().drawable_img(songDetails.get("album_id"), this));
+                    @Override
+                    protected void onPostExecute(String s) {
+                        slider.setBackground(background);
+                    }
+                }.execute(songDetails.get("album_id"));
 
             } catch (Exception e) {
-                //   e.printStackTrace(
-//    String contentURI=null;);
+
             }
-
-            sliderPlayer_progressBar.setMax(VinMedia.getInstance().getDuration() / 1000);
-            handler = new Handler();
-            this.runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    //Log.d("handler","running");
-                    try {
-                        sliderPlayer_progressBar.setProgress(VinMedia.getInstance().getAudioProgress());
-                    } catch (Exception e) {
-
-                    }
-                    handler.postDelayed(this, 1000);
-                }
-            });
         }
     }
 
@@ -402,18 +434,28 @@ public class MainActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         getIntentData();
+        loadAlreadyPlaying();
         //vm.VinMediaInitialize();
         sendBroadcast(new Intent().setAction(getString(R.string.newSongLoaded)));
         registerReceiver(broadcastReceiver, intentFilter);
     }
 
     private void loadAlreadyPlaying() {
-
+        ArrayList<HashMap<String,String>> lastplay = new ArrayList<>();
+        lastplay = LastPlayTable.getInstance(this).getLastPlayQueue();
+        if (lastplay!=null){
+            VinMedia.getInstance().updateTempQueue(lastplay,this);
+            VinMedia.getInstance().updateQueue(false,this);
+            VinMedia.getInstance().setPosition(Integer.parseInt(lastplay.get(0).get("position")));
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        if (VinMedia.getInstance().getCurrentList()!=null)
+        LastPlayTable.getInstance(this).storeLastPlayQueue(VinMedia.getInstance().getCurrentList(),
+                VinMedia.getInstance().getPosition());
     }
 
 
@@ -429,15 +471,19 @@ public class MainActivity extends AppCompatActivity implements
         if (slidingUpPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
             slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         } else {
-            if (firstback) {
-                if (System.currentTimeMillis() - firstback_t < 1000) {
-                    super.onBackPressed();
+            if (librayViewPager.getCurrentItem()!=0)
+                librayViewPager.setCurrentItem(0);
+            else {
+                if (firstback) {
+                    if (System.currentTimeMillis() - firstback_t < 1000) {
+                        super.onBackPressed();
+                    }
+                    firstback = false;
                 }
-                firstback = false;
+                firstback = true;
+                firstback_t = System.currentTimeMillis();
+                Toast.makeText(this, "Press again to quit", Toast.LENGTH_SHORT).show();
             }
-            firstback = true;
-            firstback_t = System.currentTimeMillis();
-            Toast.makeText(this, "Press again to quit", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -445,7 +491,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onListFragmentInteraction(int p) {
 
         if (VinMedia.getInstance().isPlaying()) {
-            VinMedia.getInstance().resetPlayer();
+            VinMedia.getInstance().resetPlayer(VinMedia.getInstance().getMediaPlayer());
         }
         VinMedia.getInstance().updateQueue(true, this);
         sendBroadcast(new Intent().setAction(getString(R.string.queueUpdated)));
@@ -463,7 +509,7 @@ public class MainActivity extends AppCompatActivity implements
 
         Log.d("queue", "fragment interation  " + p);
         if (VinMedia.getInstance().isPlaying()) {
-            VinMedia.getInstance().resetPlayer();
+            VinMedia.getInstance().resetPlayer(VinMedia.getInstance().getMediaPlayer());
         }
         playPauseAction(p);
     }
@@ -498,7 +544,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onArtistListFragmentInteraction(int i) {
         if (VinMedia.getInstance().isPlaying()) {
-            VinMedia.getInstance().resetPlayer();
+            VinMedia.getInstance().resetPlayer(VinMedia.getInstance().getMediaPlayer());
         }
         VinMedia.getInstance().updateQueue(false, this);
         sendBroadcast(new Intent().setAction(getString(R.string.queueUpdated)));
@@ -600,7 +646,7 @@ public class MainActivity extends AppCompatActivity implements
 
         VinMedia.getInstance().setPosition(position);
         if (VinMedia.getInstance().isPlaying() || !VinMedia.getInstance().isClean()) {
-            VinMedia.getInstance().resetPlayer();
+            VinMedia.getInstance().resetPlayer(VinMedia.getInstance().getMediaPlayer());
             VinMedia.getInstance().startMusic(position, this);
         } else {
             VinMedia.getInstance().startMusic(position, this);
