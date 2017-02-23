@@ -97,7 +97,7 @@ public class VinMediaLists {
                     h.put("index",cur.getPosition()+"");
                     allSongsList.add(h);
 
-                  Log.d("song data", data);
+            //      Log.d("song data", data);
 
                 }
             }

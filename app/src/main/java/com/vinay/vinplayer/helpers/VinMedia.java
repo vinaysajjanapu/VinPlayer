@@ -618,28 +618,29 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
 
     private void onNewSongLoaded() {
         isSticky = true;
+        onStartCommand(intent,flags,startId);
     }
 
     private void onSongPaused() {
-        Log.d("abcde","paused");
         isSticky = false;
         onStartCommand(intent,flags,startId);
     }
 
     private void onSongResumed() {
         isSticky = true;
-        Log.d("abcde","resumed");
         onStartCommand(intent,flags,startId);
     }
 
     private void onMusicStopped() {
+        isSticky = false;
+        onStartCommand(intent,flags,startId);
     }
 
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d("vinmusicservice","destroyed");
+        Log.d(LOGTAG,"destroyed");
         if (remoteControlClient != null) {
             audioManager.unregisterRemoteControlClient(remoteControlClient);
             audioManager.abandonAudioFocus(this);

@@ -64,7 +64,7 @@ public class VinPlayerReceiver extends BroadcastReceiver {
 				Log.d("notification","close it");
 				Intent intent1 = new Intent(VinPlayer.applicationContext, VinMedia.class);
 				VinPlayer.applicationContext.stopService(intent1);
-				VinMedia.getInstance().releasePlayer();
+				VinMedia.getInstance().resetPlayer(VinMedia.getInstance().getMediaPlayer());
 			}
 			else if (intent.getAction().equals(VinMedia.NOTIFY_PREVIOUS)) {
 				VinMedia.getInstance().previousSong(context);
