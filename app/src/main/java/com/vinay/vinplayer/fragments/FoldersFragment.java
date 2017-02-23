@@ -9,6 +9,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -223,7 +224,7 @@ public class FoldersFragment extends Fragment {
             for (Map.Entry<String,String> entry : file_structure.get(k).entrySet()){
                 if (entry.getValue().equals(parent)){
                     grand_parent = entry.getKey();
-                    return;
+                    if(!grand_parent.equals("pos"))return;
                 }
             }
         }

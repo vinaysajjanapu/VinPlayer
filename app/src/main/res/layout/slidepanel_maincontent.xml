@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,6 +8,11 @@
     android:background="@color/transparentLightBlack"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -94,4 +99,85 @@
         />
 
 </LinearLayout>
-</LinearLayout>
+    </LinearLayout>
+
+
+    <!-- Your FAB implementation -->
+    <com.vinay.vinplayer.ui_elemets.Fab
+        android:id="@+id/fab"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="20dp"
+        android:layout_height="120dp"
+        android:layout_width="120dp"/>
+
+    <!-- Overlay that dims the screen -->
+    <com.gordonwong.materialsheetfab.DimOverlayFrameLayout
+        android:id="@+id/overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Circular reveal container for the sheet -->
+    <io.codetail.widget.RevealLinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="end|bottom"
+        android:orientation="vertical">
+
+        <!-- Sheet that contains your items -->
+        <android.support.v7.widget.CardView
+            android:id="@+id/fab_sheet"
+            android:layout_width="180dp"
+            android:layout_height="148dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+            <!-- TODO: Put your sheet items here -->
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_margin="2dp"
+                android:id="@+id/fab_listitem1"
+                android:layout_gravity="center"
+                android:layout_height="45dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    android:textSize="15dp"
+                    android:layout_height="match_parent"
+                    android:text="Play All"/>
+            </android.support.v7.widget.CardView>
+                <android.support.v7.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_margin="2dp"
+                    android:id="@+id/fab_listitem2"
+                    android:layout_gravity="center"
+                    android:layout_height="45dp">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:gravity="center"
+                        android:textSize="15dp"
+                        android:layout_height="match_parent"
+                        android:text="Shuffle All"/>
+                </android.support.v7.widget.CardView>
+                <android.support.v7.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_margin="2dp"
+                    android:id="@+id/fab_listitem3"
+                    android:layout_gravity="center"
+                    android:layout_height="45dp">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:gravity="center"
+                        android:textSize="15dp"
+                        android:layout_height="match_parent"
+                        android:text="play recommended"/>
+                </android.support.v7.widget.CardView>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+    </io.codetail.widget.RevealLinearLayout>
+
+
+
+</RelativeLayout>

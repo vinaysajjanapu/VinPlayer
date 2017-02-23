@@ -21,6 +21,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
@@ -34,13 +35,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-
+import com.gordonwong.materialsheetfab.MaterialSheetFab;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
+import com.rengwuxian.materialedittext.MaterialEditText;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.anim.AccordionTransformer;
 import com.vinay.vinplayer.database.LastPlayTable;
+import com.vinay.vinplayer.database.RecentPlayTable;
+import com.vinay.vinplayer.database.RecommendedTable;
 import com.vinay.vinplayer.fragments.AlbumsFragment;
 import com.vinay.vinplayer.fragments.AllSongsFragment;
 import com.vinay.vinplayer.fragments.ArtistDetailsFragment;
@@ -56,6 +60,7 @@ import com.vinay.vinplayer.helpers.MessageEvent;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
 import com.vinay.vinplayer.springtablayout.SpringIndicator;
+import com.vinay.vinplayer.ui_elemets.Fab;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -97,6 +102,8 @@ public class MainActivity extends AppCompatActivity implements
 
     RelativeLayout slider;
 
+    CardView fab_listitem1,fab_listitem2,fab_listitem3;
+    MaterialSheetFab materialSheetFab;
     Thread thread;
     ViewPager nowPlayingPager;
     NowPlayingPagerAdapter nowPlayingPagerAdapter;
@@ -387,6 +394,27 @@ public class MainActivity extends AppCompatActivity implements
         sliderPlayer_playpause.setOnClickListener(this);
         sliderPlayer_playpause.setColorFilter(Color.WHITE);
 
+
+        Fab fab = (Fab) findViewById(R.id.fab);
+        View sheetView = findViewById(R.id.fab_sheet);
+        View overlay = findViewById(R.id.overlay);
+        int sheetColor = Color.WHITE;
+        int fabColor = Color.BLACK;
+
+        // Initialize material sheet FAB
+        materialSheetFab = new MaterialSheetFab<>(fab, sheetView, overlay,
+                sheetColor, fabColor);
+        materialSheetFab.showFab(50, 50);
+
+        fab_listitem1 = (CardView)findViewById(R.id.fab_listitem1);
+        fab_listitem2 = (CardView)findViewById(R.id.fab_listitem2);
+        fab_listitem3 = (CardView)findViewById(R.id.fab_listitem3);
+        fab_listitem1.setOnClickListener(this);
+        fab_listitem2.setOnClickListener(this);
+        fab_listitem3.setOnClickListener(this);
+
+
+
     }
 
     private void setupNowPlayingPager() {
@@ -433,6 +461,23 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.iv_search:
                 startActivity(new Intent(getApplicationContext(), SearchActivity.class));
                 break;
+            case R.id.fab_listitem1:
+                VinMedia.getInstance().updateQueue(true,getApplicationContext());
+                VinMedia.getInstance().startMusic(0,getApplicationContext());
+                materialSheetFab.hideSheet();
+                slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+                break;
+            case R.id.fab_listitem2:
+                materialSheetFab.hideSheet();
+                slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+                break;
+            case R.id.fab_listitem3:
+                VinMedia.getInstance().updateTempQueue(RecommendedTable.getInstance(this).getRecommendedList(),this);
+                VinMedia.getInstance().updateQueue(false,getApplicationContext());
+                VinMedia.getInstance().startMusic(0,getApplicationContext());
+                materialSheetFab.hideSheet();
+                slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+                break;
             default:
                 break;
         }
@@ -451,7 +496,7 @@ public class MainActivity extends AppCompatActivity implements
     private void loadAlreadyPlaying() {
         ArrayList<HashMap<String,String>> lastplay = new ArrayList<>();
         lastplay = LastPlayTable.getInstance(this).getLastPlayQueue();
-        if (lastplay!=null){
+        if (lastplay!=null && lastplay.size()>0){
             VinMedia.getInstance().updateTempQueue(lastplay,this);
             VinMedia.getInstance().updateQueue(false,this);
             VinMedia.getInstance().setPosition(Integer.parseInt(lastplay.get(0).get("position")));
