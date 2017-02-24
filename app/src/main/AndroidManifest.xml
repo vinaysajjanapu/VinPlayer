@@ -9,6 +9,15 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission
+        android:required="true"
+        android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission
+        android:required="true"
+        android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission
+        android:required="true"
+        android:name="android.permission.INTERNET"/>
 
     <supports-screens
         android:anyDensity="true"
@@ -139,7 +148,8 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".activities.WifiTest"></activity>
+        <activity android:name=".activities.WifiTest"/>
+        <receiver android:name=".helpers.WiFiDirectBroadcastReceiver"/>
     </application>
 
 </manifest>

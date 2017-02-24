@@ -40,6 +40,7 @@ public class AlbumDetailsActivity extends AppCompatActivity {
         imageView= (ImageView) findViewById(R.id.toolbarImage);
         setSupportActionBar(toolbar);
         albumsongs= (ArrayList<HashMap<String, String>>) getIntent().getSerializableExtra("list");
+        if(albumsongs!=null && albumsongs.size()!=0)
         toolbar.setTitle(albumsongs.get(0).get("album")+"");
 
 
