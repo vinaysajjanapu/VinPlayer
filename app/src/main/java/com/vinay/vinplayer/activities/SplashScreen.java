@@ -22,15 +22,11 @@ public class SplashScreen extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getSupportActionBar().hide();
 /*
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                startActivity(new Intent(getBaseContext(),MainActivity.class));
-            }
-        }, 3000);*/
         if (isStoragePermissionGranted())
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(this, MainActivity.class));*/
+
+        startActivity(new Intent(this,WifiTest.class));
+
     }
 
     public  boolean isStoragePermissionGranted() {
