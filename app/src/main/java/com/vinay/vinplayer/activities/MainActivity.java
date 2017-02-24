@@ -63,6 +63,8 @@ import com.vinay.vinplayer.springtablayout.SpringIndicator;
 import com.vinay.vinplayer.ui_elemets.Fab;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -506,7 +508,7 @@ public class MainActivity extends AppCompatActivity implements
         EventBus.getDefault().post(new MessageEvent(getString(R.string.newSongLoaded)));
         //registerReceiver(broadcastReceiver, intentFilter);
         //sendBroadcast(new Intent().setAction(getString(R.string.newSongLoaded)));
-        registerReceiver(broadcastReceiver, intentFilter);
+//        registerReceiver(broadcastReceiver, intentFilter);
     }
 
     private void loadAlreadyPlaying() {
@@ -740,10 +742,10 @@ public class MainActivity extends AppCompatActivity implements
         super.onStop();
     }
 
-    // This method will be called when a MessageEvent is posted (in the UI thread for Toast)
+    // This method will be called when a MessageEvent is posted (in the UI thread for //Toast)
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
-        Toast.makeText(this, event.message, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, event.message, Toast.LENGTH_SHORT).show();
         String action = event.message;
         if (action.equals(getString(R.string.newSongLoaded))) {
             onNewSongLoaded();

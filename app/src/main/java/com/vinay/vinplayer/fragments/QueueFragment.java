@@ -157,12 +157,6 @@ public class QueueFragment extends Fragment {
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        getActivity().unregisterReceiver(broadcastReceiver);
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
         mListener=null;
@@ -199,7 +193,7 @@ public class QueueFragment extends Fragment {
     // This method will be called when a MessageEvent is posted (in the UI thread for Toast)
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
-        Toast.makeText(getActivity(), event.message, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getActivity(), event.message, Toast.LENGTH_SHORT).show();
         String action = event.message;
         if (action.equals(getString(R.string.queueUpdated))){
             queueUpdated();

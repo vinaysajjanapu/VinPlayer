@@ -474,7 +474,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
     // This method will be called when a MessageEvent is posted (in the UI thread for Toast)
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
-        Toast.makeText(getActivity(), event.message, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getActivity(), event.message, Toast.LENGTH_SHORT).show();
         String action = event.message;
         if(action.equals(getString(R.string.newSongLoaded))){
             try {
