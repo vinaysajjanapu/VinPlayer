@@ -9,6 +9,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.vinay.vinplayer.R;
 
@@ -35,13 +36,13 @@ public class SplashScreen extends AppCompatActivity {
     public  boolean isStoragePermissionGranted() {
         if (Build.VERSION.SDK_INT >= 23) {
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED) {
+                    == PackageManager.PERMISSION_GRANTED && checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED ) {
                 Log.v("Storage Permisson","granted");
                 return true;
             } else {
-
                 Log.v("Storage Permisson","revoked");
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, 150);
                 return false;
             }
         }
@@ -53,9 +54,14 @@ public class SplashScreen extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
-            Log.v("Storage Permisson","Permission: "+permissions[0]+ "was "+grantResults[0]);
-            //resume tasks needing this permission
+        if (requestCode==150) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                Log.v("Storage Permisson", "Permission: " + permissions[0] + "was " + grantResults[0]);
+                //resume tasks needing this permission
+                startActivity(new Intent(this, MainActivity.class));
+            }else {
+                Toast.makeText(this,"No Permissions",Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

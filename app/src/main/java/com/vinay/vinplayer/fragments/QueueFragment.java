@@ -157,10 +157,15 @@ public class QueueFragment extends Fragment {
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        getActivity().unregisterReceiver(broadcastReceiver);
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         mListener=null;
-        getActivity().unregisterReceiver(broadcastReceiver);
     }
 
     /**

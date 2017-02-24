@@ -21,14 +21,12 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.media.AudioManager;
-import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.RemoteControlClient;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
@@ -98,12 +96,13 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
 
     private String LOGTAG = "VinMedia";
 
-    public int CROSS_FADE_DURATION = 1000; //in milli seconds
+    public int CROSS_FADE_DURATION = 700; //in milli seconds
 
     Intent newSongLoadIntent,songPausedIntent,songResumedIntent,musicStoppedIntent,queueUpdatedIntent;
     SharedPreferences media_settings;
     int repeatmode;
     boolean is_shuffle;
+    static boolean appJustStarted = true;
 
 
     public static VinMedia getInstance() {
@@ -130,6 +129,7 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     @Override
     public void onCreate() {
         isSticky = true;
+        appJustStarted = true;
         Log.d(LOGTAG,"service started");
         EventBus.getDefault().register(this);
         //setupBroadCastReceiver();
@@ -138,6 +138,10 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         notificationManager = (android.app.NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         try {
+            ((AudioManager)getSystemService(AUDIO_SERVICE)).registerMediaButtonEventReceiver(
+                    new ComponentName(
+                            getPackageName(),
+                            VinPlayerReceiver.class.getName()));
             TelephonyManager mgr = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
 
             phoneStateListener = new PhoneStateListener() {
@@ -196,7 +200,8 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
                 }
             }
             if (messageObject!=null)
-                createNotification(messageObject);
+                if (!appJustStarted)
+                    createNotification(messageObject);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -215,7 +220,7 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         songPausedIntent.setAction(context.getString(R.string.songPaused));
         songResumedIntent.setAction(context.getString(R.string.songResumed));
         musicStoppedIntent.setAction(context.getString(R.string.musicStopped));
-          }*/
+          }
 
     public void updateTempQueue(ArrayList<HashMap<String,String>> songList, Context context){
             tempQueue = songList;
@@ -464,7 +469,12 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     }
 
     public int getDuration(){
-        if (mediaPlayer!=null)return mediaPlayer.getDuration();
+        if (mediaPlayer!=null)
+            try {
+                return mediaPlayer.getDuration();
+            }catch (Exception e){
+                return 0;
+            }
         else return 0;
         //return /*(getCurrentSongDetails()!=null)? Integer.parseInt(getCurrentSongDetails().get("duration")):0*/0;
     }
@@ -596,7 +606,7 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
 
             /*notification.flags |= Notification.FLAG_ONGOING_EVENT;
             startForeground(5, notification);*/
-
+            //if (mediaPlayer.isPlaying())
             notificationManager.notify(5,notification);
 
             if (remoteControlClient != null) {
@@ -609,6 +619,7 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
 
 
     /*private void setupBroadCastReceiver() {
+    private void setupBroadCastReceiver() {
 
         intentFilter = new IntentFilter();
         intentFilter.addAction(getString(R.string.newSongLoaded));
@@ -635,6 +646,7 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     }*/
 
     private void onNewSongLoaded() {
+        appJustStarted = false;
         isSticky = true;
         onStartCommand(intent,flags,startId);
     }
@@ -658,11 +670,13 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d(LOGTAG,"vinmedia service destroyed");
         Log.d(LOGTAG,"destroyed");
 EventBus.getDefault().unregister(this);
         Log.d("vinmusicservice","destroyed");
         if (remoteControlClient != null) {
             audioManager.unregisterRemoteControlClient(remoteControlClient);
+
             audioManager.abandonAudioFocus(this);
         }
         try {

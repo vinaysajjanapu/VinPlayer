@@ -11,8 +11,10 @@ import com.vinay.vinplayer.VinPlayer;
 
 public class VinPlayerReceiver extends BroadcastReceiver {
 
+	String LOGTAG = "Vinplayer Receiver";
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		Log.d(LOGTAG,"intent recevied");
 		if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON)) {
 			if (intent.getExtras() == null) {
 				return;
@@ -25,29 +27,31 @@ public class VinPlayerReceiver extends BroadcastReceiver {
 				return;
 
 			switch (keyEvent.getKeyCode()) {
-			case KeyEvent.KEYCODE_HEADSETHOOK:
-				break;
-			case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-				if (!VinMedia.getInstance().isPlaying()&&!VinMedia.getInstance().isClean()) {
-					VinMedia.getInstance().resumeMusic(context);
-				} else {
-					VinMedia.getInstance().pauseMusic(context);
-				}
-				break;
-			case KeyEvent.KEYCODE_MEDIA_PLAY:
-				VinMedia.getInstance().resumeMusic(context);
-				break;
-			case KeyEvent.KEYCODE_MEDIA_PAUSE:
-				VinMedia.getInstance().pauseMusic(context);
-				break;
-			case KeyEvent.KEYCODE_MEDIA_STOP:
-				break;
-			case KeyEvent.KEYCODE_MEDIA_NEXT:
-				VinMedia.getInstance().nextSong(context);
-				break;
-			case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-				VinMedia.getInstance().previousSong(context);
-				break;
+				case KeyEvent.KEYCODE_HEADSETHOOK:
+					Log.d(LOGTAG,"headsethook");
+					break;
+				case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+					Log.d(LOGTAG,"media play pause");
+					break;
+				case KeyEvent.KEYCODE_MEDIA_PLAY:
+					Log.d(LOGTAG,"media play");
+					break;
+				case KeyEvent.KEYCODE_MEDIA_PAUSE:
+					Log.d(LOGTAG,"media pause");
+
+					break;
+				case KeyEvent.KEYCODE_MEDIA_STOP:
+					Log.d(LOGTAG,"media stop");
+
+					break;
+				case KeyEvent.KEYCODE_MEDIA_NEXT:
+					Log.d(LOGTAG,"media next");
+
+					break;
+				case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+					Log.d(LOGTAG,"media previous");
+
+					break;
 			}
 		} else {
 			if (intent.getAction().equals(VinMedia.NOTIFY_PLAY)) {

@@ -37,13 +37,11 @@ import android.widget.Toast;
 
 import com.gordonwong.materialsheetfab.MaterialSheetFab;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
-import com.rengwuxian.materialedittext.MaterialEditText;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.anim.AccordionTransformer;
 import com.vinay.vinplayer.database.LastPlayTable;
-import com.vinay.vinplayer.database.RecentPlayTable;
 import com.vinay.vinplayer.database.RecommendedTable;
 import com.vinay.vinplayer.fragments.AlbumsFragment;
 import com.vinay.vinplayer.fragments.AllSongsFragment;
@@ -56,15 +54,15 @@ import com.vinay.vinplayer.fragments.NowPlayingDetailsFragment;
 import com.vinay.vinplayer.fragments.NowPlayingFragment;
 import com.vinay.vinplayer.fragments.QueueFragment;
 import com.vinay.vinplayer.helpers.BlurBuilder;
+import com.vinay.vinplayer.helpers.HeadPhoneDetectService;
 import com.vinay.vinplayer.helpers.MessageEvent;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
+import com.vinay.vinplayer.helpers.VinPlayerReceiver;
 import com.vinay.vinplayer.springtablayout.SpringIndicator;
 import com.vinay.vinplayer.ui_elemets.Fab;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -120,6 +118,8 @@ public class MainActivity extends AppCompatActivity implements
     SharedPreferences media_settings;
     SharedPreferences.Editor editor;
 
+    String LOGTAG = "MainActivity";
+
     boolean firstback = false;
     long firstback_t;
 
@@ -128,6 +128,14 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        VinPlayerReceiver mMediaButtonReceiver = new VinPlayerReceiver();
+        IntentFilter mediaFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
+        mediaFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+        registerReceiver(mMediaButtonReceiver, mediaFilter);
+
+        startService(new Intent(this, HeadPhoneDetectService.class));
+
         setContentView(R.layout.activity_main);
 
         getSupportActionBar().hide();
@@ -160,6 +168,11 @@ public class MainActivity extends AppCompatActivity implements
         iv_search = (ImageView) findViewById(R.id.iv_search);
         iv_search.setColorFilter(Color.WHITE);
         iv_search.setOnClickListener(this);
+
+        IntentFilter filter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
+        VinPlayerReceiver r = new VinPlayerReceiver();
+        filter.setPriority(1000);
+      //  registerReceiver(r, filter);
     }
 
    /* private void setupBroadCastReceiver() {
@@ -492,6 +505,8 @@ public class MainActivity extends AppCompatActivity implements
         //sendBroadcast(new Intent().setAction(getString(R.string.newSongLoaded)));
         EventBus.getDefault().post(new MessageEvent(getString(R.string.newSongLoaded)));
         //registerReceiver(broadcastReceiver, intentFilter);
+        //sendBroadcast(new Intent().setAction(getString(R.string.newSongLoaded)));
+        registerReceiver(broadcastReceiver, intentFilter);
     }
 
     private void loadAlreadyPlaying() {
@@ -503,7 +518,6 @@ public class MainActivity extends AppCompatActivity implements
             VinMedia.getInstance().setPosition(Integer.parseInt(lastplay.get(0).get("position")));
         }
     }
-
     @Override
     protected void onPause() {
         super.onPause();
@@ -517,6 +531,9 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (broadcastReceiver!=null)
+            unregisterReceiver(broadcastReceiver);
+
         // VinMedia.getInstance().releasePlayer();
     }
 
