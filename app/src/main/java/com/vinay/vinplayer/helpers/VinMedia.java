@@ -96,7 +96,7 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
 
     private String LOGTAG = "VinMedia";
 
-    public int CROSS_FADE_DURATION = 700; //in milli seconds
+    public int CROSS_FADE_DURATION = 1200; //in milli seconds
 
     Intent newSongLoadIntent,songPausedIntent,songResumedIntent,musicStoppedIntent,queueUpdatedIntent;
     SharedPreferences media_settings;
@@ -305,17 +305,36 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
          //NotificationManager.getInstance().notifyNewSongLoaded(NotificationManager.newaudioloaded, getCurrentSongDetails());
     }
 
-    public void pauseMusic(Context context){
-        mediaPlayer.pause();
-        //context.sendBroadcast(songPausedIntent);
-        EventBus.getDefault().post(new MessageEvent("songPaused"));
-        Log.d("Broadcast","music paused");
-        pausePosition = mediaPlayer.getCurrentPosition();
+    public void pauseMusic(Context context) {
+        if (mediaPlayer != null) {
+            Runnable timerRun = new Runnable() {
+
+                @Override
+                public void run() {
+                    int i;
+                    for (i = 50; i > 0; i--) {
+                        try {
+                            Thread.sleep(CROSS_FADE_DURATION / 50);
+                            mediaPlayer.setVolume(((float) i) / 50, ((float) i) / 50);
+                        } catch (Exception e) {
+
+                        }
+                    }
+                    mediaPlayer.pause();
+                }
+            };
+            Thread thread = new Thread(timerRun);
+            if (!thread.isAlive()) thread.start();
+            EventBus.getDefault().post(new MessageEvent("songPaused"));
+            Log.d(LOGTAG, "music paused");
+            pausePosition = mediaPlayer.getCurrentPosition();
+        }
     }
 
     public void resumeMusic(Context context){
         try {
             mediaPlayer.seekTo(pausePosition);
+            mediaPlayer.setVolume(1f,1f);
             mediaPlayer.start();
         }catch (Exception e){
             startMusic(getPosition(),context);
