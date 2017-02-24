@@ -21,9 +21,11 @@ public class SplashScreen extends AppCompatActivity {
         setContentView(R.layout.activity_splash_screen);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getSupportActionBar().hide();
+
 /*
         if (isStoragePermissionGranted())
-            startActivity(new Intent(this, MainActivity.class));*/
+            startActivity(new Intent(this, MainActivity.class));
+*/
 
         startActivity(new Intent(this,WifiTest.class));
 
