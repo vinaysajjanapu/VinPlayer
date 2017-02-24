@@ -29,11 +29,6 @@
             android:name=".activities.MainActivity"
             android:theme="@style/Base.Theme.AppCompat.Light">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            <intent-filter>
                 <action android:name="android.intent.action.MUSIC_PLAYER" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -111,7 +106,13 @@
         </receiver>
 
         <activity android:name=".activities.SearchActivity" />
-        <activity android:name=".activities.SplashScreen" />
+        <activity android:name=".activities.SplashScreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".activities.MetaDataEditor" />
         <activity
             android:name=".ringdroid.RingdroidEditActivity"
