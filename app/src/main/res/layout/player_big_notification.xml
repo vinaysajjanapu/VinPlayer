@@ -16,15 +16,7 @@
             android:background="#ffc0c0c0"
             android:scaleType="fitXY" />
 
-        <ProgressBar
-            android:id="@+id/player_progress_bar"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_centerInParent="true"
-            android:indeterminateDuration="1500" />
     </RelativeLayout>
-    <!--android:indeterminateDrawable="@drawable/loading_animation"-->
-
     <FrameLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -71,17 +63,7 @@
                 android:textSize="14sp" />
 
         </LinearLayout>
-<!--
 
-        <ImageView
-            android:id="@+id/player_close"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="right"
-            android:padding="10dp"
-            android:scaleType="fitXY"
-            android:src="@drawable/icon_close" />
--->
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -106,16 +88,6 @@
                 android:layout_marginRight="10dp"
                 android:scaleType="fitXY"
                 android:src="@drawable/icon_previous" />
-<!--
-            <ImageView
-                android:id="@+id/player_pause"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginLeft="10dp"
-                android:background="@android:color/transparent"
-                android:layout_marginRight="10dp"
-                android:scaleType="fitXY"
-                android:src="@drawable/icon_pause" />-->
 
             <ImageView
                 android:id="@+id/player_play"

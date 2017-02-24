@@ -85,7 +85,7 @@ EventBus.getDefault().unregister(this);
             @Override
             public void onClick(View v) {
                 if (VinMedia.getInstance().isPlaying()) {
-                    VinMedia.getInstance().resetPlayer();
+                    VinMedia.getInstance().resetPlayer(VinMedia.getInstance().getMediaPlayer());
                 }
                 VinMedia.getInstance().updateQueue(false,context);
                 //context.sendBroadcast(new Intent().setAction(context.getString(R.string.queueUpdated)));
@@ -99,7 +99,7 @@ EventBus.getDefault().unregister(this);
 
         VinMedia.getInstance().setPosition(position);
         if (VinMedia.getInstance().isPlaying() || !VinMedia.getInstance().isClean()) {
-            VinMedia.getInstance().resetPlayer();
+            VinMedia.getInstance().resetPlayer(VinMedia.getInstance().getMediaPlayer());
             VinMedia.getInstance().startMusic(position,context);
         } else {
             VinMedia.getInstance().startMusic(position,context);

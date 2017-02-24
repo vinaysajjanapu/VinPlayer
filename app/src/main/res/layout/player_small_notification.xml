@@ -28,17 +28,6 @@
         android:singleLine="true"
         android:textColor="#fff"
         android:textSize="16dp" />
-<!--
-
-    <ImageView
-        android:id="@+id/player_close"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignParentRight="true"
-        android:padding="8dp"
-        android:scaleType="fitXY"
-        android:src="@drawable/icon_close" />
--->
 
     <TextView
         android:id="@+id/player_author_name"
@@ -59,14 +48,6 @@
         android:layout_marginRight="40dp"
         android:gravity="center"
         android:orientation="horizontal">
-
-        <ProgressBar
-            android:id="@+id/player_progress_bar"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:layout_marginRight="56dp"
-            android:indeterminateDuration="1500" />
 
         <ImageView
             android:id="@+id/player_previous"
