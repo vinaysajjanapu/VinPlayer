@@ -13,10 +13,16 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.adapters.QueueAdapter;
+import com.vinay.vinplayer.helpers.MessageEvent;
 import com.vinay.vinplayer.helpers.VinMedia;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,7 +66,7 @@ public class QueueFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_queue, container, false);
-        setupBroadCastReceiver();
+        //setupBroadCastReceiver();
 
         if (VinMedia.getInstance().getCurrentList()!=null)songQueue = VinMedia.getInstance().getCurrentList();
         else songQueue = null;
@@ -84,13 +90,15 @@ public class QueueFragment extends Fragment {
                        if (recyclerView.getChildAt(0).getTop() == 0) {
                            if ((int) (start_y[0] - event.getY()) < 50) {
                                Log.d("scroll", "dragged");
-                               getActivity().sendBroadcast(new Intent().setAction(getString(R.string.closePanel)));
+                               //getActivity().sendBroadcast(new Intent().setAction(getString(R.string.closePanel)));
+                               EventBus.getDefault().post(new MessageEvent(getString(R.string.closePanel)));
                            }
                        }
                    }else {
                        if ((int) (start_y[0] - event.getY()) < 50) {
                            Log.d("scroll", "dragged");
-                           getActivity().sendBroadcast(new Intent().setAction(getString(R.string.closePanel)));
+                           //getActivity().sendBroadcast(new Intent().setAction(getString(R.string.closePanel)));
+                           EventBus.getDefault().post(new MessageEvent(getString(R.string.closePanel)));
                        }
                    }
                 }
@@ -101,7 +109,7 @@ public class QueueFragment extends Fragment {
 
         return view;
     }
-    private void setupBroadCastReceiver(){
+    /*private void setupBroadCastReceiver(){
 
         Log.d("queuefrag","setup bcast listener");
 
@@ -122,7 +130,7 @@ public class QueueFragment extends Fragment {
             }
         };
         getActivity().registerReceiver(broadcastReceiver,intentFilter);
-    }
+    }*/
 
     private void newSongLoaded() {
         recyclerView.scrollToPosition(VinMedia.getInstance().getPosition());
@@ -171,4 +179,28 @@ public class QueueFragment extends Fragment {
 
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+    // This method will be called when a MessageEvent is posted (in the UI thread for Toast)
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event) {
+        Toast.makeText(getActivity(), event.message, Toast.LENGTH_SHORT).show();
+        String action = event.message;
+        if (action.equals(getString(R.string.queueUpdated))){
+            queueUpdated();
+        }else {
+            newSongLoaded();
+        }
+    }
 }
+

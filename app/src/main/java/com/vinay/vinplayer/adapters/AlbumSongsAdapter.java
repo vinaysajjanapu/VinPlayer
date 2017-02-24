@@ -3,7 +3,6 @@ package com.vinay.vinplayer.adapters;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.Uri;
@@ -15,10 +14,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
+import com.vinay.vinplayer.helpers.MessageEvent;
 import com.vinay.vinplayer.helpers.VinMedia;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +39,7 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
     private BroadcastReceiver broadcastReceiver;
     private IntentFilter intentFilter;
     static int pos1=0,pos2=0;
+    static int gp;
 
     public AlbumSongsAdapter(Context context, List<HashMap<String,String>> items) {
         mValues = items;
@@ -51,14 +54,18 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
     @Override
     public void onBindViewHolder(final AlbumSongsAdapter.ViewHolder holder, final int position) {
 
+        gp=position;
         holder.mItem = mValues.get(position);
         holder.songname.setText(mValues.get(position).get("title"));
         holder.ArtisName_duration.setText(
                 mValues.get(position).get("album") + "\t-\t"+ mValues.get(position).get("artist") + ""
         );
 
-        setupBroadCastReceiver(holder,position);
-
+        //setupBroadCastReceiver(holder,position);
+        if(EventBus.getDefault().isRegistered(MessageEvent.class)){
+EventBus.getDefault().unregister(this);
+        }
+        //EventBus.getDefault().register(this);
 
         try {
             Log.d("albumsonsrecycler","set image");
@@ -81,7 +88,8 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
                     VinMedia.getInstance().resetPlayer();
                 }
                 VinMedia.getInstance().updateQueue(false,context);
-                context.sendBroadcast(new Intent().setAction(context.getString(R.string.queueUpdated)));
+                //context.sendBroadcast(new Intent().setAction(context.getString(R.string.queueUpdated)));
+                EventBus.getDefault().post(new MessageEvent(context.getString(R.string.queueUpdated)));
                 playPauseAction(position);
                // Toast.makeText(context,"Playing Album",Toast.LENGTH_SHORT).show();
             }
@@ -99,7 +107,7 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
     }
 
 
-    private void setupBroadCastReceiver(final AlbumSongsAdapter.ViewHolder view, final int position){
+/*    private void setupBroadCastReceiver(final AlbumSongsAdapter.ViewHolder view, final int position){
 
         intentFilter = new IntentFilter();
         intentFilter.addAction(context.getString(R.string.newSongLoaded));
@@ -123,8 +131,9 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
             }
         };
         context.registerReceiver(broadcastReceiver,intentFilter);
-    }
-    private void onNewSongLoaded(AlbumSongsAdapter.ViewHolder view, int position){
+    }*/
+
+    private void onNewSongLoaded( int position){
         if (position== VinMedia.getInstance().getPosition()){
             if ((pos1==-1)&&(pos2==-1))pos1 = position;
             else if ((pos1!=-1)&&(pos2==-1)) pos2 = position;
@@ -133,7 +142,7 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
             // view.img_playindic.setVisibility(View.VISIBLE);
         }
     }
-    private void onMusicStopped(AlbumSongsAdapter.ViewHolder view, int position){
+    private void onMusicStopped( int position){
         if (position == pos1){
             pos1=pos2;
             pos2=-1;
@@ -175,5 +184,23 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
 
     }
 
+    @Subscribe
+    public void onEvent(MessageEvent event) {
+        Log.e("Test event 2 ", event.message);
+        String action = event.message;
+        if(action.equals(context.getString(R.string.newSongLoaded))){
+            onNewSongLoaded(gp);
+        }else if (action.equals(context.getString(R.string.songPaused))){
+            // onSongPaused();
+        }else if (action.equals(context.getString(R.string.songResumed))){
+            //onSongResumed();
+        }else if (action.equals(context.getString(R.string.musicStopped))){
+            onMusicStopped(gp);
+        }
+    }
 
+    @Override
+    public void onViewDetachedFromWindow(ViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+    }
 }

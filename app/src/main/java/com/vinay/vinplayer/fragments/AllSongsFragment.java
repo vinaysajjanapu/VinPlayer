@@ -12,10 +12,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.futuremind.recyclerviewfastscroll.FastScroller;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.adapters.AllSongsAdapter;
+import com.vinay.vinplayer.helpers.MessageEvent;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,7 +68,7 @@ public class AllSongsFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_allsongs, container, false);
 
-        setupBroadCastReceiver();
+        //setupBroadCastReceiver();
         // Set the adapter
 
             Context context = view.getContext();
@@ -78,7 +84,7 @@ public class AllSongsFragment extends Fragment {
 
 
 
-    private void setupBroadCastReceiver(){
+   /* private void setupBroadCastReceiver(){
 
         Log.d("queuefrag","setup bcast listener");
 
@@ -95,7 +101,7 @@ public class AllSongsFragment extends Fragment {
             }
         };
         getActivity().registerReceiver(broadcastReceiver,intentFilter);
-    }
+    }*/
 
     private void newSongLoaded() {
         recyclerView.getAdapter().notifyDataSetChanged();
@@ -125,4 +131,26 @@ public class AllSongsFragment extends Fragment {
         void onListFragmentInteraction(int i);
 
     }
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+    // This method will be called when a MessageEvent is posted (in the UI thread for Toast)
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event) {
+        //Toast.makeText(getActivity(), event.message, Toast.LENGTH_SHORT).show();
+        String action = event.message;
+        if (action.equals(getString(R.string.newSongLoaded))){
+            newSongLoaded();
+        }
+    }
 }
+

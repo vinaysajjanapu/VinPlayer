@@ -19,8 +19,11 @@ import android.widget.Toast;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.helpers.BlurBuilder;
+import com.vinay.vinplayer.helpers.MessageEvent;
 import com.vinay.vinplayer.helpers.VinMediaDataManager;
 import com.vinay.vinplayer.helpers.VinMediaLists;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.net.URISyntaxException;
 
@@ -36,9 +39,10 @@ public class MetaDataEditor extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        Intent intent = new Intent();
+      /*  Intent intent = new Intent();
         intent.setAction(getString(R.string.mediaListChanged));
-        sendBroadcast(intent);
+        sendBroadcast(intent);*/
+        EventBus.getDefault().post(new MessageEvent(getString(R.string.mediaListChanged)));
         super.onDestroy();
     }
 

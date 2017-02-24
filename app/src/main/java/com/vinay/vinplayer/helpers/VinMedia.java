@@ -35,6 +35,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.VinPlayer;
@@ -46,6 +47,10 @@ import com.vinay.vinplayer.database.PlaylistTable;
 import com.vinay.vinplayer.database.RecentPlayTable;
 import com.vinay.vinplayer.database.RecommendedTable;
 import com.vinay.vinplayer.database.UsageDataTable;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -116,7 +121,7 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         return localInstance;
     }
 
-    private void iniatializeBroadcasts(Context context) {
+  /*  private void iniatializeBroadcasts(Context context) {
 
         newSongLoadIntent = new Intent();
         songPausedIntent = new Intent();
@@ -127,7 +132,7 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         songPausedIntent.setAction(context.getString(R.string.songPaused));
         songResumedIntent.setAction(context.getString(R.string.songResumed));
         musicStoppedIntent.setAction(context.getString(R.string.musicStopped));
-          }
+          }*/
 
     public void updateTempQueue(ArrayList<HashMap<String,String>> songList, Context context){
             tempQueue = songList;
@@ -139,9 +144,10 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
             currentQueue = tempQueue;
         }else currentQueue = VinMediaLists.getInstance().getAllSongsList(context);
 
-        queueUpdatedIntent = new Intent();
+      /*  queueUpdatedIntent = new Intent();
         queueUpdatedIntent.setAction(context.getString(R.string.queueUpdated));
-        context.sendBroadcast(queueUpdatedIntent);
+        context.sendBroadcast(queueUpdatedIntent);*/
+        EventBus.getDefault().post(new MessageEvent(context.getString(R.string.queueUpdated)));
     }
 
     public ArrayList<HashMap<String,String>> getCurrentList(){
@@ -176,7 +182,8 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                context.sendBroadcast(musicStoppedIntent);
+                //context.sendBroadcast(musicStoppedIntent);
+                EventBus.getDefault().post(new MessageEvent("musicStopped"));
                 Log.d("Broadcast","song complete");
                 if (!isClean()&&!isPlaying()){
                       nextSong(context);
@@ -201,10 +208,11 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
                 resetPlayer();
             }
         }
-        iniatializeBroadcasts(context);
+        //iniatializeBroadcasts(context);
         newMediaPlayer(context);
         setMediaSource();
-        context.sendBroadcast(newSongLoadIntent);
+        //context.sendBroadcast(newSongLoadIntent);
+        EventBus.getDefault().post(new MessageEvent("newSongLoaded"));
 
         RecentPlayTable.getInstance(context).addSongToRecentPlayList(currentSongDetails);
 
@@ -220,7 +228,8 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
 
     public void pauseMusic(Context context){
         mediaPlayer.pause();
-        context.sendBroadcast(songPausedIntent);
+        //context.sendBroadcast(songPausedIntent);
+        EventBus.getDefault().post(new MessageEvent("songPaused"));
         Log.d("Broadcast","music paused");
         pausePosition = mediaPlayer.getCurrentPosition();
     }
@@ -232,7 +241,8 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         }catch (Exception e){
             startMusic(getPosition(),context);
         }
-        context.sendBroadcast(songResumedIntent);
+       // context.sendBroadcast(songResumedIntent);
+        EventBus.getDefault().post(new MessageEvent("songResumed"));
         Log.d("Broadcast","music paused");
     }
 
@@ -414,7 +424,8 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     public void onCreate() {
         sticky = true;
         Log.d("service","started");
-        setupBroadCastReceiver();
+        EventBus.getDefault().register(this);
+        //setupBroadCastReceiver();
         play = BitmapFactory.decodeResource(getResources(),R.drawable.icon_play);
         pause = BitmapFactory.decodeResource(getResources(),R.drawable.icon_pause);
         notificationManager = (android.app.NotificationManager)getSystemService(NOTIFICATION_SERVICE);
@@ -597,7 +608,7 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     }
 
 
-    private void setupBroadCastReceiver() {
+    /*private void setupBroadCastReceiver() {
 
         intentFilter = new IntentFilter();
         intentFilter.addAction(getString(R.string.newSongLoaded));
@@ -621,7 +632,7 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
             }
         };
         registerReceiver(broadcastReceiver, intentFilter);
-    }
+    }*/
 
     private void onNewSongLoaded() {
         sticky = true;
@@ -646,7 +657,7 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     @Override
     public void onDestroy() {
         super.onDestroy();
-
+EventBus.getDefault().unregister(this);
         Log.d("vinmusicservice","destroyed");
         if (remoteControlClient != null) {
             RemoteControlClient.MetadataEditor metadataEditor = remoteControlClient.editMetadata(true);
@@ -731,6 +742,24 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         @Override
         protected void onProgressUpdate(Void... values) {
             Log.d("creating list",values.toString()+"\t");
+        }
+    }
+
+
+
+    // This method will be called when a MessageEvent is posted (in the UI thread for Toast)
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event) {
+        Toast.makeText(this, event.message, Toast.LENGTH_SHORT).show();
+        String action = event.message;
+        if (action.equals(getString(R.string.newSongLoaded))) {
+            onNewSongLoaded();
+        } else if (action.equals(getString(R.string.songPaused))) {
+            onSongPaused();
+        } else if (action.equals(getString(R.string.songResumed))) {
+            onSongResumed();
+        } else if (action.equals(getString(R.string.musicStopped))) {
+            onMusicStopped();
         }
     }
 

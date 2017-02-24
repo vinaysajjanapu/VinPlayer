@@ -22,9 +22,16 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.vinay.vinplayer.R;
+import com.vinay.vinplayer.activities.MainActivity;
 import com.vinay.vinplayer.anim.AccordionTransformer;
+import com.vinay.vinplayer.helpers.MessageEvent;
 import com.vinay.vinplayer.helpers.VinMedia;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -85,7 +92,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
 
         View view = inflater.inflate(R.layout.fragment_nowplaying, container, false);
         setupViews(view);
-        setupBroadCastReceiver();
+       // setupBroadCastReceiver();
 
         return view;
     }
@@ -186,7 +193,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
     }
 
 
-    private void setupBroadCastReceiver(){
+    /*private void setupBroadCastReceiver(){
 
         intentFilter = new IntentFilter();
         intentFilter.addAction(getString(R.string.newSongLoaded));
@@ -215,7 +222,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
         };
         getActivity().registerReceiver(broadcastReceiver,intentFilter);
     }
-
+*/
     private void onSongPaused(){
         playerButtonPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
     }
@@ -405,5 +412,37 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
         // TODO: Update argument type and name
         void OnNowPlayingFragmentInteraction(int i);
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+    // This method will be called when a MessageEvent is posted (in the UI thread for Toast)
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event) {
+        Toast.makeText(getActivity(), event.message, Toast.LENGTH_SHORT).show();
+        String action = event.message;
+        if(action.equals(getString(R.string.newSongLoaded))){
+            try {
+                onNewSongLoaded();
+            }catch (Exception e){
+
+            }
+        }else if (action.equals(getString(R.string.songPaused))){
+            onSongPaused();
+        }else if (action.equals(getString(R.string.songResumed))){
+            onSongResumed();
+        }else if (action.equals(getString(R.string.musicStopped))){
+            onMusicStopped();
+        }
     }
 }

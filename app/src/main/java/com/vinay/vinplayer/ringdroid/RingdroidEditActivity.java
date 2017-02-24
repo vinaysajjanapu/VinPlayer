@@ -47,8 +47,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vinay.vinplayer.helpers.MessageEvent;
 import com.vinay.vinplayer.ringdroid.soundfile.SoundFile;
 import com.vinay.vinplayer.R;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.StringWriter;
@@ -219,9 +222,10 @@ public class RingdroidEditActivity extends AppCompatActivity
         }
 
 
-        Intent intent = new Intent();
+       /* Intent intent = new Intent();
         intent.setAction(getString(R.string.mediaListChanged));
-        sendBroadcast(intent);
+        sendBroadcast(intent);*/
+        EventBus.getDefault().post(new MessageEvent(getString(R.string.mediaListChanged)));
 
         super.onDestroy();
     }

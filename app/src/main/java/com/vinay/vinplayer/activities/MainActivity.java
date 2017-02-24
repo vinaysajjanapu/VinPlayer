@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements
         setupLibraryViewPager();
         setupSlidingPanelLayout();
         setupNowPlayingPager();
-        setupBroadCastReceiver();
+        //setupBroadCastReceiver();
         slider.setBackground(BlurBuilder.getInstance().drawable_img("null", this));
 
 
@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements
         iv_search.setOnClickListener(this);
     }
 
-    private void setupBroadCastReceiver() {
+   /* private void setupBroadCastReceiver() {
 
 
 
@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements
             }
         };
         registerReceiver(broadcastReceiver, intentFilter);
-    }
+    }*/
 
     private void onNewSongLoaded() {
         HashMap<String, String> songDetails = VinMedia.getInstance().getCurrentSongDetails();
@@ -409,8 +409,9 @@ public class MainActivity extends AppCompatActivity implements
         super.onResume();
         getIntentData();
         //vm.VinMediaInitialize();
-        sendBroadcast(new Intent().setAction(getString(R.string.newSongLoaded)));
-        registerReceiver(broadcastReceiver, intentFilter);
+        //sendBroadcast(new Intent().setAction(getString(R.string.newSongLoaded)));
+        EventBus.getDefault().post(new MessageEvent(getString(R.string.newSongLoaded)));
+        //registerReceiver(broadcastReceiver, intentFilter);
     }
 
     private void loadAlreadyPlaying() {
@@ -454,7 +455,8 @@ public class MainActivity extends AppCompatActivity implements
             VinMedia.getInstance().resetPlayer();
         }
         VinMedia.getInstance().updateQueue(true, this);
-        sendBroadcast(new Intent().setAction(getString(R.string.queueUpdated)));
+        //sendBroadcast(new Intent().setAction(getString(R.string.queueUpdated)));
+        EventBus.getDefault().post(new MessageEvent(getString(R.string.queueUpdated)));
         playPauseAction(p);
     }
 
@@ -614,9 +616,43 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-  
 
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+    // This method will be called when a MessageEvent is posted (in the UI thread for Toast)
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event) {
+        Toast.makeText(this, event.message, Toast.LENGTH_SHORT).show();
+        String action = event.message;
+        if (action.equals(getString(R.string.newSongLoaded))) {
+            onNewSongLoaded();
+        } else if (action.equals(getString(R.string.songPaused))) {
+            onSongPaused();
+        } else if (action.equals(getString(R.string.songResumed))) {
+            onSongResumed();
+        } else if (action.equals(getString(R.string.musicStopped))) {
+            onMusicStopped();
+        } else if (action.equals(getString(R.string.closePanel))) {
+            Log.d("slider", "closepanel");
+            slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        }else if(action.equals(getString(R.string.mediaListChanged))){
+            finish();
+            startActivity(new Intent(MainActivity.this,MainActivity.class));
+        }
+    }
 
 }
+
+
 
