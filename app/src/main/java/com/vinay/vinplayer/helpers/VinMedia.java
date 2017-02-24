@@ -70,7 +70,8 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     static Intent intent;
     static int flags, startId;
     android.app.NotificationManager notificationManager;
-    Bitmap pause, play;
+    Bitmap pause,play;
+
 
 
     public static Boolean SHUFFLE_ON = true;
@@ -80,13 +81,13 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     public static int REPEAT_QUEUE = 1;
     public static int REPEAT_TRACK = 2;
 
-    private static ArrayList<HashMap<String, String>> allSongs, currentQueue, tempQueue;
+    private static ArrayList<HashMap<String,String>> allSongs,currentQueue,tempQueue;
     private static volatile VinMedia Instance = null;
     private Cursor cur;
     private MediaPlayer mediaPlayer;
     public static int pausePosition;
-    public static int position = -1;
-    public HashMap<String, String> currentSongDetails;
+    public static int position=-1;
+    public HashMap<String,String> currentSongDetails;
     private static Uri uri;
     private ContentResolver contentResolver;
     private static int[] shuffle_queue;
@@ -95,9 +96,9 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
 
     private String LOGTAG = "VinMedia";
 
-    public int CROSS_FADE_DURATION = 700; //in milli seconds
+    public int CROSS_FADE_DURATION = 1200; //in milli seconds
 
-    Intent newSongLoadIntent, songPausedIntent, songResumedIntent, musicStoppedIntent, queueUpdatedIntent;
+    Intent newSongLoadIntent,songPausedIntent,songResumedIntent,musicStoppedIntent,queueUpdatedIntent;
     SharedPreferences media_settings;
     int repeatmode;
     boolean is_shuffle;
@@ -112,13 +113,13 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
                 if (localInstance == null) {
                     Instance = localInstance = new VinMedia();
                     VinPlayer.applicationContext.startService(new Intent(VinPlayer.applicationContext, VinMedia.class));
-                }
+                 }
             }
         }
         return localInstance;
     }
 
-    // private void iniatializeBroadcasts(Context context) {
+  // private void iniatializeBroadcasts(Context context) {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -129,15 +130,15 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     public void onCreate() {
         isSticky = true;
         appJustStarted = true;
-        Log.d(LOGTAG, "service started");
+        Log.d(LOGTAG,"service started");
         EventBus.getDefault().register(this);
         //setupBroadCastReceiver();
-        play = BitmapFactory.decodeResource(getResources(), R.drawable.icon_play);
-        pause = BitmapFactory.decodeResource(getResources(), R.drawable.icon_pause);
-        notificationManager = (android.app.NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        play = BitmapFactory.decodeResource(getResources(),R.drawable.icon_play);
+        pause = BitmapFactory.decodeResource(getResources(),R.drawable.icon_pause);
+        notificationManager = (android.app.NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         try {
-            ((AudioManager) getSystemService(AUDIO_SERVICE)).registerMediaButtonEventReceiver(
+            ((AudioManager)getSystemService(AUDIO_SERVICE)).registerMediaButtonEventReceiver(
                     new ComponentName(
                             getPackageName(),
                             VinPlayerReceiver.class.getName()));
@@ -175,7 +176,7 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         this.startId = startId;
 
         try {
-            HashMap<String, String> messageObject = getCurrentSongDetails();
+            HashMap<String,String> messageObject = getCurrentSongDetails();
             /*if (messageObject == null) {
                 return START_NOT_STICKY;
             }*/
@@ -198,48 +199,65 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
                     Log.e("tmessages", e.toString());
                 }
             }
-            if (messageObject != null)
+            if (messageObject!=null)
                 if (!appJustStarted)
                     createNotification(messageObject);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return super.onStartCommand(intent, flags, startId);
-
     }
 
-    public void updateTempQueue(ArrayList<HashMap<String, String>> songList, Context context) {
-        tempQueue = songList;
+
+    private void iniatializeBroadcasts(Context context) {
+
+        newSongLoadIntent = new Intent();
+        songPausedIntent = new Intent();
+        songResumedIntent = new Intent();
+        musicStoppedIntent = new Intent();
+
+        newSongLoadIntent.setAction(context.getString(R.string.newSongLoaded));
+        songPausedIntent.setAction(context.getString(R.string.songPaused));
+        songResumedIntent.setAction(context.getString(R.string.songResumed));
+        musicStoppedIntent.setAction(context.getString(R.string.musicStopped));
+          }
+
+    public void updateTempQueue(ArrayList<HashMap<String,String>> songList, Context context){
+            tempQueue = songList;
         //VinMediaLists.getInstance().getArtistSongsList(VinMediaLists.getInstance().getArtistsList(context).get(position).get("artist"),context);
     }
 
-    public void updateQueue(boolean allsongs, Context context) {
-        if (!allsongs) {
+    public void updateQueue(boolean allsongs,Context context){
+        if (!allsongs){
             currentQueue = tempQueue;
-        } else currentQueue = VinMediaLists.getInstance().getAllSongsList(context);
-        EventBus.getDefault().post("queueUpdated");
+        }else currentQueue = VinMediaLists.getInstance().getAllSongsList(context);
+
+      /*  queueUpdatedIntent = new Intent();
+        queueUpdatedIntent.setAction(context.getString(R.string.queueUpdated));
+        context.sendBroadcast(queueUpdatedIntent);*/
+        EventBus.getDefault().post(new MessageEvent(context.getString(R.string.queueUpdated)));
     }
 
-    public ArrayList<HashMap<String, String>> getCurrentList() {
+    public ArrayList<HashMap<String,String>> getCurrentList(){
         return currentQueue;
     }
 
-    private void setMediaSource() {
+    private void setMediaSource(){
         try {
             mediaPlayer.setDataSource(currentQueue.get(position).get("data"));
 //            Log.d("playing song url",currentQueue.get(position).get("data"));
-            //          Log.d("mediaplayer status","starting music");
+  //          Log.d("mediaplayer status","starting music");
             mediaPlayer.prepareAsync();
 
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (IllegalStateException e) {
+        }catch (IllegalStateException e){
             //e1.printStackTrace();
         }
     }
 
 
-    void newMediaPlayer(final Context context) {
+    void newMediaPlayer(final Context context){
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -247,30 +265,33 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
             public void onCompletion(MediaPlayer mp) {
                 //context.sendBroadcast(musicStoppedIntent);
                 EventBus.getDefault().post(new MessageEvent("musicStopped"));
-                Log.d("Broadcast", "song complete");
-                if (!isClean() && !isPlaying()) {
-                    nextSong(context);
+                Log.d("Broadcast","song complete");
+                if (!isClean()&&!isPlaying()){
+                      nextSong(context);
                 }
             }
         });
-        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
+        {
             @Override
-            public void onPrepared(MediaPlayer mp) {
+            public void onPrepared(MediaPlayer mp)
+            {
                 mediaPlayer.start();
-                EventBus.getDefault().post(new MessageEvent("musicStopped"));
+        EventBus.getDefault().post(new MessageEvent("musicStopped"));
 
-                //context.sendBroadcast(newSongLoadIntent);
+        //context.sendBroadcast(newSongLoadIntent);
             }
         });
     }
 
 
-    public void startMusic(int index, Context context) {
-        Log.d("Broadcast", "music started");
-        this.position = index;
-        //iniatializeBroadcasts(VinPlayer.applicationContext);
-        if (mediaPlayer != null) {
-            if (isPlaying() || !isClean()) {
+
+    public void startMusic(int index,Context context){
+        Log.d("Broadcast","music started");
+        this.position  = index;
+        iniatializeBroadcasts(VinPlayer.applicationContext);
+        if (mediaPlayer!=null){
+            if(isPlaying()||!isClean()){
                 resetPlayer(mediaPlayer);
             }
         }
@@ -281,50 +302,69 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         EventBus.getDefault().post(new MessageEvent("newSongLoaded"));
 
         //NotificationManager.getInstance().postNotificationName(NotificationManager.audioDidStarted, getCurrentSongDetails());
-        //NotificationManager.getInstance().notifyNewSongLoaded(NotificationManager.newaudioloaded, getCurrentSongDetails());
+         //NotificationManager.getInstance().notifyNewSongLoaded(NotificationManager.newaudioloaded, getCurrentSongDetails());
     }
 
     public void pauseMusic(Context context) {
-        mediaPlayer.pause();
-        //context.sendBroadcast(songPausedIntent);
-        EventBus.getDefault().post(new MessageEvent("songPaused"));
-        Log.d("Broadcast", "music paused");
-        pausePosition = mediaPlayer.getCurrentPosition();
+        if (mediaPlayer != null) {
+            Runnable timerRun = new Runnable() {
+
+                @Override
+                public void run() {
+                    int i;
+                    for (i = 50; i > 0; i--) {
+                        try {
+                            Thread.sleep(CROSS_FADE_DURATION / 50);
+                            mediaPlayer.setVolume(((float) i) / 50, ((float) i) / 50);
+                        } catch (Exception e) {
+
+                        }
+                    }
+                    mediaPlayer.pause();
+                }
+            };
+            Thread thread = new Thread(timerRun);
+            if (!thread.isAlive()) thread.start();
+            EventBus.getDefault().post(new MessageEvent("songPaused"));
+            Log.d(LOGTAG, "music paused");
+            pausePosition = mediaPlayer.getCurrentPosition();
+        }
     }
 
-    public void resumeMusic(Context context) {
+    public void resumeMusic(Context context){
         try {
             mediaPlayer.seekTo(pausePosition);
+            mediaPlayer.setVolume(1f,1f);
             mediaPlayer.start();
-        } catch (Exception e) {
-            startMusic(getPosition(), context);
+        }catch (Exception e){
+            startMusic(getPosition(),context);
         }
-        // context.sendBroadcast(songResumedIntent);
+       // context.sendBroadcast(songResumedIntent);
         EventBus.getDefault().post(new MessageEvent("songResumed"));
-        Log.d("Broadcast", "music paused");
+        Log.d("Broadcast","music paused");
     }
 
-    public void nextSong(Context context) {
-        media_settings = context.getSharedPreferences(context.getString(R.string.media_settings), Context.MODE_PRIVATE);
-        repeatmode = media_settings.getInt(context.getString(R.string.repeat_mode), REPEAT_NONE);
-        is_shuffle = media_settings.getBoolean(context.getString(R.string.shuffle), SHUFFLE_OFF);
-        if (!is_shuffle) {
-            if (position == currentQueue.size() - 1) {
-                if (repeatmode == REPEAT_NONE) return;
-                if (repeatmode == REPEAT_QUEUE) position = 0;
-            } else if ((position + 1) < currentQueue.size()) {
-                if (repeatmode != REPEAT_TRACK) position++;
+    public void nextSong(Context context){
+        media_settings = context.getSharedPreferences(context.getString(R.string.media_settings),Context.MODE_PRIVATE);
+        repeatmode = media_settings.getInt(context.getString(R.string.repeat_mode),REPEAT_NONE);
+        is_shuffle = media_settings.getBoolean(context.getString(R.string.shuffle),SHUFFLE_OFF);
+        if (!is_shuffle){
+            if (position==currentQueue.size()-1){
+                if (repeatmode==REPEAT_NONE)return;
+                if (repeatmode==REPEAT_QUEUE)position=0;
+            }else if ((position+1)<currentQueue.size()){
+                if (repeatmode!=REPEAT_TRACK)position++;
             }
-            // startMusic(position,context);
-        } else {
-            if (shuffle_index == currentQueue.size() - 1) {
-                shuffle_index = 0;
-            } else if ((shuffle_index + 1) < currentQueue.size()) {
-                position = getShuffleQueue()[++shuffle_index];
-            }
+           // startMusic(position,context);
+        }else {
+            if (shuffle_index==currentQueue.size()-1){
+              shuffle_index=0;
+            }else if ((shuffle_index+1)<currentQueue.size()){
+                    position = getShuffleQueue()[++shuffle_index];
+              }
         }
 
-        startMusic(position, context);
+        startMusic(position,context);
 
        /* FavouriteTable.getInstance(context).addSongToFavourite(currentSongDetails);
         LastPlayTable.getInstance(context).storeLastPlayQueue(currentQueue,getPosition());
@@ -339,63 +379,62 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
 
     }
 
-    public MediaPlayer getMediaPlayer() {
+    public MediaPlayer getMediaPlayer(){
         return mediaPlayer;
     }
-
-    public void previousSong(Context context) {
-        media_settings = context.getSharedPreferences(context.getString(R.string.media_settings), Context.MODE_PRIVATE);
-        repeatmode = media_settings.getInt(context.getString(R.string.repeat_mode), 0);
-        is_shuffle = media_settings.getBoolean(context.getString(R.string.shuffle), false);
+    public void previousSong(Context context){
+        media_settings = context.getSharedPreferences(context.getString(R.string.media_settings),Context.MODE_PRIVATE);
+        repeatmode = media_settings.getInt(context.getString(R.string.repeat_mode),0);
+        is_shuffle = media_settings.getBoolean(context.getString(R.string.shuffle),false);
         if (!is_shuffle) {
             if (position == 0) {
                 if (repeatmode == REPEAT_QUEUE) position = currentQueue.size() - 1;
             } else if ((position - 1) >= 0) {
                 if (repeatmode != REPEAT_TRACK) position--;
             }
-            // startMusic(position,context);
-        } else {
+           // startMusic(position,context);
+        }else {
             if (shuffle_index == 0) {
                 shuffle_index = currentQueue.size() - 1;
             } else if ((shuffle_index - 1) >= 0) {
-                position = getShuffleQueue()[--shuffle_index];
+                    position = getShuffleQueue()[--shuffle_index];
             }
         }
-        startMusic(position, context);
+        startMusic(position,context);
 
-        // new createRecommendedList().execute("");
+       // new createRecommendedList().execute("");
 
     }
 
-    public int[] getShuffleQueue() {
+    public int[] getShuffleQueue(){
         return shuffle_queue;
     }
 
-    public void createShuffleQueue() {
+    public void createShuffleQueue(){
         shuffle_index = 0;
         int[] shuffle_list = new int[currentQueue.size()];
-        int ind1, k, l;
-        for (ind1 = 0; ind1 < getCurrentList().size(); ind1++) shuffle_list[ind1] = ind1;
-        for (ind1 = 0; ind1 < getCurrentList().size(); ind1++) {
+        int ind1,k,l;
+        for (ind1=0;ind1<getCurrentList().size();ind1++)shuffle_list[ind1] = ind1;
+        for (ind1=0;ind1<getCurrentList().size();ind1++){
             k = shuffle_list[ind1];
-            l = (int) (Math.random() * getCurrentList().size());
+            l = (int)(Math.random()*getCurrentList().size());
             shuffle_list[ind1] = shuffle_list[l];
             shuffle_list[l] = k;
         }
         shuffle_queue = shuffle_list;
-        String s = "";
-        for (ind1 = 0; ind1 < getCurrentList().size(); ind1++) s = s + " " + shuffle_queue[ind1];
+        String s="";
+        for (ind1=0;ind1<getCurrentList().size();ind1++)s = s + " "+shuffle_queue[ind1];
         Log.d("shuffle queue", s);
 
     }
 
-    public void resetPlayer(final MediaPlayer mediaPlayer) {
-        Log.d("mediaplayer status", "reset player");
+    public void resetPlayer(final MediaPlayer mediaPlayer){
+        Log.d("mediaplayer status","reset player");
         try {
-            //  mediaPlayer.stop();
+          //  mediaPlayer.stop();
             //mediaPlayer.reset();
             //mediaPlayer.setVolume(5,);
-            if (mediaPlayer != null) {
+            if (mediaPlayer!=null) {
                 Runnable timerRun = new Runnable() {
 
                     @Override
@@ -415,63 +454,63 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
                 Thread thread = new Thread(timerRun);
                 if (!thread.isAlive()) thread.start();
             }
-        } catch (Exception e) {
+        }catch (Exception e){
 
         }
 
     }
 
-    public void setAudioProgress(int seekBarProgress) {
-        if (!isPlaying()) pausePosition = seekBarProgress;
-        if (mediaPlayer != null) mediaPlayer.seekTo(seekBarProgress);
+    public void setAudioProgress(int seekBarProgress){
+        if(!isPlaying())pausePosition = seekBarProgress;
+        if(mediaPlayer!=null)mediaPlayer.seekTo(seekBarProgress);
     }
 
-    public int getAudioProgress() {
+    public int getAudioProgress(){
         int pos;
         try {
-            pos = mediaPlayer.getCurrentPosition() / 1000;
-        } catch (Exception e) {
+            pos = mediaPlayer.getCurrentPosition()/1000;
+        }catch (Exception e){
             pos = 0;
         }
         return pos;
     }
 
-    public void setPosition(int position) {
+    public void setPosition(int position){
         this.position = position;
     }
 
-    public int getPosition() {
+    public int getPosition(){
         return position;
     }
 
-    public int getCurrentQueueSize() {
-        return (getCurrentList() != null) ? getCurrentList().size() : 0;
+    public int getCurrentQueueSize(){
+        return (getCurrentList()!=null)?getCurrentList().size():0;
     }
 
-    public int getDuration() {
-        if (mediaPlayer != null)
+    public int getDuration(){
+        if (mediaPlayer!=null)
             try {
                 return mediaPlayer.getDuration();
-            } catch (Exception e) {
+            }catch (Exception e){
                 return 0;
             }
         else return 0;
         //return /*(getCurrentSongDetails()!=null)? Integer.parseInt(getCurrentSongDetails().get("duration")):0*/0;
     }
 
-    public void releasePlayer() {
-        if (mediaPlayer != null) {
+    public void releasePlayer(){
+        if (mediaPlayer!=null){
             mediaPlayer.release();
-            //       Intent intent = new Intent(VinPlayer.applicationContext, VinMedia.class);
+     //       Intent intent = new Intent(VinPlayer.applicationContext, VinMedia.class);
             //VinPlayer.applicationContext.stopService(intent);
-        }
+            }
     }
 
-    public boolean isPlaying() {
+    public boolean isPlaying(){
         boolean isPlaying = false;
         try {
             isPlaying = mediaPlayer.isPlaying();
-        } catch (Exception e) {
+        }catch (Exception e){
 
         }
         return isPlaying;
@@ -487,14 +526,14 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         return isClean;
     }
 
-    public HashMap<String, String> getCurrentSongDetails() {
-        if (currentQueue != null) {
+    public HashMap<String, String> getCurrentSongDetails(){
+        if (currentQueue!=null) {
             currentSongDetails = currentQueue.get(getPosition());
             return currentSongDetails;
-        } else return null;
+        }else return null;
     }
 
-    public boolean isHeadPhonePlugged() {
+    public boolean isHeadPhonePlugged(){
         return false;
     }
 
@@ -574,20 +613,20 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
                 notification.bigContentView.setTextViewText(R.id.player_author_name, authorName);
             }
 
-            if (isSticky) {
+            if (isSticky){
                 notification.contentView.setImageViewResource(R.id.player_play, R.drawable.icon_pause);
-                if (supportBigNotifications)
+                if(supportBigNotifications)
                     notification.bigContentView.setImageViewResource(R.id.player_play, R.drawable.icon_pause);
-            } else {
+            }else {
                 notification.contentView.setImageViewResource(R.id.player_play, R.drawable.icon_play);
-                if (supportBigNotifications)
+                if(supportBigNotifications)
                     notification.bigContentView.setImageViewResource(R.id.player_play, R.drawable.icon_play);
             }
 
             /*notification.flags |= Notification.FLAG_ONGOING_EVENT;
             startForeground(5, notification);*/
             //if (mediaPlayer.isPlaying())
-            notificationManager.notify(5, notification);
+            notificationManager.notify(5,notification);
 
             if (remoteControlClient != null) {
                 audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
@@ -597,52 +636,63 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         }
     }
 
-    // This method will be called when a MessageEvent is posted (in the UI thread for Toast)
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(MessageEvent event) {
-        //Toast.makeText(this, event.message, Toast.LENGTH_SHORT).show();
-        String action = event.message;
-        if (action.equals(getString(R.string.newSongLoaded))) {
-            onNewSongLoaded();
-        } else if (action.equals(getString(R.string.songPaused))) {
-            onSongPaused();
-        } else if (action.equals(getString(R.string.songResumed))) {
-            onSongResumed();
-        } else if (action.equals(getString(R.string.musicStopped))) {
-            onMusicStopped();
-        }
-    }
 
+    /*private void setupBroadCastReceiver() {
+    private void setupBroadCastReceiver() {
+
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(getString(R.string.newSongLoaded));
+        intentFilter.addAction(getString(R.string.songPaused));
+        intentFilter.addAction(getString(R.string.songResumed));
+        intentFilter.addAction(getString(R.string.musicStopped));
+
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if (action.equals(getString(R.string.newSongLoaded))) {
+                    onNewSongLoaded();
+                } else if (action.equals(getString(R.string.songPaused))) {
+                    onSongPaused();
+                } else if (action.equals(getString(R.string.songResumed))) {
+                    onSongResumed();
+                } else if (action.equals(getString(R.string.musicStopped))) {
+                    onMusicStopped();
+                }
+            }
+        };
+        registerReceiver(broadcastReceiver, intentFilter);
+    }*/
 
     private void onNewSongLoaded() {
         appJustStarted = false;
         isSticky = true;
-        onStartCommand(intent, flags, startId);
+        onStartCommand(intent,flags,startId);
     }
 
     private void onSongPaused() {
         isSticky = false;
-        onStartCommand(intent, flags, startId);
+        onStartCommand(intent,flags,startId);
     }
 
     private void onSongResumed() {
         isSticky = true;
-        onStartCommand(intent, flags, startId);
+        onStartCommand(intent,flags,startId);
     }
 
     private void onMusicStopped() {
         isSticky = false;
-        onStartCommand(intent, flags, startId);
+        onStartCommand(intent,flags,startId);
     }
 
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(LOGTAG, "vinmedia service destroyed");
-        Log.d(LOGTAG, "destroyed");
-        EventBus.getDefault().unregister(this);
-        Log.d("vinmusicservice", "destroyed");
+        Log.d(LOGTAG,"vinmedia service destroyed");
+        Log.d(LOGTAG,"destroyed");
+EventBus.getDefault().unregister(this);
+        Log.d("vinmusicservice","destroyed");
         if (remoteControlClient != null) {
             audioManager.unregisterRemoteControlClient(remoteControlClient);
 
@@ -687,7 +737,7 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
                 setAudioFocus();
             }
         } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
-            if (AudioFocus) {
+            if (AudioFocus){
                 VinMedia.getInstance().resumeMusic(getApplicationContext());
                 AudioFocus = false;
             }
@@ -712,18 +762,36 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
             // might want to change "executed" for the returned string passed
             // into onPostExecute() but that is upto yo
             // u
-            Log.d("async task", "post execute");
+            Log.d("async task","post execute");
         }
 
         @Override
         protected void onPreExecute() {
-            Log.d("async task", "pre execute");
+                Log.d("async task","pre execute");
         }
 
         @Override
         protected void onProgressUpdate(Void... values) {
-            Log.d("creating list", values.toString() + "\t");
+            Log.d("creating list",values.toString()+"\t");
         }
-
     }
+
+
+
+    // This method will be called when a MessageEvent is posted (in the UI thread for Toast)
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event) {
+        //Toast.makeText(this, event.message, Toast.LENGTH_SHORT).show();
+        String action = event.message;
+        if (action.equals(getString(R.string.newSongLoaded))) {
+            onNewSongLoaded();
+        } else if (action.equals(getString(R.string.songPaused))) {
+            onSongPaused();
+        } else if (action.equals(getString(R.string.songResumed))) {
+            onSongResumed();
+        } else if (action.equals(getString(R.string.musicStopped))) {
+            onMusicStopped();
+        }
+    }
+
 }
