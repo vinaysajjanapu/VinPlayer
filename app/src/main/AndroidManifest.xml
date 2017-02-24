@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <supports-screens
         android:anyDensity="true"
@@ -88,9 +88,10 @@
         </activity>
         <activity
             android:name=".activities.AlbumDetailsActivity"
-            android:theme="@style/Theme.AppCompat.NoActionBar"/>
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
 
-        <service android:name=".helpers.VinMedia"
+        <service
+            android:name=".helpers.VinMedia"
             android:enabled="true"
             android:exported="true" />
 
@@ -101,18 +102,17 @@
                 <action android:name="musicplayer.next" />
                 <action android:name="musicplayer.play" />
                 <action android:name="musicplayer.previous" />
-                <action android:name="android.intent.action.MEDIA_BUTTON"/>
-                <action android:name="android.intent.action.SCREEN_OFF"/>
-                <action android:name="android.intent.action.SCREEN_ON"/>
-                <action android:name="android.intent.action.HEADSET_PLUG"/>
-                <action android:name="android.media.SCO_AUDIO_STATE_CHANGED"/>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+                <action android:name="android.intent.action.SCREEN_OFF" />
+                <action android:name="android.intent.action.SCREEN_ON" />
+                <action android:name="android.intent.action.HEADSET_PLUG" />
+                <action android:name="android.media.SCO_AUDIO_STATE_CHANGED" />
             </intent-filter>
         </receiver>
 
         <activity android:name=".activities.SearchActivity" />
         <activity android:name=".activities.SplashScreen" />
         <activity android:name=".activities.MetaDataEditor" />
-
         <activity
             android:name=".ringdroid.RingdroidEditActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
@@ -126,16 +126,19 @@
         </activity>
         <activity
             android:name=".ringdroid.ChooseContactActivity"
-            android:configChanges="orientation|keyboardHidden"/>
-        <activity android:name=".activities.minimal_ui.Minimal_NowPlaying"/>
+            android:configChanges="orientation|keyboardHidden" />
+        <activity android:name=".activities.minimal_ui.Minimal_NowPlaying" />
 
-        <service android:name=".helpers.HeadPhoneDetectService"
-            android:enabled="true" android:excludeFromRecents="true">
+        <service
+            android:name=".helpers.HeadPhoneDetectService"
+            android:enabled="true"
+            android:excludeFromRecents="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </service>
 
+        <activity android:name=".activities.WifiTest"></activity>
     </application>
 
 </manifest>
