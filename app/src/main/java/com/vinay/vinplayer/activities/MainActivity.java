@@ -125,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements
     boolean firstback = false;
     long firstback_t;
 
+
     ImageView iv_search;
 
     @Override
@@ -435,6 +436,7 @@ public class MainActivity extends AppCompatActivity implements
     private void setupNowPlayingPager() {
 
         nowPlayingPager = (ViewPager) findViewById(R.id.nowplaying_pager);
+        nowPlayingPager.setOffscreenPageLimit(0);
         nowPlayingPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -533,9 +535,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (broadcastReceiver!=null)
-            unregisterReceiver(broadcastReceiver);
-
         // VinMedia.getInstance().releasePlayer();
     }
 
@@ -638,24 +637,6 @@ public class MainActivity extends AppCompatActivity implements
         // Show DialogFragment
         dFragment.show(fm, "Dialog Fragment");
     }
-
-
-/*
-    @Override
-    public void didReceivedNotification(int id, Object... args) {
-        if (id == NotificationManager.audioDidStarted || id == NotificationManager.audioPlayStateChanged || id == NotificationManager.audioDidReset) {
-           // updateTitle(id == NotificationManager.audioDidReset && (Boolean) args[1]);
-        } else if (id == NotificationManager.audioProgressDidChanged) {
-            HashMap<String,String> mSongDetail = VinMedia.getInstance().getCurrentSongDetails();
-           // updateProgress(mSongDetail);
-        }
-    }
-
-    @Override
-    public void newSongLoaded(Object... args) {
-
-    }*/
-
 
     public class ViewPagerAdapter extends FragmentPagerAdapter {
 

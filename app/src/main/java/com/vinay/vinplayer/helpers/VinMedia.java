@@ -34,12 +34,14 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.VinPlayer;
 import com.vinay.vinplayer.activities.MainActivity;
+import com.vinay.vinplayer.database.NextSongDataTable;
+import com.vinay.vinplayer.database.RecentPlayTable;
 import com.vinay.vinplayer.database.RecommendedTable;
+import com.vinay.vinplayer.database.UsageDataTable;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -47,6 +49,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 public class VinMedia extends Service implements SensorEventListener,AudioManager.OnAudioFocusChangeListener {
@@ -63,7 +66,6 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     public static final String NOTIFY_PAUSE = "musicplayer.pause";
     public static final String NOTIFY_PLAY = "musicplayer.play";
     public static final String NOTIFY_NEXT = "musicplayer.next";
-    BroadcastReceiver broadcastReceiver;
     IntentFilter intentFilter;
     Notification notification;
     static boolean isSticky = true;
@@ -71,6 +73,8 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     static int flags, startId;
     android.app.NotificationManager notificationManager;
     Bitmap pause,play;
+    static boolean toggleTwoTimes = true;
+
 
 
 
@@ -92,17 +96,22 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     private ContentResolver contentResolver;
     private static int[] shuffle_queue;
     static int shuffle_index;
+
     public static int playPercentThreshold = 10;
+    static boolean asFirstSongIndic = true;
+    static boolean asLastSongIndic = false;
+    static long IndicId1, IndicId2;
 
     private String LOGTAG = "VinMedia";
-
     public int CROSS_FADE_DURATION = 1200; //in milli seconds
 
-    Intent newSongLoadIntent,songPausedIntent,songResumedIntent,musicStoppedIntent,queueUpdatedIntent;
     SharedPreferences media_settings;
     int repeatmode;
     boolean is_shuffle;
     static boolean appJustStarted = true;
+    private long startPosMillis=0,endPosMillis=0,playeddurationMillis=0;
+
+    private static boolean isPlayerPrepared = false;
 
 
     public static VinMedia getInstance() {
@@ -119,7 +128,6 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         return localInstance;
     }
 
-  // private void iniatializeBroadcasts(Context context) {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -129,6 +137,7 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     @Override
     public void onCreate() {
         isSticky = true;
+        asFirstSongIndic = true;
         appJustStarted = true;
         Log.d(LOGTAG,"service started");
         EventBus.getDefault().register(this);
@@ -208,23 +217,8 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         return super.onStartCommand(intent, flags, startId);
     }
 
-
-    private void iniatializeBroadcasts(Context context) {
-
-        newSongLoadIntent = new Intent();
-        songPausedIntent = new Intent();
-        songResumedIntent = new Intent();
-        musicStoppedIntent = new Intent();
-
-        newSongLoadIntent.setAction(context.getString(R.string.newSongLoaded));
-        songPausedIntent.setAction(context.getString(R.string.songPaused));
-        songResumedIntent.setAction(context.getString(R.string.songResumed));
-        musicStoppedIntent.setAction(context.getString(R.string.musicStopped));
-          }
-
     public void updateTempQueue(ArrayList<HashMap<String,String>> songList, Context context){
             tempQueue = songList;
-        //VinMediaLists.getInstance().getArtistSongsList(VinMediaLists.getInstance().getArtistsList(context).get(position).get("artist"),context);
     }
 
     public void updateQueue(boolean allsongs,Context context){
@@ -232,9 +226,6 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
             currentQueue = tempQueue;
         }else currentQueue = VinMediaLists.getInstance().getAllSongsList(context);
 
-      /*  queueUpdatedIntent = new Intent();
-        queueUpdatedIntent.setAction(context.getString(R.string.queueUpdated));
-        context.sendBroadcast(queueUpdatedIntent);*/
         EventBus.getDefault().post(new MessageEvent(context.getString(R.string.queueUpdated)));
     }
 
@@ -245,64 +236,105 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     private void setMediaSource(){
         try {
             mediaPlayer.setDataSource(currentQueue.get(position).get("data"));
-//            Log.d("playing song url",currentQueue.get(position).get("data"));
-  //          Log.d("mediaplayer status","starting music");
             mediaPlayer.prepareAsync();
 
         } catch (IOException e) {
             e.printStackTrace();
         }catch (IllegalStateException e){
-            //e1.printStackTrace();
         }
     }
 
 
     void newMediaPlayer(final Context context){
+        isPlayerPrepared = false;
         mediaPlayer = new MediaPlayer();
+        startPosMillis = 0;
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                //context.sendBroadcast(musicStoppedIntent);
                 EventBus.getDefault().post(new MessageEvent("musicStopped"));
                 Log.d("Broadcast","song complete");
+
+
                 if (!isClean()&&!isPlaying()){
                       nextSong(context);
                 }
             }
         });
+
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
         {
             @Override
             public void onPrepared(MediaPlayer mp)
             {
+                isPlayerPrepared = true;
                 mediaPlayer.start();
-        EventBus.getDefault().post(new MessageEvent("musicStopped"));
-
-        //context.sendBroadcast(newSongLoadIntent);
+                EventBus.getDefault().post(new MessageEvent("newSongLoaded"));
             }
         });
+        mediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
+            @Override
+            public void onSeekComplete(MediaPlayer mp) {
+                startPosMillis = mp.getCurrentPosition();
+            }
+        });
+        updateUsageAndRecents(context);
     }
 
+
+    private void updateUsageAndRecents(final Context context) {
+        //final int percent = (int) ((endPosMillis - startPosMillis) * 100 / getMediaPlayer().getDuration());
+        final int percent = 60;
+        if (percent > 10) {
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    HashMap<String, String> song = getCurrentSongDetails();
+                    RecentPlayTable.getInstance(context).addSongToRecentPlayList(song);
+                    UsageDataTable.getInstance(context).updateUsageData(
+                            song,
+                            getCrrentTimeDiv(),
+                            percent,
+                            asFirstSongIndic, false,
+                            isHeadPhonePlugged()
+                    );
+                }
+            };
+            Thread thread = new Thread(runnable);
+            thread.start();
+        }
+    }
 
 
     public void startMusic(int index,Context context){
         Log.d("Broadcast","music started");
         this.position  = index;
-        iniatializeBroadcasts(VinPlayer.applicationContext);
         if (mediaPlayer!=null){
             if(isPlaying()||!isClean()){
                 resetPlayer(mediaPlayer);
             }
         }
-        //iniatializeBroadcasts(context);
         newMediaPlayer(context);
         setMediaSource();
-        //context.sendBroadcast(newSongLoadIntent);
+        updateNextSongData(context);
         EventBus.getDefault().post(new MessageEvent("newSongLoaded"));
+    }
 
-        //NotificationManager.getInstance().postNotificationName(NotificationManager.audioDidStarted, getCurrentSongDetails());
-         //NotificationManager.getInstance().notifyNewSongLoaded(NotificationManager.newaudioloaded, getCurrentSongDetails());
+    private void updateNextSongData(Context context){
+
+        if (toggleTwoTimes) {
+            toggleTwoTimes = false;
+            if (IndicId1 == -1) IndicId1 = Long.parseLong(getCurrentSongDetails().get("id"));
+            else {
+                NextSongDataTable.getInstance(context).addNextSongData(IndicId2,IndicId1);
+            }
+        }else {
+            toggleTwoTimes = true;
+            IndicId2 = Long.parseLong(getCurrentSongDetails().get("id"));
+            NextSongDataTable.getInstance(context).addNextSongData(IndicId1,IndicId2);
+        }
+
     }
 
     public void pauseMusic(Context context) {
@@ -348,6 +380,7 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         media_settings = context.getSharedPreferences(context.getString(R.string.media_settings),Context.MODE_PRIVATE);
         repeatmode = media_settings.getInt(context.getString(R.string.repeat_mode),REPEAT_NONE);
         is_shuffle = media_settings.getBoolean(context.getString(R.string.shuffle),SHUFFLE_OFF);
+        IndicId1 = Long.parseLong(getCurrentSongDetails().get("id"));
         if (!is_shuffle){
             if (position==currentQueue.size()-1){
                 if (repeatmode==REPEAT_NONE)return;
@@ -365,18 +398,6 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         }
 
         startMusic(position,context);
-
-       /* FavouriteTable.getInstance(context).addSongToFavourite(currentSongDetails);
-        LastPlayTable.getInstance(context).storeLastPlayQueue(currentQueue,getPosition());
-       // NextSongDataTable.getInstance(context).initializeNextSongData();
-
-        PlaylistTable.getInstance(context).addSongToPlaylist(currentSongDetails, "MyPlaylist");
-
-        UsageDataTable.getInstance(context).updateUsageData(currentSongDetails,3,30,true,false,true);
-
-        NextSongDataTable.getInstance(context).addNextSongData(Long.parseLong(15623+""),Long.parseLong(15625+""));
-*/
-
     }
 
     public MediaPlayer getMediaPlayer(){
@@ -401,9 +422,6 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
             }
         }
         startMusic(position,context);
-
-       // new createRecommendedList().execute("");
-
     }
 
     public int[] getShuffleQueue(){
@@ -431,9 +449,6 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     public void resetPlayer(final MediaPlayer mediaPlayer){
         Log.d("mediaplayer status","reset player");
         try {
-          //  mediaPlayer.stop();
-            //mediaPlayer.reset();
-            //mediaPlayer.setVolume(5,);
             if (mediaPlayer!=null) {
                 Runnable timerRun = new Runnable() {
 
@@ -495,16 +510,8 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
                 return 0;
             }
         else return 0;
-        //return /*(getCurrentSongDetails()!=null)? Integer.parseInt(getCurrentSongDetails().get("duration")):0*/0;
     }
 
-    public void releasePlayer(){
-        if (mediaPlayer!=null){
-            mediaPlayer.release();
-     //       Intent intent = new Intent(VinPlayer.applicationContext, VinMedia.class);
-            //VinPlayer.applicationContext.stopService(intent);
-            }
-    }
 
     public boolean isPlaying(){
         boolean isPlaying = false;
@@ -637,33 +644,6 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     }
 
 
-    /*private void setupBroadCastReceiver() {
-    private void setupBroadCastReceiver() {
-
-        intentFilter = new IntentFilter();
-        intentFilter.addAction(getString(R.string.newSongLoaded));
-        intentFilter.addAction(getString(R.string.songPaused));
-        intentFilter.addAction(getString(R.string.songResumed));
-        intentFilter.addAction(getString(R.string.musicStopped));
-
-        broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if (action.equals(getString(R.string.newSongLoaded))) {
-                    onNewSongLoaded();
-                } else if (action.equals(getString(R.string.songPaused))) {
-                    onSongPaused();
-                } else if (action.equals(getString(R.string.songResumed))) {
-                    onSongResumed();
-                } else if (action.equals(getString(R.string.musicStopped))) {
-                    onMusicStopped();
-                }
-            }
-        };
-        registerReceiver(broadcastReceiver, intentFilter);
-    }*/
-
     private void onNewSongLoaded() {
         appJustStarted = false;
         isSticky = true;
@@ -685,14 +665,13 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         onStartCommand(intent,flags,startId);
     }
 
-
     @Override
     public void onDestroy() {
         super.onDestroy();
+        asFirstSongIndic = false;
         Log.d(LOGTAG,"vinmedia service destroyed");
-        Log.d(LOGTAG,"destroyed");
-EventBus.getDefault().unregister(this);
-        Log.d("vinmusicservice","destroyed");
+
+        EventBus.getDefault().unregister(this);
         if (remoteControlClient != null) {
             audioManager.unregisterRemoteControlClient(remoteControlClient);
 
@@ -706,9 +685,7 @@ EventBus.getDefault().unregister(this);
         } catch (Exception e) {
             Log.e("tmessages", e.toString());
         }
-        unregisterReceiver(broadcastReceiver);
     }
-
 
     public void setListeners(RemoteViews view) {
         try {
@@ -776,6 +753,11 @@ EventBus.getDefault().unregister(this);
         }
     }
 
+    public static int getCrrentTimeDiv() {
+        Date d = new Date();
+        long h = (d.getTime() / 1000 / 60 / 60) % 24;
+        return (int)h/4;
+    }
 
 
     // This method will be called when a MessageEvent is posted (in the UI thread for Toast)

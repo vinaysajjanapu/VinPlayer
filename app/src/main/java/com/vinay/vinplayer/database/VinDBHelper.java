@@ -37,6 +37,7 @@ public class VinDBHelper extends SQLiteOpenHelper {
     public static String ALBUM_ID = "album_id";
     public static String ARTIST = "artist";
     public static String DATE_ADDED = "date_added";
+    public static String ADDED_BEFORE = "added_before";
     public static String DATA = "data";
     public static String NO_TIMES_PLAYED = "actual_times";
     public static String WITH_HEADP = "with_head";
@@ -85,7 +86,6 @@ public class VinDBHelper extends SQLiteOpenHelper {
         try {
             db.execSQL(usageDataTableSQL());
             db.execSQL(recentPlaySQL());
-            db.execSQL(recentAddedSQL());
             db.execSQL(favouriteSQL());
             db.execSQL(lastPlaySQL());
           //  db.execSQL(nextSongTableSQL(VinMediaLists.allSongs.size()));
@@ -99,7 +99,6 @@ public class VinDBHelper extends SQLiteOpenHelper {
         try {
             db.execSQL("DROP TABLE IF EXISTS "+usageDataTable );
             db.execSQL("DROP TABLE IF EXISTS "+recentPlayTable );
-            db.execSQL("DROP TABLE IF EXISTS "+recentAddedTable );
             db.execSQL("DROP TABLE IF EXISTS "+favouriteTable );
             db.execSQL("DROP TABLE IF EXISTS "+lastPlayTable );
           //  db.execSQL("DROP TABLE IF EXISTS "+nextSongDataTable );
@@ -154,17 +153,6 @@ public class VinDBHelper extends SQLiteOpenHelper {
     }
 
 
-    private String recentAddedSQL(){
-        String sql = "CREATE TABLE IF NOT EXISTS " + recentAddedTable + " (" +
-                SONG_ID + " INTEGER NOT NULL PRIMARY KEY,"+
-                ALBUM_ID + " INTEGER NOT NULL," +
-                TITLE + " TEXT NOT NULL," +
-                ALBUM + " TEXT NOT NULL," +
-                ARTIST + " TEXT NOT NULL," +
-                DATA + " TEXT NOT NULL,"+
-                DATE_ADDED + " INTEGER NOT NULL);";
-        return sql;
-    }
 
 
     public String lastPlaySQL(){

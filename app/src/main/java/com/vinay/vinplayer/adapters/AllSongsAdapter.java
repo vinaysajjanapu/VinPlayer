@@ -67,11 +67,12 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
 
         holder.img_playindic.setVisibility(View.GONE);
         holder.mView.setBackgroundColor(Color.TRANSPARENT);
+
         if (VinMedia.getInstance().getCurrentSongDetails()!=null) {
             if (VinMedia.getInstance().getCurrentSongDetails().get("title").equals(title)){
-                holder.img_playindic.setVisibility(View.VISIBLE);
+                holder.img_playindic.setVisibility(View.VISIBLE);/*
                 holder.songname.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-                holder.ArtisName_duration.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                holder.ArtisName_duration.setTypeface(Typeface.DEFAULT, Typeface.BOLD);*/
                 holder.ArtisName_duration.setTextColor(Color.WHITE);
                 holder.mView.setBackgroundColor(context.getResources().getColor(R.color.transparentLightBlack));
             }
@@ -80,7 +81,11 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
             final Uri sArtworkUri = Uri
                     .parse("content://media/external/audio/albumart");
             Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mValues.get(position).get("album_id")));
-           Picasso.with(context).load(uri).error(R.drawable.albumart_default).resize(70,70).into(holder.circleImageView);
+           Picasso.with(context)
+                   .load(uri)
+                   .error(R.drawable.albumart_default)
+                   .resize(80,80)
+                   .into(holder.circleImageView);
 
         } catch (Exception e) {
             e.printStackTrace();

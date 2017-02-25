@@ -357,7 +357,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
         if (thread!=null){
             if (thread.isAlive())thread.interrupt();
         }
-        getActivity().unregisterReceiver(broadcastReceiver);
+
     }
 
     @Override

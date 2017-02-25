@@ -52,7 +52,10 @@ public class AlbumArtFragment extends Fragment {
 
 
             Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(album_id));
-            Picasso.with(getActivity()).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
+            Picasso.with(getActivity())
+                    .load(uri)
+                    .placeholder(R.drawable.albumart_default)
+                    .error(R.drawable.albumart_default)
                     .into(albumArt);
         }catch (Exception e){
         //    e.printStackTrace();

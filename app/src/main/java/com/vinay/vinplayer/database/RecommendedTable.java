@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 
+import static com.vinay.vinplayer.database.VinDBHelper.ADDED_BEFORE;
 import static com.vinay.vinplayer.database.VinDBHelper.ALBUM;
 import static com.vinay.vinplayer.database.VinDBHelper.ALBUM_ID;
 import static com.vinay.vinplayer.database.VinDBHelper.ALL_INDEX;
@@ -40,6 +41,7 @@ import static com.vinay.vinplayer.database.VinDBHelper.recentAddedTable;
 import static com.vinay.vinplayer.database.VinDBHelper.recentPlayTable;
 import static com.vinay.vinplayer.database.VinDBHelper.scoreTable;
 import static com.vinay.vinplayer.database.VinDBHelper.usageDataTable;
+import static com.vinay.vinplayer.helpers.VinMedia.getCrrentTimeDiv;
 
 /**
  * Created by vinaysajjanapu on 21-Feb-17.
@@ -412,6 +414,7 @@ public class RecommendedTable {
                         String album = cursor.getString(cursor.getColumnIndexOrThrow(ALBUM));
                         String artist = cursor.getString(cursor.getColumnIndexOrThrow(ARTIST));
                         String data = cursor.getString(cursor.getColumnIndexOrThrow(DATA));
+                        long days = cursor.getLong(cursor.getColumnIndexOrThrow(ADDED_BEFORE));
 
                         String sql = "Insert or Replace into " + scoreTable + " values(?,?,?,?," +
                                 "?,?,?,?," +
@@ -431,7 +434,7 @@ public class RecommendedTable {
                             insert.bindLong(8, 0);
                             insert.bindLong(9, 0);
                             insert.bindLong(10, 0);
-                            insert.bindLong(11, cursor.getPosition());
+                            insert.bindLong(11, days);
                             insert.bindLong(12, 0);
                             insert.bindLong(13, 0);
                             insert.bindLong(14, 0);
@@ -544,11 +547,6 @@ public class RecommendedTable {
         }
     }
 
-    public static int getCrrentTimeDiv() {
-        Date d = new Date();
-        long h = (d.getTime() / 1000 / 60 / 60) % 24;
-        return (int)h/4;
-    }
 
     private boolean isPresentAlready(long id) {
         Cursor mCursor = null;

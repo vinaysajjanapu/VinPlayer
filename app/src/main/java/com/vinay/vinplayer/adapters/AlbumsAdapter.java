@@ -45,7 +45,11 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
             final Uri sArtworkUri = Uri
                     .parse("content://media/external/audio/albumart");
             Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mValues.get(position).get("album_id")));
-            Picasso.with(context).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
+            Picasso.with(context)
+                    .load(uri)
+                    .placeholder(R.drawable.albumart_default)
+                    .error(R.drawable.albumart_default)
+                    .resize(150,150)
                     .into(holder.imageView);
 
             //ImageLoader.getInstance().displayImage(uri.toString(), holder.imageView);

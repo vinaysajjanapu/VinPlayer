@@ -68,10 +68,7 @@ public class AllSongsFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_allsongs, container, false);
 
-        //setupBroadCastReceiver();
-        // Set the adapter
-
-            Context context = view.getContext();
+           Context context = view.getContext();
             recyclerView = (RecyclerView) view.findViewById(R.id.list);
             fastScroller = (FastScroller) view.findViewById(R.id.fastscroll);
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -82,26 +79,6 @@ public class AllSongsFragment extends Fragment {
         return view;
     }
 
-
-
-   /* private void setupBroadCastReceiver(){
-
-        Log.d("queuefrag","setup bcast listener");
-
-        intentFilter = new IntentFilter();
-        intentFilter.addAction(getString(R.string.newSongLoaded));
-
-        broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if (action.equals(getString(R.string.newSongLoaded))){
-                    newSongLoaded();
-                }
-            }
-        };
-        getActivity().registerReceiver(broadcastReceiver,intentFilter);
-    }*/
 
     private void newSongLoaded() {
         recyclerView.getAdapter().notifyDataSetChanged();
@@ -124,7 +101,6 @@ public class AllSongsFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        getContext().unregisterReceiver(broadcastReceiver);
     }
 
     public interface OnListFragmentInteractionListener {

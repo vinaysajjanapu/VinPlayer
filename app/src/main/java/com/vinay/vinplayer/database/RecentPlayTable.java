@@ -103,7 +103,7 @@ public class RecentPlayTable {
         ArrayList<HashMap<String,String>> RecentPlayLists = new ArrayList<>();
         Cursor cursor = null;
         try {
-            String sqlQuery = "Select * from " + recentPlayTable + " ORDER BY idx DESC" ;
+            String sqlQuery = "Select * from " + recentPlayTable + " ORDER BY idx ASC" ;
             database = dbHelper.getDb();
             cursor = database.rawQuery(sqlQuery, null);
             if (cursor != null && cursor.getCount() >= 1) {

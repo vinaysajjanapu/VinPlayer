@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static com.vinay.vinplayer.database.VinDBHelper.ADDED_BEFORE;
 import static com.vinay.vinplayer.database.VinDBHelper.ALBUM;
 import static com.vinay.vinplayer.database.VinDBHelper.ALBUM_ID;
 import static com.vinay.vinplayer.database.VinDBHelper.ARTIST;
@@ -57,7 +58,12 @@ public class RecentAddedTable {
 
     public boolean updateRecentAddedList() {
         try {
+            Date date = new Date();
+            long today = date.getTime()/86400;
+            today /= 1000;
             database = dbHelper.getDb();
+            database.execSQL("DROP TABLE IF EXISTS "+recentAddedTable );
+            database.execSQL(recentAddedSQL());
             database.beginTransaction();
             for (HashMap<String,String> song : VinMediaLists.allSongs) {
                 if (!isSongPresentInRecentlyAdded(song.get("id"))) {
@@ -72,7 +78,7 @@ public class RecentAddedTable {
                         insert.bindString(4, song.get("album"));
                         insert.bindString(5, song.get("artist"));
                         insert.bindString(6, song.get("data"));
-                        insert.bindLong(7, Long.parseLong(song.get("date_added"))/86400 );
+                        insert.bindLong(7, (today - Long.parseLong(song.get("date_added"))/86400) );
                         insert.execute();
 
                     } catch (Exception e) {
@@ -97,7 +103,7 @@ public class RecentAddedTable {
         ArrayList<HashMap<String,String>> RecentAddedLists = new ArrayList<>();
         Cursor cursor = null;
         try {
-            String sqlQuery = "Select * from " + recentAddedTable + " ORDER BY " + DATE_ADDED + " DESC" ;
+            String sqlQuery = "Select * from " + recentAddedTable + " ORDER BY " + ADDED_BEFORE + " ASC" ;
             if (list_size>0)sqlQuery = sqlQuery + " LIMIT "+ list_size;
             sqlQuery += ";";
             database = dbHelper.getDb();
@@ -111,6 +117,8 @@ public class RecentAddedTable {
                     String album = cursor.getString(cursor.getColumnIndexOrThrow(ALBUM));
                     String artist = cursor.getString(cursor.getColumnIndexOrThrow(ARTIST));
                     String data = cursor.getString(cursor.getColumnIndexOrThrow(DATA));
+                    long days = cursor.getLong(cursor.getColumnIndexOrThrow(ADDED_BEFORE));
+
 
                     song.put("id",id+"");
                     song.put("album_id",album_id+"");
@@ -118,6 +126,7 @@ public class RecentAddedTable {
                     song.put("album",album);
                     song.put("artist",artist);
                     song.put("data",data);
+                    song.put("days",days+"");
 
                     RecentAddedLists.add(song);
                 }
@@ -148,5 +157,16 @@ public class RecentAddedTable {
     }
 
 
+    private String recentAddedSQL(){
+        String sql = "CREATE TABLE IF NOT EXISTS " + recentAddedTable + " (" +
+                SONG_ID + " INTEGER NOT NULL PRIMARY KEY,"+
+                ALBUM_ID + " INTEGER NOT NULL," +
+                TITLE + " TEXT NOT NULL," +
+                ALBUM + " TEXT NOT NULL," +
+                ARTIST + " TEXT NOT NULL," +
+                DATA + " TEXT NOT NULL,"+
+                ADDED_BEFORE + " INTEGER NOT NULL);";
+        return sql;
+    }
 
 }

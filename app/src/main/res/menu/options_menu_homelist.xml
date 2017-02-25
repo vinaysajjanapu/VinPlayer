@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/play"
+        android:title="play" />
+
+    <item
+        android:id="@+id/view_list"
+        android:title="view full list" />
+
+    <item
+        android:id="@+id/go_to_album"
+        android:title="go to album" />
+
+    <item
+        android:id="@+id/go_to_artist"
+        android:title="go to artist" />
+
+</menu>

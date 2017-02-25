@@ -60,7 +60,7 @@ public class NextSongDataTable {
 
             for (int j=1;j<=VinMediaLists.allSongs.size();j++) {
                 String sql1 = "INSERT INTO " + nextSongDataTable + " VALUES (" + (j)+", "+
-                        VinMediaLists.allSongs.get(j).get("id") + ", 0 ";
+                        VinMediaLists.allSongs.get(j-1).get("id") + ", 0 ";
                 try {
                     database.execSQL(sql1+sql2);
                 } catch (Exception e) {

@@ -9,7 +9,6 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,7 +74,7 @@ public class FoldersFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        createFileStructure();
+        createFolderFileStructure();
         playable_queue = new ArrayList<>();
     }
 
@@ -118,7 +117,7 @@ public class FoldersFragment extends Fragment {
         super.onDetach();
     }
 
-    private void createFileStructure() {
+    public void createFolderFileStructure() {
         file_structure = new ArrayList<>();
         String[] path;
         for (int i = 0; i<VinMediaLists.allSongs.size();i++){

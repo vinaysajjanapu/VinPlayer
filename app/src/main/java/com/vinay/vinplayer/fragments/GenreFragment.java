@@ -8,7 +8,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
+import com.futuremind.recyclerviewfastscroll.FastScroller;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.adapters.GenreAdapter;
 
@@ -43,13 +45,13 @@ public class GenreFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_albums, container, false);
 
         // Set the adapter
-        if (view instanceof RecyclerView) {
+        if (view instanceof RelativeLayout) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-
+            RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list);
+            FastScroller fastScroller = (FastScroller) view.findViewById(R.id.fastscroll);
             recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
-
             recyclerView.setAdapter(new GenreAdapter(getActivity(),albumsList, mListener));
+            fastScroller.setRecyclerView(recyclerView);
         }
         return view;
     }
