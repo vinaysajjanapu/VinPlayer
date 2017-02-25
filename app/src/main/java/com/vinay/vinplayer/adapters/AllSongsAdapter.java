@@ -63,7 +63,7 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
         holder.ArtisName_duration.setText(
                 mValues.get(position).get("album") + "\t-\t" + mValues.get(position).get("artist") + ""
         );
-
+        holder.songname.setTypeface(Typeface.DEFAULT);
 
         holder.img_playindic.setVisibility(View.GONE);
         holder.mView.setBackgroundColor(Color.TRANSPARENT);

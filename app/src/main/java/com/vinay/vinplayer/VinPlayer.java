@@ -6,6 +6,8 @@ import android.content.res.Configuration;
 import android.os.Handler;
 
 
+import com.sylversky.fontreplacer.FontReplacer;
+import com.sylversky.fontreplacer.Replacer;
 import com.vinay.vinplayer.database.VinDBHelper;
 
 
@@ -24,6 +26,9 @@ public class VinPlayer extends Application {
         super.onCreate();
         applicationContext = getApplicationContext();
         applicationHandler = new Handler(applicationContext.getMainLooper());
+        Replacer replacer = FontReplacer.Build(getApplicationContext());
+        replacer.setDefaultFont("badfont.ttf");
+        replacer.applyFont();
 
         initilizeDB();
 

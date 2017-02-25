@@ -24,7 +24,7 @@ import org.greenrobot.eventbus.ThreadMode;
  */
 
 
-public class NowPlayingDetailsFragment extends Fragment {
+public class NowPlayingDetailsFragment extends Fragment{
 
     private BroadcastReceiver broadcastReceiver;
     private IntentFilter intentFilter;

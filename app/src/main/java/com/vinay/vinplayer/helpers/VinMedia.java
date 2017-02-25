@@ -21,7 +21,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.media.RemoteControlClient;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -34,8 +33,11 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
+import com.h6ah4i.android.media.IBasicMediaPlayer;
+import com.h6ah4i.android.media.IMediaPlayerFactory;
+import com.h6ah4i.android.media.hybrid.HybridMediaPlayerFactory;
+import com.h6ah4i.android.media.opensl.OpenSLMediaPlayerFactory;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.VinPlayer;
 import com.vinay.vinplayer.activities.MainActivity;
@@ -84,7 +86,11 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     private static ArrayList<HashMap<String,String>> allSongs,currentQueue,tempQueue;
     private static volatile VinMedia Instance = null;
     private Cursor cur;
-    private MediaPlayer mediaPlayer;
+
+
+    private IMediaPlayerFactory factory;
+    private IBasicMediaPlayer mediaPlayer[] = new IBasicMediaPlayer[3];
+    private static int currentPlayerIndex = -1;
     public static int pausePosition;
     public static int position=-1;
     public HashMap<String,String> currentSongDetails;
@@ -97,12 +103,11 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     private String LOGTAG = "VinMedia";
 
     public int CROSS_FADE_DURATION = 1200; //in milli seconds
-
-    Intent newSongLoadIntent,songPausedIntent,songResumedIntent,musicStoppedIntent,queueUpdatedIntent;
     SharedPreferences media_settings;
     int repeatmode;
     boolean is_shuffle;
     static boolean appJustStarted = true;
+
 
 
     public static VinMedia getInstance() {
@@ -112,6 +117,7 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
                 localInstance = Instance;
                 if (localInstance == null) {
                     Instance = localInstance = new VinMedia();
+                    currentPlayerIndex = -1;
                     VinPlayer.applicationContext.startService(new Intent(VinPlayer.applicationContext, VinMedia.class));
                  }
             }
@@ -119,7 +125,6 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         return localInstance;
     }
 
-  // private void iniatializeBroadcasts(Context context) {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -132,7 +137,9 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         appJustStarted = true;
         Log.d(LOGTAG,"service started");
         EventBus.getDefault().register(this);
-        //setupBroadCastReceiver();
+
+        factory = new HybridMediaPlayerFactory(this);
+
         play = BitmapFactory.decodeResource(getResources(),R.drawable.icon_play);
         pause = BitmapFactory.decodeResource(getResources(),R.drawable.icon_pause);
         notificationManager = (android.app.NotificationManager)getSystemService(NOTIFICATION_SERVICE);
@@ -208,20 +215,6 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         return super.onStartCommand(intent, flags, startId);
     }
 
-
-    private void iniatializeBroadcasts(Context context) {
-
-        newSongLoadIntent = new Intent();
-        songPausedIntent = new Intent();
-        songResumedIntent = new Intent();
-        musicStoppedIntent = new Intent();
-
-        newSongLoadIntent.setAction(context.getString(R.string.newSongLoaded));
-        songPausedIntent.setAction(context.getString(R.string.songPaused));
-        songResumedIntent.setAction(context.getString(R.string.songResumed));
-        musicStoppedIntent.setAction(context.getString(R.string.musicStopped));
-          }
-
     public void updateTempQueue(ArrayList<HashMap<String,String>> songList, Context context){
             tempQueue = songList;
         //VinMediaLists.getInstance().getArtistSongsList(VinMediaLists.getInstance().getArtistsList(context).get(position).get("artist"),context);
@@ -232,9 +225,6 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
             currentQueue = tempQueue;
         }else currentQueue = VinMediaLists.getInstance().getAllSongsList(context);
 
-      /*  queueUpdatedIntent = new Intent();
-        queueUpdatedIntent.setAction(context.getString(R.string.queueUpdated));
-        context.sendBroadcast(queueUpdatedIntent);*/
         EventBus.getDefault().post(new MessageEvent(context.getString(R.string.queueUpdated)));
     }
 
@@ -242,105 +232,197 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         return currentQueue;
     }
 
-    private void setMediaSource(){
-        try {
-            mediaPlayer.setDataSource(currentQueue.get(position).get("data"));
-//            Log.d("playing song url",currentQueue.get(position).get("data"));
-  //          Log.d("mediaplayer status","starting music");
-            mediaPlayer.prepareAsync();
+    private IBasicMediaPlayer.OnCompletionListener mOnCompletionListener = new IBasicMediaPlayer.OnCompletionListener() {
+        @Override
+        public void onCompletion(IBasicMediaPlayer mp) {
+            VinMedia.this.onPlayerCompletion(mp);
+        }
+    };
 
+    private IBasicMediaPlayer.OnErrorListener mOnErrorListener = new IBasicMediaPlayer.OnErrorListener() {
+        @Override
+        public boolean onError(IBasicMediaPlayer mp, int what, int extra) {
+            return VinMedia.this.onPlayerError(mp, what, extra);
+        }
+    };
+
+    private IBasicMediaPlayer.OnInfoListener mOnInfoListener = new IBasicMediaPlayer.OnInfoListener() {
+        @Override
+        public boolean onInfo(IBasicMediaPlayer mp, int what, int extra) {
+            return VinMedia.this.onPlayerInfo(mp, what, extra);
+        }
+    };
+
+
+    private IBasicMediaPlayer.OnPreparedListener mOnPreparedListener = new IBasicMediaPlayer.OnPreparedListener() {
+        @Override
+        public void onPrepared(IBasicMediaPlayer mp) {
+            VinMedia.this.onPlayerPrepared(mp);
+        }
+    };
+
+
+    private void onPlayerCompletion(IBasicMediaPlayer mp) {
+
+    }
+    private IBasicMediaPlayer.OnSeekCompleteListener mOnSeekCompleteListener = new IBasicMediaPlayer.OnSeekCompleteListener() {
+        @Override
+        public void onSeekComplete(IBasicMediaPlayer mp) {
+            VinMedia.this.onPlayerSeekComplete(mp);
+        }
+    };
+
+    private boolean onPlayerError(IBasicMediaPlayer mp, int what, int extra) {
+        return false;
+    }
+
+    private boolean onPlayerInfo(IBasicMediaPlayer mp, int what, int extra) {
+        return false;
+    }
+
+    private void onPlayerPrepared(IBasicMediaPlayer mp) {
+
+    }
+
+    private void onPlayerSeekComplete(IBasicMediaPlayer mp) {
+
+    }
+
+
+    private int getPlayerIndex(){
+        return 0;
+    }
+
+    public IMediaPlayerFactory getFactory(){return factory;}
+
+    public IBasicMediaPlayer getMediaPlayer(int index){
+        return mediaPlayer[index];
+    }
+    public IBasicMediaPlayer getActivePlayer(){
+        return mediaPlayer[getPlayerIndex()];
+    }
+
+    private boolean setMediaSource(int index){
+        try {
+            getMediaPlayer(index).setDataSource(currentQueue.get(position).get("data"));
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }catch (IllegalStateException e){
             //e1.printStackTrace();
+            return false;
+        }
+    }
+    private boolean preparePlayer(int index){
+        try {
+            getMediaPlayer(index).prepare();
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+    private boolean startPlayer(int index){
+        try {
+            getMediaPlayer(index).start();
+            EventBus.getDefault().post(new MessageEvent("newSongLoaded"));
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
         }
     }
 
 
-    void newMediaPlayer(final Context context){
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                //context.sendBroadcast(musicStoppedIntent);
-                EventBus.getDefault().post(new MessageEvent("musicStopped"));
-                Log.d("Broadcast","song complete");
-                if (!isClean()&&!isPlaying()){
-                      nextSong(context);
-                }
-            }
-        });
-        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
-        {
-            @Override
-            public void onPrepared(MediaPlayer mp)
-            {
-                mediaPlayer.start();
-        EventBus.getDefault().post(new MessageEvent("musicStopped"));
 
-        //context.sendBroadcast(newSongLoadIntent);
+    private void newMediaPlayer(final Context context,int playerIndex){
+        if (factory!=null) {
+            try {
+                mediaPlayer[playerIndex] = factory.createMediaPlayer();
+            }catch (Exception e) {
+                Log.d(LOGTAG,"creating mediaplayer failed");
+                return;
             }
-        });
+            mediaPlayer[playerIndex].setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mediaPlayer[playerIndex].setOnCompletionListener(VinMedia.this.mOnCompletionListener);
+            mediaPlayer[playerIndex].setOnErrorListener(VinMedia.this.mOnErrorListener);
+            if (setMediaSource(playerIndex))
+                if (preparePlayer(playerIndex))
+                    startPlayer(playerIndex);
+                else Log.d(LOGTAG, "new mediaplayer failed");
+            else Log.d(LOGTAG, "new mediaplayer failed");
+        }else Log.d(LOGTAG, "Factory NULL");
     }
 
+    public void resetPlayer(final IBasicMediaPlayer mediaPlayer){
+        try {
+            if (mediaPlayer!=null) {
+                mediaPlayer.stop();
+                Runnable timerRun = new Runnable() {
 
+                    @Override
+                    public void run() {
+                        int i;
+                        for (i = 50; i > 0; i--) {
+                            try {
+                                Thread.sleep(CROSS_FADE_DURATION / 50);
+                                mediaPlayer.setVolume(((float) i) / 50, ((float) i) / 50);
+                            } catch (Exception e) {
+
+                            }
+                        }
+                       // getActivePlayer().release();
+                    }
+                };
+                //   Thread thread = new Thread(timerRun);
+                //     if (!thread.isAlive()) thread.start();
+            }else Log.d(LOGTAG,"mediaPlayer NULL");
+        }catch (Exception e){
+            Log.d(LOGTAG,"resetting failed");
+        }
+    }
 
     public void startMusic(int index,Context context){
-        Log.d("Broadcast","music started");
-        this.position  = index;
-        iniatializeBroadcasts(VinPlayer.applicationContext);
-        if (mediaPlayer!=null){
-            if(isPlaying()||!isClean()){
-                resetPlayer(mediaPlayer);
-            }
+        if (factory==null)factory = new HybridMediaPlayerFactory(context);
+        position  = index;
+        switch (currentPlayerIndex){
+            case -1:
+                newMediaPlayer(context,++currentPlayerIndex);
+                break;
+            case 0:
+                newMediaPlayer(context,++currentPlayerIndex);
+                if (getMediaPlayer(0)!=null)resetPlayer(getMediaPlayer(0));
+                break;
+            case 1:
+                newMediaPlayer(context,++currentPlayerIndex);
+                if (getMediaPlayer(0)!=null)resetPlayer(getMediaPlayer(1));
+                break;
+            case 2:
+                currentPlayerIndex=0;
+                newMediaPlayer(context,currentPlayerIndex);
+                if (getMediaPlayer(0)!=null)resetPlayer(getMediaPlayer(2));
+                break;
         }
-        //iniatializeBroadcasts(context);
-        newMediaPlayer(context);
-        setMediaSource();
-        //context.sendBroadcast(newSongLoadIntent);
-        EventBus.getDefault().post(new MessageEvent("newSongLoaded"));
-
-        //NotificationManager.getInstance().postNotificationName(NotificationManager.audioDidStarted, getCurrentSongDetails());
-         //NotificationManager.getInstance().notifyNewSongLoaded(NotificationManager.newaudioloaded, getCurrentSongDetails());
     }
 
     public void pauseMusic(Context context) {
-        if (mediaPlayer != null) {
-            Runnable timerRun = new Runnable() {
-
-                @Override
-                public void run() {
-                    int i;
-                    for (i = 50; i > 0; i--) {
-                        try {
-                            Thread.sleep(CROSS_FADE_DURATION / 50);
-                            mediaPlayer.setVolume(((float) i) / 50, ((float) i) / 50);
-                        } catch (Exception e) {
-
-                        }
-                    }
-                    mediaPlayer.pause();
-                }
-            };
-            Thread thread = new Thread(timerRun);
-            if (!thread.isAlive()) thread.start();
+        if (getMediaPlayer(getPlayerIndex()) != null) {
             EventBus.getDefault().post(new MessageEvent("songPaused"));
+            mediaPlayer[getPlayerIndex()].pause();
             Log.d(LOGTAG, "music paused");
-            pausePosition = mediaPlayer.getCurrentPosition();
+            pausePosition = getActivePlayer().getCurrentPosition();
         }
     }
 
     public void resumeMusic(Context context){
+        EventBus.getDefault().post(new MessageEvent("songResumed"));
         try {
-            mediaPlayer.seekTo(pausePosition);
-            mediaPlayer.setVolume(1f,1f);
-            mediaPlayer.start();
+            getActivePlayer().seekTo(pausePosition);
+            getActivePlayer().start();
         }catch (Exception e){
             startMusic(getPosition(),context);
         }
-       // context.sendBroadcast(songResumedIntent);
-        EventBus.getDefault().post(new MessageEvent("songResumed"));
         Log.d("Broadcast","music paused");
     }
 
@@ -360,28 +442,13 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
             if (shuffle_index==currentQueue.size()-1){
               shuffle_index=0;
             }else if ((shuffle_index+1)<currentQueue.size()){
-                    position = getShuffleQueue()[++shuffle_index];
+                    position = VinMediaLists.getInstance().getShuffleQueue()[++shuffle_index];
               }
         }
 
         startMusic(position,context);
-
-       /* FavouriteTable.getInstance(context).addSongToFavourite(currentSongDetails);
-        LastPlayTable.getInstance(context).storeLastPlayQueue(currentQueue,getPosition());
-       // NextSongDataTable.getInstance(context).initializeNextSongData();
-
-        PlaylistTable.getInstance(context).addSongToPlaylist(currentSongDetails, "MyPlaylist");
-
-        UsageDataTable.getInstance(context).updateUsageData(currentSongDetails,3,30,true,false,true);
-
-        NextSongDataTable.getInstance(context).addNextSongData(Long.parseLong(15623+""),Long.parseLong(15625+""));
-*/
-
     }
 
-    public MediaPlayer getMediaPlayer(){
-        return mediaPlayer;
-    }
     public void previousSong(Context context){
         media_settings = context.getSharedPreferences(context.getString(R.string.media_settings),Context.MODE_PRIVATE);
         repeatmode = media_settings.getInt(context.getString(R.string.repeat_mode),0);
@@ -397,78 +464,21 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
             if (shuffle_index == 0) {
                 shuffle_index = currentQueue.size() - 1;
             } else if ((shuffle_index - 1) >= 0) {
-                    position = getShuffleQueue()[--shuffle_index];
+                    position = VinMediaLists.getInstance().getShuffleQueue()[--shuffle_index];
             }
         }
         startMusic(position,context);
-
-       // new createRecommendedList().execute("");
-
-    }
-
-    public int[] getShuffleQueue(){
-        return shuffle_queue;
-    }
-
-    public void createShuffleQueue(){
-        shuffle_index = 0;
-        int[] shuffle_list = new int[currentQueue.size()];
-        int ind1,k,l;
-        for (ind1=0;ind1<getCurrentList().size();ind1++)shuffle_list[ind1] = ind1;
-        for (ind1=0;ind1<getCurrentList().size();ind1++){
-            k = shuffle_list[ind1];
-            l = (int)(Math.random()*getCurrentList().size());
-            shuffle_list[ind1] = shuffle_list[l];
-            shuffle_list[l] = k;
-        }
-        shuffle_queue = shuffle_list;
-        String s="";
-        for (ind1=0;ind1<getCurrentList().size();ind1++)s = s + " "+shuffle_queue[ind1];
-        Log.d("shuffle queue", s);
-
-    }
-
-    public void resetPlayer(final MediaPlayer mediaPlayer){
-        Log.d("mediaplayer status","reset player");
-        try {
-          //  mediaPlayer.stop();
-            //mediaPlayer.reset();
-            //mediaPlayer.setVolume(5,);
-            if (mediaPlayer!=null) {
-                Runnable timerRun = new Runnable() {
-
-                    @Override
-                    public void run() {
-                        int i;
-                        for (i = 50; i > 0; i--) {
-                            try {
-                                Thread.sleep(CROSS_FADE_DURATION / 50);
-                                mediaPlayer.setVolume(((float) i) / 50, ((float) i) / 50);
-                            } catch (Exception e) {
-
-                            }
-                        }
-                        mediaPlayer.release();
-                    }
-                };
-                Thread thread = new Thread(timerRun);
-                if (!thread.isAlive()) thread.start();
-            }
-        }catch (Exception e){
-
-        }
-
     }
 
     public void setAudioProgress(int seekBarProgress){
         if(!isPlaying())pausePosition = seekBarProgress;
-        if(mediaPlayer!=null)mediaPlayer.seekTo(seekBarProgress);
+        if(mediaPlayer!=null)getActivePlayer().seekTo(seekBarProgress);
     }
 
     public int getAudioProgress(){
         int pos;
         try {
-            pos = mediaPlayer.getCurrentPosition()/1000;
+            pos = getActivePlayer().getCurrentPosition()/1000;
         }catch (Exception e){
             pos = 0;
         }
@@ -490,7 +500,7 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     public int getDuration(){
         if (mediaPlayer!=null)
             try {
-                return mediaPlayer.getDuration();
+                return getActivePlayer().getDuration();
             }catch (Exception e){
                 return 0;
             }
@@ -498,18 +508,11 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
         //return /*(getCurrentSongDetails()!=null)? Integer.parseInt(getCurrentSongDetails().get("duration")):0*/0;
     }
 
-    public void releasePlayer(){
-        if (mediaPlayer!=null){
-            mediaPlayer.release();
-     //       Intent intent = new Intent(VinPlayer.applicationContext, VinMedia.class);
-            //VinPlayer.applicationContext.stopService(intent);
-            }
-    }
 
     public boolean isPlaying(){
         boolean isPlaying = false;
         try {
-            isPlaying = mediaPlayer.isPlaying();
+            isPlaying = getActivePlayer().isPlaying();
         }catch (Exception e){
 
         }
@@ -519,7 +522,7 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
     public boolean isClean() {
         boolean isClean = false;
         try {
-            isClean = (mediaPlayer.getCurrentPosition() == 0);
+            isClean = (getActivePlayer().getCurrentPosition() == 0);
         } catch (Exception e) {
 
         }

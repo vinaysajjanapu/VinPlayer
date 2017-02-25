@@ -44,5 +44,9 @@ dependencies {
     compile 'com.marshalchen.ultimaterecyclerview:library:0.7.0'
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.gordonwong:material-sheet-fab:1.2.1'
-    //compile 'com.h6ah4i.android:openslmediaplayer:0.7.2'
-    compile 'com.futuremind.recyclerfastscroll:fastscroll:0.2.5'}
+    compile 'com.h6ah4i.android:openslmediaplayer:0.7.2'
+    compile 'com.futuremind.recyclerfastscroll:fastscroll:0.2.5'
+    compile 'com.github.oxoooo:pull-back-layout:1.0.1'
+    compile 'com.sylversky.fontreplacer:fontreplacer:1.0'
+}
+

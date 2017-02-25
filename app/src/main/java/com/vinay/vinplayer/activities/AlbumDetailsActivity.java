@@ -21,6 +21,8 @@ import com.vinay.vinplayer.helpers.BlurBuilder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import ooo.oxo.library.widget.PullBackLayout;
+
 public class AlbumDetailsActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     Bitmap blurredBitmap, blurredBitmap1;
@@ -31,11 +33,20 @@ public class AlbumDetailsActivity extends AppCompatActivity {
     static ArrayList<HashMap<String,String>> albumsongs;
     ImageView imageView;
     Toolbar toolbar;
+    //import ooo.oxo.mr.databinding.ViewerActivityBinding;
 
+    //private ViewerActivityBinding binding;
+
+    PullBackLayout pullBackLayout;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_album_details);
+        //setContentView(R.layout.fragment_album_details);
+
+
+
+
         toolbar= (Toolbar) findViewById(R.id.toolbar);
         imageView= (ImageView) findViewById(R.id.toolbarImage);
         setSupportActionBar(toolbar);

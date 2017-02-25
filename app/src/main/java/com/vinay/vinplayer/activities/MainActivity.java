@@ -25,6 +25,7 @@ import android.support.v7.widget.CardView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -322,6 +323,40 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode==KeyEvent.KEYCODE_VOLUME_DOWN){
+            Log.d(LOGTAG,"volume down");
+        }else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP){
+            Log.d(LOGTAG,"volume up");
+        }else if(keyCode == KeyEvent.KEYCODE_HOME){
+            playPauseAction();
+        }
+        return super.onKeyDown(keyCode,event);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (keyCode==KeyEvent.KEYCODE_VOLUME_DOWN){
+            Log.d(LOGTAG,"volume down left");
+        }else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP){
+            Log.d(LOGTAG,"volume up left");
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onKeyMultiple(int keyCode, int repeatCount, KeyEvent event) {
+        Log.d(LOGTAG,"multiple");
+        return super.onKeyMultiple(keyCode, repeatCount, event);
+    }
+
+    @Override
+    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+        Log.d(LOGTAG,"long pressed");
+        return true;
+    }
+
     private void getIntentData() {
         try {
             Uri data = getIntent().getData();
@@ -533,8 +568,10 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
+/*
         if (broadcastReceiver!=null)
             unregisterReceiver(broadcastReceiver);
+*/
 
         // VinMedia.getInstance().releasePlayer();
     }
@@ -564,7 +601,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onListFragmentInteraction(int p) {
 
         if (VinMedia.getInstance().isPlaying()) {
-            VinMedia.getInstance().resetPlayer(VinMedia.getInstance().getMediaPlayer());
+            VinMedia.getInstance().resetPlayer(VinMedia.getInstance().getActivePlayer());
         }
         VinMedia.getInstance().updateQueue(true, this);
         //sendBroadcast(new Intent().setAction(getString(R.string.queueUpdated)));
@@ -583,7 +620,7 @@ public class MainActivity extends AppCompatActivity implements
 
         Log.d("queue", "fragment interation  " + p);
         if (VinMedia.getInstance().isPlaying()) {
-            VinMedia.getInstance().resetPlayer(VinMedia.getInstance().getMediaPlayer());
+            VinMedia.getInstance().resetPlayer(VinMedia.getInstance().getActivePlayer());
         }
         playPauseAction(p);
     }
@@ -591,13 +628,14 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void OnAlbumFragmentInteraction(int pos) {
 
+        Log.d(LOGTAG,"album clicekd");
         VinMedia.getInstance().updateTempQueue(VinMediaLists.getInstance()
                 .getAlbumSongsList(VinMediaLists.getInstance().getAlbumsList(this)
                         .get(pos).get("album"), this), this);
 
         startActivity(new Intent(getApplicationContext(), AlbumDetailsActivity.class).putExtra("list",
                 VinMediaLists.getInstance().getAlbumSongsList((VinMediaLists.allAlbums.get(pos).get("album")), this)));
-        overridePendingTransition(0,0);
+       // overridePendingTransition(0,0);
     }
 
     @Override
@@ -618,7 +656,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onArtistListFragmentInteraction(int i) {
         if (VinMedia.getInstance().isPlaying()) {
-            VinMedia.getInstance().resetPlayer(VinMedia.getInstance().getMediaPlayer());
+            VinMedia.getInstance().resetPlayer(VinMedia.getInstance().getActivePlayer());
         }
         VinMedia.getInstance().updateQueue(false, this);
         //sendBroadcast(new Intent().setAction(getString(R.string.queueUpdated)));
@@ -721,7 +759,7 @@ public class MainActivity extends AppCompatActivity implements
 
         VinMedia.getInstance().setPosition(position);
         if (VinMedia.getInstance().isPlaying() || !VinMedia.getInstance().isClean()) {
-            VinMedia.getInstance().resetPlayer(VinMedia.getInstance().getMediaPlayer());
+            VinMedia.getInstance().resetPlayer(VinMedia.getInstance().getActivePlayer());
             VinMedia.getInstance().startMusic(position, this);
         } else {
             VinMedia.getInstance().startMusic(position, this);

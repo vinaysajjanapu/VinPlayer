@@ -15,7 +15,9 @@ import com.vinay.vinplayer.adapters.AlbumsAdapter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class AlbumsFragment extends Fragment {
+import ooo.oxo.library.widget.PullBackLayout;
+
+public class AlbumsFragment extends Fragment implements PullBackLayout.Callback{
 
     private OnAlbumFragmentInteractionListner mListener;
     private static ArrayList<HashMap<String,String>> albumsList;
@@ -68,6 +70,27 @@ public class AlbumsFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
+
+    @Override
+    public void onPullStart() {
+
+    }
+
+    @Override
+    public void onPull(float v) {
+
+    }
+
+    @Override
+    public void onPullCancel() {
+
+    }
+
+    @Override
+    public void onPullComplete() {
+
+    }
+
     public interface OnAlbumFragmentInteractionListner {
         // TODO: Update argument type and name
         void OnAlbumFragmentInteraction(int pos);

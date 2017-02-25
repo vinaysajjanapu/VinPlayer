@@ -33,6 +33,7 @@ import com.vinay.vinplayer.anim.AccordionTransformer;
 import com.vinay.vinplayer.helpers.MessageEvent;
 import com.vinay.vinplayer.helpers.BlurBuilder;
 import com.vinay.vinplayer.helpers.VinMedia;
+import com.vinay.vinplayer.helpers.VinMediaLists;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -66,6 +67,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
     Thread thread;
     Handler handler;
     Runnable timerRun;
+    Thread thread1;
     Boolean isNowPlayingSeekingDone = false;
     int nowPlayingSeekBarProgress;
     private IntentFilter intentFilter;
@@ -74,6 +76,8 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
 
     private SharedPreferences media_settings;
     private SharedPreferences.Editor editor;
+
+    changeSong changeSong;
 
     private OnNowPlayingFragmentInteractionListener mListener;
 
@@ -157,7 +161,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
 
         albumArtPager.setAdapter(albumArtPagerAdapter);
         albumArtPager.setPageTransformer(true,new AccordionTransformer());
-
+        //albumArtPager.setOffscreenPageLimit(current_queue.size()-1);
         playerSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -178,6 +182,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
             }
         });
 
+        changeSong = new changeSong();
 
         albumArtPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             int albumart_pos;
@@ -189,19 +194,46 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
             @Override
             public void onPageSelected(int pos) {
                 albumart_pos = pos;
-                if ((albumart_pos - VinMedia.getInstance().getPosition())>0)
-                    new changeSong().execute("next");
-                else if((albumart_pos - VinMedia.getInstance().getPosition())<0)
-                    new changeSong().execute("prev");
+             /*   final long ctime = System.currentTimeMillis();
+
+                if (thread1!=null)thread1.interrupt();
+
+                thread1 = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        while (true){
+                            if (System.currentTimeMillis()==(ctime+1000)){
+                                if ((albumart_pos - VinMedia.getInstance().getPosition())>0)
+                                    new changeSong().execute("next");
+                                else if((albumart_pos - VinMedia.getInstance().getPosition())<0)
+                                    new changeSong().execute("prev");
+                                break;
+                            }
+                        }
+                    }
+                });
+                thread1.start();*/
+/*
+                if (changeSong.getStatus().equals(AsyncTask.Status.RUNNING)||
+                        changeSong.getStatus().equals(AsyncTask.Status.PENDING)) {
+                    changeSong.cancel(true);
+                }*/
+
             }
 
             @Override
             public void onPageScrollStateChanged(int state) {
-                if (state==ViewPager.SCROLL_STATE_IDLE){
-                    /*if ((albumart_pos - VinMedia.getInstance().getPosition())>0)
-                        new changeSong().execute("next");
-                    else if((albumart_pos - VinMedia.getInstance().getPosition())<0)
-                        new changeSong().execute("prev");*/
+                if (state == ViewPager.SCROLL_STATE_IDLE) {
+
+                    if ((albumart_pos - VinMedia.getInstance().getPosition())>0) {
+                        VinMedia.getInstance().nextSong(getActivity());
+                        //changeSong.execute("next");
+                    }
+                    else if((albumart_pos - VinMedia.getInstance().getPosition())<0) {
+                        //changeSong = new changeSong();
+                        VinMedia.getInstance().previousSong(getActivity());
+                        //  changeSong.execute("prev");
+                    }
                 }
             }
         });
@@ -211,7 +243,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
         @Override
         protected String doInBackground(String... params) {
             try {
-                Thread.sleep(300);
+                Thread.sleep(500);
             }catch (Exception e){
 
             }
@@ -224,37 +256,6 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
         }
     }
 
-
-    /*private void setupBroadCastReceiver(){
-
-        intentFilter = new IntentFilter();
-        intentFilter.addAction(getString(R.string.newSongLoaded));
-        intentFilter.addAction(getString(R.string.songPaused));
-        intentFilter.addAction(getString(R.string.songResumed));
-        intentFilter.addAction(getString(R.string.musicStopped));
-
-        broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if(action.equals(getString(R.string.newSongLoaded))){
-                    try {
-                        onNewSongLoaded();
-                    }catch (Exception e){
-
-                    }
-                }else if (action.equals(getString(R.string.songPaused))){
-                    onSongPaused();
-                }else if (action.equals(getString(R.string.songResumed))){
-                    onSongResumed();
-                }else if (action.equals(getString(R.string.musicStopped))){
-                    onMusicStopped();
-                }
-            }
-        };
-        getActivity().registerReceiver(broadcastReceiver,intentFilter);
-    }
-*/
     private void onSongPaused(){
         playerButtonPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
     }
@@ -357,7 +358,6 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
         if (thread!=null){
             if (thread.isAlive())thread.interrupt();
         }
-        getActivity().unregisterReceiver(broadcastReceiver);
     }
 
     @Override
@@ -390,7 +390,7 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
                             playerButtonShuffle.setColorFilter(Color.GREEN);
                             editor.putBoolean(getActivity().getString(R.string.shuffle), VinMedia.SHUFFLE_ON);
                             editor.apply();
-                            VinMedia.getInstance().createShuffleQueue();
+                            VinMediaLists.getInstance().createShuffleQueue();
                         }
                     }else {
                         Toast.makeText(getActivity(),"First Add few songs to the Queue",Toast.LENGTH_SHORT).show();

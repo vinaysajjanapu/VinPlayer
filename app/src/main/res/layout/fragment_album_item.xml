@@ -5,12 +5,19 @@
     android:layout_margin="1dp"
     android:orientation="vertical">
 
-    <ImageView
+    <ooo.oxo.library.widget.PullBackLayout
+        android:id="@+id/puller"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:scaleType="centerCrop"
-        android:id="@+id/albumart_albums"
-        />
+        android:layout_height="200dp">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:id="@+id/albumart_albums"
+            />
+
+    </ooo.oxo.library.widget.PullBackLayout>
 <LinearLayout
     android:layout_width="match_parent"
     android:orientation="vertical"

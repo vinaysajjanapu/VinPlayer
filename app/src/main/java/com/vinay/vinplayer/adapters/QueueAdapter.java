@@ -57,23 +57,28 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.ViewHolder> 
 
         //Log.d("queue",mValues.size()+"");
         if (mValues!=null) {
+            String title = mValues.get(position).get("title");
             holder.mItem = mValues.get(position);
-            holder.songname.setText(mValues.get(position).get("title"));
+            holder.songname.setText(title);
             holder.ArtisName_duration.setText(
                     mValues.get(position).get("album") + "\t-\t" + mValues.get(position).get("artist") + ""
             );
-        }
-        holder.img_playindic.setVisibility(View.GONE);
-        holder.mView.setBackgroundColor(Color.TRANSPARENT);
 
-        if (position == VinMedia.getInstance().getPosition()){
-            Log.d("queue position", position+"");
-            holder.img_playindic.setVisibility(View.VISIBLE);
-            holder.songname.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-            holder.ArtisName_duration.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-            holder.ArtisName_duration.setTextColor(Color.WHITE);
-            holder.mView.setBackgroundColor(context.getResources().getColor(R.color.transparentLightBlack));
 
+            holder.songname.setTypeface(Typeface.DEFAULT);
+            holder.img_playindic.setVisibility(View.GONE);
+            holder.mView.setBackgroundColor(Color.TRANSPARENT);
+            if (VinMedia.getInstance().getCurrentSongDetails() != null) {
+                if (VinMedia.getInstance().getCurrentSongDetails().get("title").equals(title)) {
+                    Log.d("queue position", position + "");
+                    holder.img_playindic.setVisibility(View.VISIBLE);
+                    holder.songname.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                    holder.ArtisName_duration.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                    holder.ArtisName_duration.setTextColor(Color.WHITE);
+                    holder.mView.setBackgroundColor(context.getResources().getColor(R.color.transparentLightBlack));
+
+                }
+            }
         }
        // setupBroadCastReceiver(holder,position);
 

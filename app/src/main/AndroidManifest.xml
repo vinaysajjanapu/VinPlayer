@@ -82,8 +82,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.AlbumDetailsActivity"
-            android:theme="@style/Theme.AppCompat.NoActionBar" />
+            android:name=".activities.AlbumDetailsActivity"/>
 
         <service
             android:name=".helpers.VinMedia"

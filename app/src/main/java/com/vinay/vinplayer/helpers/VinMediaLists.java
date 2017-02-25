@@ -23,6 +23,8 @@ import java.io.FileDescriptor;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static com.vinay.vinplayer.helpers.VinMedia.shuffle_index;
+
 public class VinMediaLists {
 
     private String selection;
@@ -32,6 +34,7 @@ public class VinMediaLists {
     public static ArrayList<HashMap<String,String>> allAlbums;
     public static ArrayList<HashMap<String,String>> allArtists;
     public static ArrayList<HashMap<String,String>> allgenres;
+    public static int[] shuffle_queue;
 
     private static volatile VinMediaLists Instance = null;
 
@@ -48,6 +51,25 @@ public class VinMediaLists {
         return localInstance;
     }
 
+
+    public int[] getShuffleQueue(){
+        return shuffle_queue;
+    }
+
+    public void createShuffleQueue(){
+        shuffle_index = 0;
+        int list_size = VinMedia.getInstance().getCurrentList().size();
+        int[] shuffle_list = new int[list_size];
+        int ind1,k,l;
+        for (ind1=0;ind1<list_size;ind1++)shuffle_list[ind1] = ind1;
+        for (ind1=0;ind1<list_size;ind1++){
+            k = shuffle_list[ind1];
+            l = (int)(Math.random()*list_size);
+            shuffle_list[ind1] = shuffle_list[l];
+            shuffle_list[l] = k;
+        }
+        shuffle_queue = shuffle_list;
+    }
 
     public ArrayList<HashMap<String,String>> getAllSongsList(Context context){
         ArrayList<HashMap<String,String>> allSongsList = new ArrayList<>();

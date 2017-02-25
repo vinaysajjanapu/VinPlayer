@@ -7,6 +7,18 @@
     android:background="@android:color/black"
     tools:context="com.vinay.vinplayer.activities.SplashScreen">
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/main_activity"
+        android:text="main"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/wifi"
+        android:layout_below="@+id/main_activity"
+        android:text="wifi"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
