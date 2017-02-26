@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.futuremind.recyclerviewfastscroll.SectionTitleProvider;
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.fragments.ArtistsFragment;
@@ -16,7 +17,7 @@ import com.vinay.vinplayer.fragments.ArtistsFragment;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ViewHolder> {
+public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ViewHolder> implements SectionTitleProvider {
 
     private final ArrayList<HashMap<String,String>> mValues;
     private final ArtistsFragment.OnArtistFragmentInteractionListner mListener;
@@ -74,6 +75,11 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ViewHold
     @Override
     public int getItemCount() {
         return mValues.size();
+    }
+
+    @Override
+    public String getSectionTitle(int position) {
+        return mValues.get(position).get("artist").substring(0, 1);
     }
 
 

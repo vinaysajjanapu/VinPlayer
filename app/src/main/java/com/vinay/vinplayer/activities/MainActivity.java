@@ -27,6 +27,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -120,6 +121,9 @@ public class MainActivity extends AppCompatActivity implements
     SharedPreferences media_settings;
     SharedPreferences.Editor editor;
 
+    Button drawer_random_play_button;
+
+
     String LOGTAG = "MainActivity";
 
     boolean firstback = false;
@@ -176,43 +180,9 @@ public class MainActivity extends AppCompatActivity implements
         VinPlayerReceiver r = new VinPlayerReceiver();
         filter.setPriority(1000);
       //  registerReceiver(r, filter);
+
+     //   VinMedia.getInstance().RandomPlay(this,VinMediaLists.allSongs,false,5000);
     }
-
-   /* private void setupBroadCastReceiver() {
-
-
-
-        intentFilter = new IntentFilter();
-        intentFilter.addAction(getString(R.string.newSongLoaded));
-        intentFilter.addAction(getString(R.string.songPaused));
-        intentFilter.addAction(getString(R.string.songResumed));
-        intentFilter.addAction(getString(R.string.musicStopped));
-        intentFilter.addAction(getString(R.string.closePanel));
-        intentFilter.addAction(getString(R.string.mediaListChanged));
-
-        broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if (action.equals(getString(R.string.newSongLoaded))) {
-                    onNewSongLoaded();
-                } else if (action.equals(getString(R.string.songPaused))) {
-                    onSongPaused();
-                } else if (action.equals(getString(R.string.songResumed))) {
-                    onSongResumed();
-                } else if (action.equals(getString(R.string.musicStopped))) {
-                    onMusicStopped();
-                } else if (action.equals(getString(R.string.closePanel))) {
-                    Log.d("slider", "closepanel");
-                    slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-                }else if(action.equals(getString(R.string.mediaListChanged))){
-                    finish();
-                    startActivity(new Intent(MainActivity.this,MainActivity.class));
-                }
-            }
-        };
-        registerReceiver(broadcastReceiver, intentFilter);
-    }*/
 
     private Drawable background;
     private class loadBackground extends AsyncTask<String, Void, String> {
@@ -351,6 +321,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void setupSlidingPanelLayout() {
 
+        drawer_random_play_button = (Button) findViewById(R.id.randomPlay);
         slidingUpPanelLayout = (SlidingUpPanelLayout) findViewById(R.id.slidingpanel_layout);
         sliderPlayer = (RelativeLayout) findViewById(R.id.slider_playingdetails);
         sliderPlayer_progressBar = (ProgressBar) findViewById(R.id.slider_progressBar);
@@ -430,6 +401,8 @@ public class MainActivity extends AppCompatActivity implements
         fab_listitem3.setOnClickListener(this);
 
 
+        drawer_random_play_button.setOnClickListener(this);
+
 
     }
 
@@ -495,6 +468,9 @@ public class MainActivity extends AppCompatActivity implements
                 materialSheetFab.hideSheet();
                 slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
                 break;
+            case R.id.randomPlay:
+                startActivity(new Intent(this,RandomAutoPlay.class));
+                break;
             default:
                 break;
         }
@@ -535,6 +511,9 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (!VinMedia.getInstance().isPlaying()){
+            stopService(new Intent(this,VinMedia.class));
+        }
         // VinMedia.getInstance().releasePlayer();
     }
 

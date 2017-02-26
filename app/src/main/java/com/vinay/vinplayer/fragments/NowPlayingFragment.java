@@ -225,36 +225,6 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
     }
 
 
-    /*private void setupBroadCastReceiver(){
-
-        intentFilter = new IntentFilter();
-        intentFilter.addAction(getString(R.string.newSongLoaded));
-        intentFilter.addAction(getString(R.string.songPaused));
-        intentFilter.addAction(getString(R.string.songResumed));
-        intentFilter.addAction(getString(R.string.musicStopped));
-
-        broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if(action.equals(getString(R.string.newSongLoaded))){
-                    try {
-                        onNewSongLoaded();
-                    }catch (Exception e){
-
-                    }
-                }else if (action.equals(getString(R.string.songPaused))){
-                    onSongPaused();
-                }else if (action.equals(getString(R.string.songResumed))){
-                    onSongResumed();
-                }else if (action.equals(getString(R.string.musicStopped))){
-                    onMusicStopped();
-                }
-            }
-        };
-        getActivity().registerReceiver(broadcastReceiver,intentFilter);
-    }
-*/
     private void onSongPaused(){
         playerButtonPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
     }

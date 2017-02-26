@@ -76,6 +76,7 @@ public class SplashScreen extends AppCompatActivity {
                     editor.apply();
                     firstTimeInitialisations();
                 } else {
+                    finish();
                     startActivity(new Intent(getBaseContext(), MainActivity.class));
                 }
             }
@@ -103,8 +104,10 @@ public class SplashScreen extends AppCompatActivity {
             @Override
             protected void onPostExecute(String s) {
                 dialog1.dismiss();
-                if (isStoragePermissionGranted())
+                if (isStoragePermissionGranted()) {
+                    finish();
                     startActivity(new Intent(getBaseContext(), MainActivity.class));
+                }
             }
         }.execute();
 

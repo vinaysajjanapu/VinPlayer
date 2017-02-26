@@ -139,7 +139,8 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".activities.WifiTest"></activity>
+        <activity android:name=".activities.WifiTest" />
+        <activity android:name=".activities.RandomAutoPlay"></activity>
     </application>
 
 </manifest>

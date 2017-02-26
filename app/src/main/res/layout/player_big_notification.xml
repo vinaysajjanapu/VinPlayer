@@ -22,11 +22,21 @@
         android:layout_height="match_parent"
         android:layout_weight="1">
 
+
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:id="@+id/close"
+            android:src="@drawable/icon_close"
+            android:layout_gravity="end"
+            android:layout_margin="10dp"
+            android:background="@android:color/transparent"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="44dp"
             android:orientation="vertical">
+
 
             <TextView
                 android:id="@+id/player_song_name"
