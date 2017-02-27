@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <supports-screens
         android:anyDensity="true"
@@ -140,7 +141,9 @@
         </service>
 
         <activity android:name=".activities.WifiTest" />
-        <activity android:name=".activities.RandomAutoPlay"></activity>
+        <activity android:name=".activities.RandomAutoPlay"/>
+
+        <service android:name=".helpers.ImageDownloadService"/>
     </application>
 
 </manifest>

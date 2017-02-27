@@ -56,6 +56,7 @@ import com.vinay.vinplayer.fragments.NowPlayingFragment;
 import com.vinay.vinplayer.fragments.QueueFragment;
 import com.vinay.vinplayer.helpers.BlurBuilder;
 import com.vinay.vinplayer.helpers.HeadPhoneDetectService;
+import com.vinay.vinplayer.helpers.ImageDownloadService;
 import com.vinay.vinplayer.helpers.MessageEvent;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
@@ -182,6 +183,9 @@ public class MainActivity extends AppCompatActivity implements
       //  registerReceiver(r, filter);
 
      //   VinMedia.getInstance().RandomPlay(this,VinMediaLists.allSongs,false,5000);
+
+            startService(new Intent(this, ImageDownloadService.class));
+
     }
 
     private Drawable background;
