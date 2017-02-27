@@ -56,6 +56,8 @@ public class AlbumArtFragment extends Fragment {
                     .load(uri)
                     .placeholder(R.drawable.albumart_default)
                     .error(R.drawable.albumart_default)
+                    .centerCrop()
+                    .resize(200,200)
                     .into(albumArt);
         }catch (Exception e){
         //    e.printStackTrace();

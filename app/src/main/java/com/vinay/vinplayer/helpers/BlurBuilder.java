@@ -19,8 +19,8 @@ import android.renderscript.ScriptIntrinsicBlur;
 import com.vinay.vinplayer.R;
 
 public class BlurBuilder {
-    private static final float BITMAP_SCALE = 0.2f;
-    private static final float BLUR_RADIUS = 7.5f;
+    private static final float BITMAP_SCALE = 0.1f;
+    private static final float BLUR_RADIUS = 1f;
 
     private static volatile BlurBuilder Instance = null;
 
@@ -64,7 +64,7 @@ public class BlurBuilder {
         }else default_bg = BitmapFactory.decodeResource(context.getResources(),R.drawable.albumart_default);
 
         Bitmap temp_input = default_bg.copy(Bitmap.Config.ARGB_4444, true);
-        Bitmap input_to_blur = Bitmap.createScaledBitmap(temp_input, 300, 300, false);
+        Bitmap input_to_blur = Bitmap.createScaledBitmap(temp_input, 100, 100, false);
         Bitmap blurredBitmap = blur_bitmap(context, input_to_blur);
         Drawable dr = new BitmapDrawable(blurredBitmap);
         default_bg= null;

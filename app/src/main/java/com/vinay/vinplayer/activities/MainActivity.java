@@ -585,12 +585,10 @@ public class MainActivity extends AppCompatActivity implements
                 .getArtistSongsList(VinMediaLists.getInstance().getArtistsList(this)
                         .get(pos).get("artist"), this), this);
 
-        FragmentManager fm = getSupportFragmentManager();
+        startActivity(new Intent(getApplicationContext(), AlbumDetailsActivity.class).putExtra("list",
+                VinMediaLists.getInstance().getArtistSongsList((VinMediaLists.allArtists.get(pos).get("artist")), this)));
+        overridePendingTransition(0,0);
 
-        ArtistDetailsFragment dFragment = ArtistDetailsFragment.newInstance(
-                VinMediaLists.getInstance().getArtistSongsList((VinMediaLists.allArtists.get(pos).get("artist")), this));
-        // Show DialogFragment
-        dFragment.show(fm, "Dialog Fragment");
     }
 
     @Override
@@ -599,7 +597,6 @@ public class MainActivity extends AppCompatActivity implements
             VinMedia.getInstance().resetPlayer(VinMedia.getInstance().getMediaPlayer());
         }
         VinMedia.getInstance().updateQueue(false, this);
-        //sendBroadcast(new Intent().setAction(getString(R.string.queueUpdated)));
         EventBus.getDefault().post(new MessageEvent(getString(R.string.queueUpdated)));
         playPauseAction(i);
     }
@@ -610,11 +607,10 @@ public class MainActivity extends AppCompatActivity implements
                 .getGenreSongsList(pos, this), this);
 
         FragmentManager fm = getSupportFragmentManager();
-
-        ArtistDetailsFragment dFragment = ArtistDetailsFragment.newInstance(
-                VinMediaLists.getInstance().getGenreSongsList(pos, this));
-        // Show DialogFragment
-        dFragment.show(fm, "Dialog Fragment");
+        ArrayList<HashMap<String,String>> list = VinMediaLists.getInstance().getGenreSongsList(pos, this);
+        startActivity(new Intent(getApplicationContext(), AlbumDetailsActivity.class).putExtra("list",
+                VinMediaLists.getInstance().getGenreSongsList(pos, this)));
+        overridePendingTransition(0,0);
     }
 
     public class ViewPagerAdapter extends FragmentPagerAdapter {

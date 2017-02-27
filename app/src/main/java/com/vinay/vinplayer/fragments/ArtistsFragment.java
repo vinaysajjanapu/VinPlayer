@@ -21,15 +21,15 @@ public class ArtistsFragment extends Fragment {
 
 
 
-
+    FastScroller fastScroller;
     private OnArtistFragmentInteractionListner mListener;
-    private static ArrayList<HashMap<String,String>> albumsList;
+    private static ArrayList<HashMap<String,String>> artistsList;
 
     public ArtistsFragment() {
     }
 
     public static ArtistsFragment newInstance( ArrayList<HashMap<String,String>> arrayList) {
-        albumsList = arrayList;
+        artistsList = arrayList;
         return new ArtistsFragment();
     }
 
@@ -49,7 +49,7 @@ public class ArtistsFragment extends Fragment {
             RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list);
             FastScroller fastScroller = (FastScroller) view.findViewById(R.id.fastscroll);
             recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
-            recyclerView.setAdapter(new ArtistsAdapter(getActivity(),albumsList, mListener));
+            recyclerView.setAdapter(new ArtistsAdapter(getActivity(), artistsList, mListener));
             fastScroller.setRecyclerView(recyclerView);
         }
         return view;

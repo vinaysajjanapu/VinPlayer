@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -49,24 +50,36 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
     @Override
     public AlbumSongsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_allsongs_item, parent, false);
+
+        if(EventBus.getDefault().isRegistered(MessageEvent.class)){
+            EventBus.getDefault().unregister(this);
+        }
+        //EventBus.getDefault().register(this);
         return new AlbumSongsAdapter.ViewHolder(view);
     }
     @Override
     public void onBindViewHolder(final AlbumSongsAdapter.ViewHolder holder, final int position) {
 
-        gp=position;
+        String title = mValues.get(position).get("title");
+
         holder.mItem = mValues.get(position);
-        holder.songname.setText(mValues.get(position).get("title"));
+        holder.songname.setText(title);
         holder.ArtisName_duration.setText(
                 mValues.get(position).get("album") + "\t-\t"+ mValues.get(position).get("artist") + ""
         );
 
-        //setupBroadCastReceiver(holder,position);
-        if(EventBus.getDefault().isRegistered(MessageEvent.class)){
-EventBus.getDefault().unregister(this);
+        if (VinMedia.getInstance().getCurrentSongDetails()!=null) {
+            if (VinMedia.getInstance().getCurrentSongDetails().get("title").equals(title)){
+                holder.img_playindic.setVisibility(View.VISIBLE);/*
+                holder.songname.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                holder.ArtisName_duration.setTypeface(Typeface.DEFAULT, Typeface.BOLD);*/
+                holder.ArtisName_duration.setTextColor(Color.WHITE);
+                holder.mView.setBackgroundColor(context.getResources().getColor(R.color.transparentLightBlack));
+            }
         }
-        //EventBus.getDefault().register(this);
 
+        holder.img_playindic.setVisibility(View.GONE);
+        holder.mView.setBackgroundColor(Color.TRANSPARENT);
         try {
             Log.d("albumsonsrecycler","set image");
             final Uri sArtworkUri = Uri
@@ -74,8 +87,6 @@ EventBus.getDefault().unregister(this);
             Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mValues.get(position).get("album_id")));
             Picasso.with(context).load(uri).placeholder(R.drawable.albumart_default).error(R.drawable.albumart_default)
                     .into(holder.circleImageView);
-
-           // ImageLoader.getInstance().displayImage(uri.toString(), holder.circleImageView);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -88,10 +99,8 @@ EventBus.getDefault().unregister(this);
                     VinMedia.getInstance().resetPlayer(VinMedia.getInstance().getMediaPlayer());
                 }
                 VinMedia.getInstance().updateQueue(false,context);
-                //context.sendBroadcast(new Intent().setAction(context.getString(R.string.queueUpdated)));
                 EventBus.getDefault().post(new MessageEvent(context.getString(R.string.queueUpdated)));
                 playPauseAction(position);
-               // Toast.makeText(context,"Playing Album",Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -107,51 +116,9 @@ EventBus.getDefault().unregister(this);
     }
 
 
-/*    private void setupBroadCastReceiver(final AlbumSongsAdapter.ViewHolder view, final int position){
-
-        intentFilter = new IntentFilter();
-        intentFilter.addAction(context.getString(R.string.newSongLoaded));
-        intentFilter.addAction(context.getString(R.string.songPaused));
-        intentFilter.addAction(context.getString(R.string.songResumed));
-        intentFilter.addAction(context.getString(R.string.musicStopped));
-
-        broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if(action.equals(context.getString(R.string.newSongLoaded))){
-                    onNewSongLoaded(view,position);
-                }else if (action.equals(context.getString(R.string.songPaused))){
-                    // onSongPaused();
-                }else if (action.equals(context.getString(R.string.songResumed))){
-                    //onSongResumed();
-                }else if (action.equals(context.getString(R.string.musicStopped))){
-                    onMusicStopped(view,position);
-                }
-            }
-        };
-        context.registerReceiver(broadcastReceiver,intentFilter);
-    }*/
-
-    private void onNewSongLoaded( int position){
-        if (position== VinMedia.getInstance().getPosition()){
-            if ((pos1==-1)&&(pos2==-1))pos1 = position;
-            else if ((pos1!=-1)&&(pos2==-1)) pos2 = position;
-
-            Log.d("dfhfjgfkhgljkh","loaded");
-            // view.img_playindic.setVisibility(View.VISIBLE);
-        }
-    }
-    private void onMusicStopped( int position){
-        if (position == pos1){
-            pos1=pos2;
-            pos2=-1;
-            Log.d("dfhfjgfkhgljkh","stopped");
-            //   view.img_playindic.setVisibility(View.INVISIBLE);
-        }
+    private void onNewSongLoaded( ){
 
     }
-
 
 
     @Override
@@ -166,6 +133,7 @@ EventBus.getDefault().unregister(this);
         public final CircleImageView circleImageView;
         public final ImageView img_playindic;
         public HashMap<String,String> mItem;
+        private ImageButton more_icon;
 
         public ViewHolder(View view) {
             super(view);
@@ -174,8 +142,10 @@ EventBus.getDefault().unregister(this);
             ArtisName_duration = (TextView) view.findViewById(R.id.ArtisName_duration);
             circleImageView = (CircleImageView)view.findViewById(R.id.SongThumb);
             img_playindic = (ImageView)view.findViewById(R.id.img_playindic);
+            more_icon = (ImageButton)view.findViewById(R.id.img_moreicon);
 
             view.setBackgroundColor(Color.argb(50,0,0,0));
+            more_icon.setVisibility(View.INVISIBLE);
             songname.setTextColor(Color.WHITE);
             ArtisName_duration.setTextColor(Color.WHITE);
             img_playindic.setColorFilter(Color.BLACK);
@@ -189,18 +159,16 @@ EventBus.getDefault().unregister(this);
         Log.e("Test event 2 ", event.message);
         String action = event.message;
         if(action.equals(context.getString(R.string.newSongLoaded))){
-            onNewSongLoaded(gp);
-        }else if (action.equals(context.getString(R.string.songPaused))){
-            // onSongPaused();
-        }else if (action.equals(context.getString(R.string.songResumed))){
-            //onSongResumed();
-        }else if (action.equals(context.getString(R.string.musicStopped))){
-            onMusicStopped(gp);
+            onNewSongLoaded();
         }
     }
 
     @Override
     public void onViewDetachedFromWindow(ViewHolder holder) {
+
+        if(EventBus.getDefault().isRegistered(MessageEvent.class)){
+            EventBus.getDefault().unregister(this);
+        }
         super.onViewDetachedFromWindow(holder);
     }
 }

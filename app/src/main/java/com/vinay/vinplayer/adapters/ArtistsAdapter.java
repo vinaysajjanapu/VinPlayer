@@ -1,5 +1,6 @@
 package com.vinay.vinplayer.adapters;
 
+import android.content.ContentUris;
 import android.content.Context;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
@@ -17,7 +18,7 @@ import com.vinay.vinplayer.fragments.ArtistsFragment;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ViewHolder> implements SectionTitleProvider {
+public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ViewHolder> /*implements SectionTitleProvider */{
 
     private final ArrayList<HashMap<String,String>> mValues;
     private final ArtistsFragment.OnArtistFragmentInteractionListner mListener;
@@ -46,9 +47,10 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ViewHold
         // holder.mContentView.setText(mValues.get(position).get("no_of_songs"));
 
         try {
-            final Uri sArtworkUri = Uri
+            Uri sArtworkUri = Uri
                     .parse("content://media/external/audio/albumart/0");
-            //Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mValues.get(0).get("album_id")));
+           // Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mValues.get(position).get("album_id")));
+
             Picasso.with(context)
                     .load(sArtworkUri)
                     .placeholder(R.drawable.albumart_default)
@@ -56,7 +58,7 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ViewHold
                     .resize(150,150)
                     .into(holder.imageView);
 
-            //ImageLoader.getInstance().displayImage(sArtworkUri.toString(), holder.imageView);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -76,11 +78,13 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ViewHold
     public int getItemCount() {
         return mValues.size();
     }
+/*
 
     @Override
     public String getSectionTitle(int position) {
         return mValues.get(position).get("artist").substring(0, 1);
     }
+*/
 
 
     class ViewHolder extends RecyclerView.ViewHolder {

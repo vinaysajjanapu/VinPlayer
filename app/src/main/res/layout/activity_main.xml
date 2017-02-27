@@ -36,17 +36,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <android.support.v7.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_marginTop="?actionBarSize"
-                android:layout_height="wrap_content">
                 <Button
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="?actionBarSize"
                     android:text="Rapid Play Mode"
+                    android:textColor="@android:color/white"
                     android:background="@android:color/transparent"
                     android:id="@+id/randomPlay"/>
-            </android.support.v7.widget.CardView>
 
         </FrameLayout>
 

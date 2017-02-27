@@ -120,8 +120,8 @@ public class FoldersFragment extends Fragment {
     public void createFolderFileStructure() {
         file_structure = new ArrayList<>();
         String[] path;
-        for (int i = 0; i<VinMediaLists.allSongs.size();i++){
-            path = VinMediaLists.allSongs.get(i).get("data").split("/");
+        for (int i = 0; i<VinMediaLists.getInstance().getAllSongsList(getActivity()).size();i++){
+            path = VinMediaLists.getInstance().getAllSongsList(getActivity()).get(i).get("data").split("/");
             HashMap<String,String> h = new HashMap<>();
             for (int j=0;j<path.length;j++) {
                 if (j==0)

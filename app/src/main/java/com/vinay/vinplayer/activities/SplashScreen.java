@@ -22,6 +22,9 @@ import com.vinay.vinplayer.database.RecommendedTable;
 import com.vinay.vinplayer.fragments.FoldersFragment;
 import com.vinay.vinplayer.helpers.VinMediaLists;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class SplashScreen extends AppCompatActivity {
 
     SharedPreferences sharedPreferences;
@@ -37,7 +40,6 @@ public class SplashScreen extends AppCompatActivity {
         editor  = sharedPreferences.edit();
 
         dialog = new ProgressDialog(this);
-
         if (isStoragePermissionGranted()) {
             initializations();
         }
@@ -53,9 +55,9 @@ public class SplashScreen extends AppCompatActivity {
             @Override
             protected String doInBackground(String... params) {
                 VinMediaLists.getInstance().createAllSongsList(getBaseContext());
-                VinMediaLists.getInstance().createAlbumsList(getBaseContext());
                 VinMediaLists.getInstance().createArtistsList(getBaseContext());
-                VinMediaLists.getInstance().createGenresList(getBaseContext());
+                VinMediaLists.getInstance().createAdvancedGenresList(getBaseContext());
+                VinMediaLists.getInstance().createAlbumsList(getBaseContext());
                 FoldersFragment.getInstance().createFolderFileStructure();
                 RecommendedTable.getInstance(getBaseContext()).createRecommendationsList();
 

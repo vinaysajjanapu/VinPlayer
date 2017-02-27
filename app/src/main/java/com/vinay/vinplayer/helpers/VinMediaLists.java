@@ -129,21 +129,8 @@ public class VinMediaLists {
         return getListByKey("album",album,context);
     }
 
-    public ArrayList<HashMap<String, String>> getArtistSongsList(String artist_key,Context context){
-        return getListByKey("artist",artist_key,context);
-    }
-    public ArrayList<HashMap<String, String>> getGenreSongsList(int pos,Context context){
-        ArrayList<HashMap<String,String>> list = new ArrayList<>();
-        for(int itr =0;itr<allSongs.size();itr++){
-            for(int z=0;z<allgenres.get(pos).size();z++) {
-                if (allSongs.get(itr).get("display_name").equals(allgenres.get(pos).get("display_name_"+z))){
-                    list.add(allSongs.get(itr));
-                 //   Log.d("genre_song","added "+z);
-                }
-            }
-        }
-       // Log.d("genre_list",list.size()+"   "+list.toString());
-        return list;
+    public ArrayList<HashMap<String, String>> getArtistSongsList(String artist,Context context){
+        return getListByKey("artist",artist,context);
     }
 
     public ArrayList<HashMap<String, String>> getAlbumsList(Context context) {
@@ -209,7 +196,7 @@ public class VinMediaLists {
                     String artist = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.AlbumColumns.ARTIST));
                     HashMap<String, String> h = new HashMap<>();
                     h.put("artist", artist);
-                    h.put("num_songs", 1 + "");
+                    Log.d("artistname",artist);
                     if (!list.contains(h)) {
                         list.add(h);
                     }
@@ -218,14 +205,39 @@ public class VinMediaLists {
             cur.close();
         }
 
+        allArtists = list;
+        return list;
+    }
 
+
+    public ArrayList<HashMap<String,String>> createAdvancedArtistList(Context context){
+        ArrayList<HashMap<String,String>> list = new ArrayList<>();
+        if(allArtists==null)
+            createArtistsList(context);
+        HashMap<String,String> artist_detail;
+        int count;
+        for (int itr = 0; itr < allArtists.size(); itr++){
+            artist_detail = new HashMap<>();
+            String artist = allArtists.get(itr).get("artist");
+            artist_detail.put("artist",artist);
+            count = 0;
+            for (int m=0; m< allSongs.size(); m++ ){
+                if (allSongs.get(m).get("artist").equals(artist)){
+                    String val = allSongs.get(m).get("album_id");
+                    if (!artist_detail.containsValue(val))
+                        artist_detail.put("album_id"+(++count),val);
+                }
+            }
+            artist_detail.put("num_songs",count+"");
+            list.add(artist_detail);
+        }
         allArtists = list;
         return list;
     }
 
 
     public ArrayList<HashMap<String, String>> getGenresList(Context context) {
-        return (allgenres!=null) ? allgenres : createGenresList(context);
+        return (allgenres!=null) ? allgenres : createAdvancedGenresList(context);
     }
 
     public ArrayList<HashMap<String, String>> createGenresList(Context context){
@@ -259,25 +271,17 @@ public class VinMediaLists {
 
                 tempcursor =  context.getContentResolver().query(uri, proj2, null, null, null);
                 if (BuildConfig.DEBUG) if (tempcursor != null) {
-  //                  Log.i("Tag-Number of s", tempcursor.getCount()+"");
                 }
                 int i;
                 if (tempcursor != null && tempcursor.moveToFirst()) {
                     i=0;
                     do {
                         index = tempcursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
-         //               Log.i("Tag-Song name", tempcursor.getString(index));
-                        genre.put("display_name_"+i, tempcursor.getString(index));
-         //               Log.d("genre","song added to genre "+"   "+i+"   "+tempcursor.getString(index));
-                        i++;
+                         genre.put("display_name_"+i, tempcursor.getString(index));
+                         i++;
                     } while (tempcursor.moveToNext());
                     tempcursor.close();
                 }
-
-
-                    //genre.put("nos", String.valueOf(tempcursor.getCount()));
-
-
                     if (!genres.contains(genre)) {
                         genres.add(genre);
 
@@ -286,9 +290,55 @@ public class VinMediaLists {
                 while(genrecursor.moveToNext());
         }
         genrecursor.close();
-//        Log.d("genres_list",genres.size()+"   "+genres.toString());
         allgenres=genres;
      return genres;
+    }
+    public ArrayList<HashMap<String, String>> getGenreSongsList(int pos,Context context){
+        ArrayList<HashMap<String,String>> list = new ArrayList<>();
+        if (Integer.parseInt(allgenres.get(pos).get("num_songs"))!=0) {
+            for(int itr =0;itr<allSongs.size();itr++){
+                for(int z=0;z<allgenres.get(pos).size();z++) {
+                    if (allSongs.get(itr).get("display_name").equals(allgenres.get(pos).get("display_name_" + z))) {
+                        list.add(allSongs.get(itr));
+                    }
+                }
+            }
+        }
+        list.size();
+        // Log.d("genre_list",list.size()+"   "+list.toString());
+        return list;
+    }
+
+
+    public ArrayList<HashMap<String,String>> createAdvancedGenresList(Context context){
+        ArrayList<HashMap<String,String>> list = new ArrayList<>();
+        if(allgenres==null)
+            createGenresList(context);
+        HashMap<String,String> genre_detail;
+        int count;
+        for (int itr = 0; itr < allgenres.size(); itr++){
+            genre_detail = new HashMap<>();
+            String genre = allgenres.get(itr).get("genre");
+            genre_detail.put("genre",genre);
+            count = 0;
+            for (int m=0; m< allSongs.size(); m++ ){
+                for(int z=0;z<allgenres.get(itr).size();z++) {
+                    String disp = allgenres.get(itr).get("display_name_" + z);
+                    if (allSongs.get(m).get("display_name").equals(disp)) {
+                        String val = allSongs.get(m).get("album_id");
+                        if (!genre_detail.containsValue(val)) {
+                            genre_detail.put("album_id" + (++count), val);
+                            genre_detail.put("display_name_"+z,disp);
+                        }
+                    }
+                }
+            }
+            genre_detail.put("num_songs",count+"");
+            if (count!=0)
+                list.add(genre_detail);
+        }
+        allgenres = list;
+        return list;
     }
 
 

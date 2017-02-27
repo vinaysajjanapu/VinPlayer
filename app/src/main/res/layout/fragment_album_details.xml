@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<android.support.design.widget.CoordinatorLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+>
+<android.support.design.widget.CoordinatorLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
@@ -55,11 +58,25 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:id="@+id/btn_close"
-        android:background="@android:drawable/ic_menu_close_clear_cancel" />
 </android.support.design.widget.CoordinatorLayout>
 
+    <ImageButton
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:id="@+id/btn_close"
+        android:scaleType="fitCenter"
+        android:layout_alignParentBottom="true"
+        android:src="@drawable/icon_close"
+        android:background="@color/transparentDarkBlack" />
 
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/fab"
+        android:layout_above="@id/btn_close"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:src="@drawable/icon_play"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"/>
+
+</RelativeLayout>
