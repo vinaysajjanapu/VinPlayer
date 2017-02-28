@@ -6,22 +6,36 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
+import android.webkit.JsResult;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.VinPlayer;
 import com.vinay.vinplayer.database.NextSongDataTable;
 import com.vinay.vinplayer.database.RecentAddedTable;
 import com.vinay.vinplayer.database.RecommendedTable;
 import com.vinay.vinplayer.fragments.FoldersFragment;
+import com.vinay.vinplayer.helpers.ArtistImageCacheService;
 import com.vinay.vinplayer.helpers.VinMediaLists;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -30,6 +44,8 @@ public class SplashScreen extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     ProgressDialog dialog;
+    byte[] Image;
+    ImageView temp;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,11 +56,13 @@ public class SplashScreen extends AppCompatActivity {
         editor  = sharedPreferences.edit();
 
         dialog = new ProgressDialog(this);
+
         if (isStoragePermissionGranted()) {
             initializations();
         }
 
         //startActivity(new Intent(this,WifiTest.class));
+
 
     }
 
@@ -147,4 +165,5 @@ public class SplashScreen extends AppCompatActivity {
             }
         }
     }
+
 }

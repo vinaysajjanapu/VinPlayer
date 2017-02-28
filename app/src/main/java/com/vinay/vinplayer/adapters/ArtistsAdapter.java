@@ -2,17 +2,20 @@ package com.vinay.vinplayer.adapters;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.fragments.ArtistsFragment;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -41,19 +44,26 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ViewHold
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 
-        holder.mIdView.setText(mValues.get(position).get("artist"));
+        String artist = mValues.get(position).get("artist");
+        holder.mIdView.setText(artist);
         // holder.mContentView.setText(mValues.get(position).get("no_of_songs"));
 
         try {
-            Uri sArtworkUri = Uri
-                    .parse("content://media/external/audio/albumart/0");
-           // Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mValues.get(position).get("album_id")));
+            String subdir;
+            String externalRootDir = Environment.getExternalStorageDirectory().getPath();
+            if (!externalRootDir.endsWith("/")) {
+                externalRootDir += "/";
+            }
+            subdir = "VinPlayer/.thumb/.artistcache/";
+            String path = externalRootDir + subdir+artist+".jpg";
 
             Picasso.with(context)
-                    .load(sArtworkUri)
+                    .load("file://"+path)
                     .placeholder(R.drawable.albumart_default)
                     .error(R.drawable.albumart_default)
-                    .resize(150,150)
+                    //.onlyScaleDown()
+                    .resize(100,100)
+                    .centerCrop()
                     .into(holder.imageView);
 
 

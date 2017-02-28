@@ -143,7 +143,7 @@
         <activity android:name=".activities.WifiTest" />
         <activity android:name=".activities.RandomAutoPlay"/>
 
-        <service android:name=".helpers.ImageDownloadService"/>
+        <service android:name=".helpers.ArtistImageCacheService"/>
     </application>
 
 </manifest>

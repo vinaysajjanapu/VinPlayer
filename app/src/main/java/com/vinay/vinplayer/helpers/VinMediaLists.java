@@ -194,15 +194,13 @@ public class VinMediaLists {
                 HashMap<String, String> h2 = new HashMap<>();
                 while (cur.moveToNext()) {
                     String artist = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.ArtistColumns.ARTIST));
-                    String artist_key = cur.getString(cur.getColumnIndexOrThrow(MediaStore.Audio.ArtistColumns.ARTIST_KEY));
 
                     HashMap<String, String> h = new HashMap<>();
                     h.put("artist", artist);
-                    h.put("artist_key", artist_key);
                     h.put("img","false");
-                    Log.d("artistname",artist);
                     if (!list.contains(h)) {
                         list.add(h);
+                       // Log.d("artistname",artist);
                     }
                 }
             }

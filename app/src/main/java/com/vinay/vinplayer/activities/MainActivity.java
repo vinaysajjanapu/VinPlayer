@@ -54,9 +54,10 @@ import com.vinay.vinplayer.fragments.HomeFragment;
 import com.vinay.vinplayer.fragments.NowPlayingDetailsFragment;
 import com.vinay.vinplayer.fragments.NowPlayingFragment;
 import com.vinay.vinplayer.fragments.QueueFragment;
+import com.vinay.vinplayer.helpers.ArtistImageCacheService;
 import com.vinay.vinplayer.helpers.BlurBuilder;
 import com.vinay.vinplayer.helpers.HeadPhoneDetectService;
-import com.vinay.vinplayer.helpers.ImageDownloadService;
+//import com.vinay.vinplayer.helpers.ImageDownloadService;
 import com.vinay.vinplayer.helpers.MessageEvent;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
@@ -180,11 +181,14 @@ public class MainActivity extends AppCompatActivity implements
         IntentFilter filter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
         VinPlayerReceiver r = new VinPlayerReceiver();
         filter.setPriority(1000);
+
+        startService(new Intent(this, ArtistImageCacheService.class));
+
       //  registerReceiver(r, filter);
 
      //   VinMedia.getInstance().RandomPlay(this,VinMediaLists.allSongs,false,5000);
 
-            startService(new Intent(this, ImageDownloadService.class));
+      //      startService(new Intent(this, ImageDownloadService.class));
 
     }
 
