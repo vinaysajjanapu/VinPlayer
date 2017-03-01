@@ -545,11 +545,11 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 						String InetAddress;
 						try {
 							obj = (WiFiTransferModal) ois.readObject();
-							//if (obj!=null) {
+						/*	//if (obj!=null) {
 								if (obj.getFileName().equals("ok")) {
 									return "vinay";
 								}
-
+*/
 							InetAddress = obj.getInetAddress();
 							if (InetAddress != null
 									&& InetAddress
@@ -596,6 +596,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 						handler.post(r);
 						Log.e("FileName got", obj.getFileName());
 
+					if (!obj.getFileName().equals("ok")) {
 						final File f = new File(
 								Environment.getExternalStorageDirectory() + "/"
 										+ FolderName + "/"
@@ -627,6 +628,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 						this.EncryptedFile = f;
 
 						return f.getAbsolutePath();
+					}else return "vinay";
 					}
 
 			}catch(IOException e){
