@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.VinPlayer;
+import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
 
 import java.io.File;
@@ -543,66 +544,66 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 					Log.d("Client's InetAddresssss", "" + client.getInetAddress());
 
 					WiFiClientIp = client.getInetAddress().getHostAddress();
-						ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
-						WiFiTransferModal obj = null;
-						// obj = (WiFiTransferModal) ois.readObject();
-						String InetAddress;
-						try {
-							obj = (WiFiTransferModal) ois.readObject();
-							//if (obj!=null) {
-								if (obj.getFileName().equals("ok")) {
-									ois.close();
-									serverSocket.close();
-									return "vinay";
-								}
+					ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
+					WiFiTransferModal obj = null;
+					// obj = (WiFiTransferModal) ois.readObject();
+					String InetAddress;
+					try {
+						obj = (WiFiTransferModal) ois.readObject();
+						//if (obj!=null) {
 
-							InetAddress = obj.getInetAddress();
-							if (InetAddress != null
-									&& InetAddress
-									.equalsIgnoreCase(FileTransferService.inetaddress)) {
-								CommonMethods.e("File Async Group Client Ip", "port-> "
-										+ WiFiClientIp);
-								SharedPreferencesHandler.setStringValues(mFilecontext,
-										"WiFiClientIp", WiFiClientIp);
-								CommonMethods
-										.e("File Async Group Client Ip from SHAREDPrefrence",
-												"port-> "
-														+ SharedPreferencesHandler
-														.getStringValues(
-																mFilecontext,
-																"WiFiClientIp"));
-								//set boolean true which identifiy that this device will act as server.
-								SharedPreferencesHandler.setStringValues(mFilecontext,
-										"ServerBoolean", "true");
-								ois.close(); // close the ObjectOutputStream object
-								// after saving
-								serverSocket.close();
+						InetAddress = obj.getInetAddress();
+						if (InetAddress != null
+								&& InetAddress
+								.equalsIgnoreCase(FileTransferService.inetaddress)) {
+							CommonMethods.e("File Async Group Client Ip", "port-> "
+									+ WiFiClientIp);
+							SharedPreferencesHandler.setStringValues(mFilecontext,
+									"WiFiClientIp", WiFiClientIp);
+							CommonMethods
+									.e("File Async Group Client Ip from SHAREDPrefrence",
+											"port-> "
+													+ SharedPreferencesHandler
+													.getStringValues(
+															mFilecontext,
+															"WiFiClientIp"));
+							//set boolean true which identifiy that this device will act as server.
+							SharedPreferencesHandler.setStringValues(mFilecontext,
+									"ServerBoolean", "true");
+							ois.close(); // close the ObjectOutputStream object
+							// after saving
+							serverSocket.close();
 
-								return "Demo";
-							}
-						} catch (ClassNotFoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							return "Demo";
 						}
-						final Runnable r = new Runnable() {
+					} catch (ClassNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					final Runnable r = new Runnable() {
 
-							public void run() {
-								// TODO Auto-generated method stub
-								mProgressDialog.setMessage("Receiving...");
-								mProgressDialog.setIndeterminate(false);
-								mProgressDialog.setMax(100);
-								mProgressDialog.setProgress(0);
-								mProgressDialog.setProgressNumberFormat(null);
+						public void run() {
+							// TODO Auto-generated method stub
+							mProgressDialog.setMessage("Receiving...");
+							mProgressDialog.setIndeterminate(false);
+							mProgressDialog.setMax(100);
+							mProgressDialog.setProgress(0);
+							mProgressDialog.setProgressNumberFormat(null);
 //						mProgressDialog.setCancelable(false);
-								mProgressDialog
-										.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-								mProgressDialog.show();
-							}
-						};
-						handler.post(r);
-						Log.e("FileName got", obj.getFileName());
+							mProgressDialog
+									.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+							mProgressDialog.show();
+						}
+					};
+					handler.post(r);
+					Log.e("FileName got", obj.getFileName());
+					if (obj.getFileName().equals("ok")) {
+						ois.close();
+						serverSocket.close();
+						return "vinay";
+					} else {
 
-							final File f = new File(
+						final File f = new File(
 								Environment.getExternalStorageDirectory() + "/"
 										+ FolderName + "/"
 										+ obj.getFileName());
@@ -634,6 +635,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 
 						return f.getAbsolutePath();
 					}
+				}
 
 			}catch(IOException e){
 					//Log.e(WiFiDirectActivity.TAG, e.getMessage());
@@ -750,14 +752,17 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 					mProgressDialog.dismiss();
 				}
 			}
-            
+/*
+			Thread.sleep(1000);
+			VinMedia.getInstance().startMusic(0,VinPlayer.applicationContext);*/
+
             out.close();
             inputStream.close();
         } catch (IOException e) {
             Log.d(WiFiDirectActivity.TAG, e.toString());
             return false;
         }
-        return true;
+		return true;
     }
 
     public static boolean copyRecievedFile(InputStream inputStream,
