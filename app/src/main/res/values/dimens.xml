@@ -35,5 +35,7 @@
     <dimen name="si_default_radius_max">24dp</dimen>
     <dimen name="si_default_radius_min">8dp</dimen>
 
+    <dimen name="tablet_list_width">300dp</dimen>
+    <dimen name="phone_list_height">200dp</dimen>
 
 </resources>

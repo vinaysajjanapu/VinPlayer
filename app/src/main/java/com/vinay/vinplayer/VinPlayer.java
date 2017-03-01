@@ -9,7 +9,6 @@ import android.os.Handler;
 import com.vinay.vinplayer.database.VinDBHelper;
 
 
-
 /**
  * Created by vinaysajjanapu on 5/2/17.
  */
@@ -22,13 +21,20 @@ public class VinPlayer extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        if(applicationContext==null){
+
         applicationContext = getApplicationContext();
+        }
         applicationHandler = new Handler(applicationContext.getMainLooper());
 
         initilizeDB();
 
         //ImageLoader.getInstance().init(config); // Get singleton instance
 
+    }
+
+    public static Context getGlobalAppContext() {
+        return VinPlayer.applicationContext;
     }
 
     @Override

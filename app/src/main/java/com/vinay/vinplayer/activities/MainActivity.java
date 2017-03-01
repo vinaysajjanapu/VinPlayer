@@ -2,7 +2,6 @@ package com.vinay.vinplayer.activities;
 
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -35,7 +34,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.gordonwong.materialsheetfab.MaterialSheetFab;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
@@ -57,13 +55,13 @@ import com.vinay.vinplayer.fragments.QueueFragment;
 import com.vinay.vinplayer.helpers.ArtistImageCacheService;
 import com.vinay.vinplayer.helpers.BlurBuilder;
 import com.vinay.vinplayer.helpers.HeadPhoneDetectService;
-//import com.vinay.vinplayer.helpers.ImageDownloadService;
 import com.vinay.vinplayer.helpers.MessageEvent;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
 import com.vinay.vinplayer.helpers.VinPlayerReceiver;
 import com.vinay.vinplayer.springtablayout.SpringIndicator;
 import com.vinay.vinplayer.ui_elemets.Fab;
+import com.vinay.vinplayer.wifi.WiFiDirectActivity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -74,6 +72,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+
+//import com.vinay.vinplayer.helpers.ImageDownloadService;
 public class MainActivity extends AppCompatActivity implements
         AllSongsFragment.OnListFragmentInteractionListener,
         AlbumsFragment.OnAlbumFragmentInteractionListner, ArtistsFragment.OnArtistFragmentInteractionListner,
@@ -112,8 +112,8 @@ public class MainActivity extends AppCompatActivity implements
     NowPlayingPagerAdapter nowPlayingPagerAdapter;
     List<Fragment> NowPlayingFragments = new ArrayList<>();
 
-    IntentFilter intentFilter;
-    BroadcastReceiver broadcastReceiver;
+
+    Button wifi;
     SystemBarTintManager tintManager;
 
     RelativeLayout.LayoutParams lp_now, lp_que;
@@ -330,6 +330,7 @@ public class MainActivity extends AppCompatActivity implements
     private void setupSlidingPanelLayout() {
 
         drawer_random_play_button = (Button) findViewById(R.id.randomPlay);
+        wifi= (Button) findViewById(R.id.wifi);
         slidingUpPanelLayout = (SlidingUpPanelLayout) findViewById(R.id.slidingpanel_layout);
         sliderPlayer = (RelativeLayout) findViewById(R.id.slider_playingdetails);
         sliderPlayer_progressBar = (ProgressBar) findViewById(R.id.slider_progressBar);
@@ -411,6 +412,7 @@ public class MainActivity extends AppCompatActivity implements
 
         drawer_random_play_button.setOnClickListener(this);
 
+        wifi.setOnClickListener(this);
 
     }
 
@@ -478,6 +480,9 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case R.id.randomPlay:
                 startActivity(new Intent(this,RandomAutoPlay.class));
+                break;
+            case R.id.wifi:
+                startActivity(new Intent(this,WiFiDirectActivity.class));
                 break;
             default:
                 break;
