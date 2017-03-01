@@ -37,15 +37,10 @@
             android:layout_height="match_parent">
             <LinearLayout
                 android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:layout_height="match_parent">
-
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@android:color/white">
-                <Button
+                android:background="@android:color/white">
+                    <Button
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="?actionBarSize"
@@ -54,23 +49,21 @@
                     android:background="@android:color/black"
                     android:id="@+id/randomPlay"/>
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Flash"
-                android:textColor="@android:color/white"
-                android:background="@android:color/transparent"
-                android:id="@+id/flashVisualizer"/>
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Flash"
+                        android:textColor="@android:color/white"
+                        android:background="@android:color/black"
+                        android:id="@+id/flashVisualizer"/>
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="wifi"
+                        android:textColor="@android:color/white"
+                        android:background="@android:color/black"
+                        android:id="@+id/wifi"/>
             </LinearLayout>
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="wifi"
-                android:textColor="@android:color/white"
-                android:background="@android:color/black"
-                android:id="@+id/wifi"/>
-</LinearLayout>
         </FrameLayout>
 
     </com.mxn.soul.flowingdrawer_core.FlowingMenuLayout>

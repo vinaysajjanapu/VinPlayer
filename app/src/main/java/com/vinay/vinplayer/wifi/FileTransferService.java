@@ -155,7 +155,7 @@ public class FileTransferService extends IntentService {
                 is = new ByteArrayInputStream(command.getBytes("UTF-8"));
                 //DeviceDetailFragment.copyFile(is, stream);
 
-                byte buf[] = new byte[64];
+                byte buf[] = new byte[ByteSize];
                 int len;
                 try {
                     while ((len = is.read(buf)) != -1) {

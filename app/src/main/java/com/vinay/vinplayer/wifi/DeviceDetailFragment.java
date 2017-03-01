@@ -545,9 +545,11 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 						String InetAddress;
 						try {
 							obj = (WiFiTransferModal) ois.readObject();
-							if(obj.getFileName().equals("ok")){
-								return "vinay";
-							}
+							//if (obj!=null) {
+								if (obj.getFileName().equals("ok")) {
+									return "vinay";
+								}
+
 							InetAddress = obj.getInetAddress();
 							if (InetAddress != null
 									&& InetAddress
@@ -645,6 +647,16 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 
 				if(result.equals("vinay")){
 					Toast.makeText(VinPlayer.applicationContext,"asdfghjkl;",Toast.LENGTH_SHORT).show();
+					FileServerAsyncTask FileServerobj = new
+							FileServerAsyncTask(mFilecontext,FileTransferService.PORT);
+					if(FileServerobj != null) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+							FileServerobj.executeOnExecutor (AsyncTask.THREAD_POOL_EXECUTOR, new String[] { null });
+
+						}
+						else FileServerobj.execute();
+
+					}
 				}
 				else if(!result.equalsIgnoreCase("Demo")){
 
