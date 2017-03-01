@@ -7,6 +7,7 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.support.percent.PercentRelativeLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -50,7 +51,7 @@ public class RandomAutoPlay extends AppCompatActivity implements View.OnClickLis
     RecyclerView randomList;
     ArrayList<HashMap<String, String>> songList;
     String LOGTAG = "RandomPlayActivity";
-    LinearLayout activity;
+    PercentRelativeLayout activity;
     CheckBox startAtBegin;
     static boolean isStartAtBegin = false;
     MaterialEditText duration_text;
@@ -71,7 +72,7 @@ public class RandomAutoPlay extends AppCompatActivity implements View.OnClickLis
         }
         isStartAtBegin = false;
 
-        activity = (LinearLayout)findViewById(R.id.activity_random_auto_play);
+        activity = (PercentRelativeLayout) findViewById(R.id.activity_random_auto_play);
         play_random = (Button) findViewById(R.id.playRandom);
         stop_random = (Button) findViewById(R.id.stopRandom);
         songList = new ArrayList<>();
