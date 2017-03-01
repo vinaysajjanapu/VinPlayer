@@ -6,6 +6,8 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
@@ -57,6 +59,8 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 	static long ActualFilelength = 0;
 	static int Percentage = 0;
 	public static String FolderName = "VinPlayer";
+
+	static String path;
 
 	Button button;
 	
@@ -545,11 +549,13 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 						String InetAddress;
 						try {
 							obj = (WiFiTransferModal) ois.readObject();
-						/*	//if (obj!=null) {
+							//if (obj!=null) {
 								if (obj.getFileName().equals("ok")) {
+									ois.close();
+									serverSocket.close();
 									return "vinay";
 								}
-*/
+
 							InetAddress = obj.getInetAddress();
 							if (InetAddress != null
 									&& InetAddress
@@ -596,8 +602,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 						handler.post(r);
 						Log.e("FileName got", obj.getFileName());
 
-					if (!obj.getFileName().equals("ok")) {
-						final File f = new File(
+							final File f = new File(
 								Environment.getExternalStorageDirectory() + "/"
 										+ FolderName + "/"
 										+ obj.getFileName());
@@ -628,7 +633,6 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 						this.EncryptedFile = f;
 
 						return f.getAbsolutePath();
-					}else return "vinay";
 					}
 
 			}catch(IOException e){
@@ -651,6 +655,21 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 					Toast.makeText(VinPlayer.applicationContext,"asdfghjkl;",Toast.LENGTH_SHORT).show();
 					FileServerAsyncTask FileServerobj = new
 							FileServerAsyncTask(mFilecontext,FileTransferService.PORT);
+
+					if(path!=null) {
+						MediaPlayer mediaPlayer = new MediaPlayer();
+						mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+							try {
+								mediaPlayer.setDataSource(path);
+								mediaPlayer.prepare();
+								mediaPlayer.start();
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+
+					}
+
+
 					if(FileServerobj != null) {
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 							FileServerobj.executeOnExecutor (AsyncTask.THREAD_POOL_EXECUTOR, new String[] { null });
@@ -662,11 +681,11 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 				}
 				else if(!result.equalsIgnoreCase("Demo")){
 
-
+					path = result;/*
 					Intent intent = new Intent();
 					intent.setAction(Intent.ACTION_VIEW);
-					intent.setDataAndType(Uri.parse("file://" + result), "audio/*");
-					mFilecontext.startActivity(intent);
+					intent.setDataAndType(Uri.parse("file://" + result), "audio*//*");
+					mFilecontext.startActivity(intent);*/
 				}
             	else{
             		/*
