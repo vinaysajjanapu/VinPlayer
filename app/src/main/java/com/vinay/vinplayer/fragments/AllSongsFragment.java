@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.futuremind.recyclerviewfastscroll.FastScroller;
 import com.vinay.vinplayer.R;
+import com.vinay.vinplayer.activities.MainActivity;
 import com.vinay.vinplayer.adapters.AllSongsAdapter;
 import com.vinay.vinplayer.helpers.MessageEvent;
 
@@ -126,6 +127,11 @@ public class AllSongsFragment extends Fragment {
         String action = event.message;
         if (action.equals(getString(R.string.newSongLoaded))){
             newSongLoaded();
+        }
+        if (action.equals(getString(R.string.fileDeleted))){
+            Log.d("eventbus", " file deleted");
+            recyclerView.getAdapter().notifyDataSetChanged();
+            //  recyclerView.setAdapter(new AllSongsAdapter(getContext(),allsongs, mListener));
         }
     }
 }

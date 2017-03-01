@@ -73,6 +73,7 @@ public class RandomAutoPlay extends AppCompatActivity implements View.OnClickLis
         isStartAtBegin = false;
 
         activity = (PercentRelativeLayout) findViewById(R.id.activity_random_auto_play);
+        //activity = (PercentRelativeLayout)findViewById(R.id.activity_random_auto_play);
         play_random = (Button) findViewById(R.id.playRandom);
         stop_random = (Button) findViewById(R.id.stopRandom);
         songList = new ArrayList<>();
@@ -179,111 +180,112 @@ public class RandomAutoPlay extends AppCompatActivity implements View.OnClickLis
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, final int position) {
-            String title = mValues.get(position).get("title");
-            holder.mItem = mValues.get(position);
-            holder.songname.setText(title);
-            holder.ArtisName_duration.setText(
-                    mValues.get(position).get("album") + "\t-\t" + mValues.get(position).get("artist") + ""
-            );
+if (mValues!=null) {
+    String title = mValues.get(position).get("title");
+    holder.mItem = mValues.get(position);
+    holder.songname.setText(title);
+    holder.ArtisName_duration.setText(
+            mValues.get(position).get("album") + "\t-\t" + mValues.get(position).get("artist") + ""
+    );
 
 
-            holder.img_playindic.setVisibility(View.GONE);
-            holder.mView.setBackgroundColor(Color.TRANSPARENT);
+    holder.img_playindic.setVisibility(View.GONE);
+    holder.mView.setBackgroundColor(Color.TRANSPARENT);
 
-            if (VinMedia.getInstance().getCurrentSongDetails()!=null) {
-                if (VinMedia.getInstance().getCurrentSongDetails().get("title").equals(title)){
-                    holder.img_playindic.setVisibility(View.VISIBLE);/*
+    if (VinMedia.getInstance().getCurrentSongDetails() != null) {
+        if (VinMedia.getInstance().getCurrentSongDetails().get("title").equals(title)) {
+            holder.img_playindic.setVisibility(View.VISIBLE);/*
                 holder.songname.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
                 holder.ArtisName_duration.setTypeface(Typeface.DEFAULT, Typeface.BOLD);*/
-                    holder.ArtisName_duration.setTextColor(Color.WHITE);
-                    holder.mView.setBackgroundColor(context.getResources().getColor(R.color.transparentLightBlack));
-                }
-            }
-            try {
-                final Uri sArtworkUri = Uri
-                        .parse("content://media/external/audio/albumart");
-                Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mValues.get(position).get("album_id")));
-                Picasso.with(context)
-                        .load(uri)
-                        .error(R.drawable.albumart_default)
-                        .resize(80,80)
-                        .into(holder.circleImageView);
+            holder.ArtisName_duration.setTextColor(Color.WHITE);
+            holder.mView.setBackgroundColor(context.getResources().getColor(R.color.transparentLightBlack));
+        }
+    }
+    try {
+        final Uri sArtworkUri = Uri
+                .parse("content://media/external/audio/albumart");
+        Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mValues.get(position).get("album_id")));
+        Picasso.with(context)
+                .load(uri)
+                .error(R.drawable.albumart_default)
+                .resize(80, 80)
+                .into(holder.circleImageView);
 
-            } catch (Exception e) {
-                e.printStackTrace();
+    } catch (Exception e) {
+        e.printStackTrace();
 
-            }
+    }
 
-            holder.mView.setOnClickListener(new View.OnClickListener() {
+    holder.mView.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+        }
+    });
+
+    holder.more_icon.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            PopupMenu popup = new PopupMenu(context, holder.more_icon);
+            popup.inflate(R.menu.options_menu_allsongs);
+            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @Override
-                public void onClick(View v) {
+                public boolean onMenuItemClick(MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.play:
+                            ArrayList<HashMap<String, String>> song = new ArrayList<>();
+                            song.add(VinMediaLists.allSongs.get(position));
+                            VinMedia.getInstance().updateTempQueue(song, context);
+                            VinMedia.getInstance().updateQueue(false, context);
+                            VinMedia.getInstance().startMusic(0, context);
+                            break;
+                        case R.id.play_next:
+                            ArrayList<HashMap<String, String>> q = new ArrayList<HashMap<String, String>>();
+                            q = VinMedia.getInstance().getCurrentList();
 
-                }
-            });
-
-            holder.more_icon.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    PopupMenu popup = new PopupMenu(context, holder.more_icon);
-                    popup.inflate(R.menu.options_menu_allsongs);
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item) {
-                            switch (item.getItemId()) {
-                                case R.id.play:
-                                    ArrayList<HashMap<String, String>> song =  new ArrayList<>();
-                                    song.add(VinMediaLists.allSongs.get(position));
-                                    VinMedia.getInstance().updateTempQueue( song,context);
-                                    VinMedia.getInstance().updateQueue(false,context);
-                                    VinMedia.getInstance().startMusic(0,context);
-                                    break;
-                                case R.id.play_next:
-                                    ArrayList<HashMap<String,String>> q = new ArrayList<HashMap<String, String>>();
-                                    q = VinMedia.getInstance().getCurrentList();
-
-                                    break;
-                                case R.id.add_to_queue:
-                                    ArrayList<HashMap<String,String>> arrayList = VinMedia.getInstance().getCurrentList();
-                                    arrayList.add(VinMediaLists.allSongs.get(position));/*
+                            break;
+                        case R.id.add_to_queue:
+                            ArrayList<HashMap<String, String>> arrayList = VinMedia.getInstance().getCurrentList();
+                            arrayList.add(VinMediaLists.allSongs.get(position));/*
                                 VinMedia.getInstance().updateTempQueue(2, arrayList,context);
                                 VinMedia.getInstance().updateQueue(2,context);*/
-                                    break;
-                                case R.id.edit_info:
-                                    Intent intent = new Intent(context.getApplicationContext(), MetaDataEditor.class);
-                                    intent.putExtra("album_art_availalbe",
-                                            VinMediaLists.getInstance().isAlbumArtAvailable(
-                                                    VinMediaLists.allSongs.get(position).get("album_id"),context));
-                                    intent.putExtra("data",VinMediaLists.allSongs.get(position).get("data"));
-                                    intent.putExtra("title",VinMediaLists.allSongs.get(position).get("title"));
-                                    intent.putExtra("album",VinMediaLists.allSongs.get(position).get("album"));
-                                    intent.putExtra("artist",VinMediaLists.allSongs.get(position).get("artist"));
-                                    // intent.putExtra("genre",VinMediaLists.allSongs.get(position).get("genre"));
-                                    intent.putExtra("album_id",VinMediaLists.allSongs.get(position).get("album_id"));
+                            break;
+                        case R.id.edit_info:
+                            Intent intent = new Intent(context.getApplicationContext(), MetaDataEditor.class);
+                            intent.putExtra("album_art_availalbe",
+                                    VinMediaLists.getInstance().isAlbumArtAvailable(
+                                            VinMediaLists.allSongs.get(position).get("album_id"), context));
+                            intent.putExtra("data", VinMediaLists.allSongs.get(position).get("data"));
+                            intent.putExtra("title", VinMediaLists.allSongs.get(position).get("title"));
+                            intent.putExtra("album", VinMediaLists.allSongs.get(position).get("album"));
+                            intent.putExtra("artist", VinMediaLists.allSongs.get(position).get("artist"));
+                            // intent.putExtra("genre",VinMediaLists.allSongs.get(position).get("genre"));
+                            intent.putExtra("album_id", VinMediaLists.allSongs.get(position).get("album_id"));
 
-                                    context.startActivity(intent);
-                                    break;
-                                case R.id.edit:
+                            context.startActivity(intent);
+                            break;
+                        case R.id.edit:
 
-                                    String filename = VinMediaLists.allSongs.get(position).get("data");
-                                    try {
-                                        Intent intent1 = new Intent(Intent.ACTION_EDIT, Uri.parse(filename));
-                                        intent1.setClassName( "com.vinay.vinplayer", "com.vinay.vinplayer.ringdroid.RingdroidEditActivity");
-                                        context.startActivity(intent1);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                        Log.e("Ringdroid", "Couldn't start editor");
-                                    }/*
+                            String filename = VinMediaLists.allSongs.get(position).get("data");
+                            try {
+                                Intent intent1 = new Intent(Intent.ACTION_EDIT, Uri.parse(filename));
+                                intent1.setClassName("com.vinay.vinplayer", "com.vinay.vinplayer.ringdroid.RingdroidEditActivity");
+                                context.startActivity(intent1);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                Log.e("Ringdroid", "Couldn't start editor");
+                            }/*
                                 context.startActivity(new Intent(context.getApplicationContext(), RingdroidSelectActivity.class));*/
-                                    break;
-                            }
-                            return false;
-                        }
-                    });
-                    popup.show();
-
+                            break;
+                    }
+                    return false;
                 }
             });
+            popup.show();
 
+        }
+    });
+}
         }
 
         @Override

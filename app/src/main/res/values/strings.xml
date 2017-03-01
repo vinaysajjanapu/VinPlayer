@@ -4,6 +4,7 @@
     <string name="db_version">1</string>
 
     <!--Broadcast Intent Names-->
+    <string name="fileDeleted">fileDeleted</string>
     <string name="newSongLoaded">newSongLoaded</string>
     <string name="songPaused">songPaused</string>
     <string name="songResumed">songResumed</string>

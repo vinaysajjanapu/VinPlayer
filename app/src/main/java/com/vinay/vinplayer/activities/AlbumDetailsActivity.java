@@ -42,7 +42,7 @@ public class AlbumDetailsActivity extends AppCompatActivity {
         imageView= (ImageView) findViewById(R.id.toolbarImage);
         setSupportActionBar(toolbar);
         albumsongs= (ArrayList<HashMap<String, String>>) getIntent().getSerializableExtra("list");
-        toolbar.setTitle(albumsongs.get(0).get("album")+"");
+//        toolbar.setTitle(albumsongs.get(0).get("album")+"");
         close = (ImageButton)findViewById(R.id.btn_close);
         close.setColorFilter(Color.WHITE);
         close.setOnClickListener(new View.OnClickListener() {

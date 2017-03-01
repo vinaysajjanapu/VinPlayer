@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/play"
-        android:title="play now" />
+        android:title="play album" />
 
     <item
         android:id="@+id/play_next"
@@ -15,16 +15,16 @@
         android:title="add to queue" />
 
     <item
-        android:id="@+id/edit_info"
-        android:title="edit info" />
+        android:id="@+id/add_to_playlist"
+        android:title="add to playlist" />
 
     <item
-        android:id="@+id/edit"
-        android:title="edit" />
+        android:id="@+id/edit_albumart"
+        android:title="change albumart" />
 
     <item
         android:id="@+id/delete"
-        android:title="delete" />
+        android:title="delete album" />
 
 
 

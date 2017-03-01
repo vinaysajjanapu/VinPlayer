@@ -34,6 +34,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import com.gordonwong.materialsheetfab.MaterialSheetFab;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
@@ -55,6 +56,7 @@ import com.vinay.vinplayer.fragments.QueueFragment;
 import com.vinay.vinplayer.helpers.ArtistImageCacheService;
 import com.vinay.vinplayer.helpers.BlurBuilder;
 import com.vinay.vinplayer.helpers.HeadPhoneDetectService;
+//import com.vinay.vinplayer.helpers.ImageDownloadService;
 import com.vinay.vinplayer.helpers.MessageEvent;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
@@ -331,6 +333,7 @@ public class MainActivity extends AppCompatActivity implements
 
         drawer_random_play_button = (Button) findViewById(R.id.randomPlay);
         wifi= (Button) findViewById(R.id.wifi);
+        //drawer_flash_button = (Button)findViewById(R.id.flashVisualizer);
         slidingUpPanelLayout = (SlidingUpPanelLayout) findViewById(R.id.slidingpanel_layout);
         sliderPlayer = (RelativeLayout) findViewById(R.id.slider_playingdetails);
         sliderPlayer_progressBar = (ProgressBar) findViewById(R.id.slider_progressBar);
@@ -483,6 +486,9 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case R.id.wifi:
                 startActivity(new Intent(this,WiFiDirectActivity.class));
+                break;
+            case R.id.flashVisualizer:
+                startActivity(new Intent(this,VisualizerFlashActivity.class));
                 break;
             default:
                 break;

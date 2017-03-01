@@ -235,6 +235,10 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
 
     }
 
+    private void onqueueUpdated() {
+        albumArtPager.getAdapter().notifyDataSetChanged();
+    }
+
     private void onNewSongLoaded(){
         current_queue = VinMedia.getInstance().getCurrentList();
         HashMap<String,String> songDetails = VinMedia.getInstance().getCurrentSongDetails();
@@ -458,6 +462,9 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
             onSongResumed();
         }else if (action.equals(getString(R.string.musicStopped))){
             onMusicStopped();
+        }else if (action.equals(getString(R.string.queueUpdated))){
+            onqueueUpdated();
         }
     }
+
 }

@@ -128,14 +128,18 @@ public class HomeFragment extends Fragment {
 
                     switch (i) {
                         case 0:
+                            list1[0].setVisibility(View.GONE);
                             songsList = RecommendedTable.getInstance(context).getRecommendedList();
                             if (songsList.size()!=0)
                                 list_name[i].setText("Recommended");
                             break;
                         case 1:
+                            list1[1].setVisibility(View.VISIBLE);
                             songsList =  RecentPlayTable.getInstance(context).getRecentPlayList();
                             if (songsList.size()!=0)
                                 list_name[i].setText("Recently Played");
+                            else
+                                list1[1].setVisibility(View.GONE);
                             break;
 
                         case 2:

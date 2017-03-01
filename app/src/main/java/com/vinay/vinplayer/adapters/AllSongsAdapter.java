@@ -1,13 +1,17 @@
 package com.vinay.vinplayer.adapters;
 
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,11 +26,17 @@ import android.widget.TextView;
 import com.futuremind.recyclerviewfastscroll.SectionTitleProvider;
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
+import com.vinay.vinplayer.activities.MainActivity;
 import com.vinay.vinplayer.fragments.AllSongsFragment.OnListFragmentInteractionListener;
+import com.vinay.vinplayer.helpers.Delete;
+import com.vinay.vinplayer.helpers.MessageEvent;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
 import com.vinay.vinplayer.activities.MetaDataEditor;
 
+import org.greenrobot.eventbus.EventBus;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +52,9 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
     private IntentFilter intentFilter;
     static int pos1 = 0, pos2 = 0;
 
+    static ViewGroup parent1;
+    static int viewType1;
+
     public AllSongsAdapter(Context context, List<HashMap<String, String>> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
@@ -50,6 +63,8 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        parent1 = parent;
+        viewType1 = viewType;
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_allsongs_item, parent, false);
         return new ViewHolder(view);
     }
@@ -111,22 +126,21 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.play:
-                                ArrayList<HashMap<String, String>> song =  new ArrayList<>();
-                                song.add(VinMediaLists.allSongs.get(position));
-                                VinMedia.getInstance().updateTempQueue( song,context);
+                                ArrayList<HashMap<String, String>> songs =  new ArrayList<>();
+                                songs.add(VinMediaLists.allSongs.get(position));
+                                VinMedia.getInstance().updateTempQueue( songs,context);
                                 VinMedia.getInstance().updateQueue(false,context);
                                 VinMedia.getInstance().startMusic(0,context);
                                 break;
                             case R.id.play_next:
-                                ArrayList<HashMap<String,String>> q = new ArrayList<HashMap<String, String>>();
-                                q = VinMedia.getInstance().getCurrentList();
-
+                                HashMap<String,String> song = VinMediaLists.allSongs.get(position);
+                                VinMedia.getInstance().getCurrentList().add((VinMedia.getInstance().getPosition()+1),song);
+                                EventBus.getDefault().post(new MessageEvent(context.getString(R.string.queueUpdated)));
                                 break;
                             case R.id.add_to_queue:
-                                ArrayList<HashMap<String,String>> arrayList = VinMedia.getInstance().getCurrentList();
-                                arrayList.add(VinMediaLists.allSongs.get(position));/*
-                                VinMedia.getInstance().updateTempQueue(2, arrayList,context);
-                                VinMedia.getInstance().updateQueue(2,context);*/
+                                HashMap<String,String> song1 = VinMediaLists.allSongs.get(position);
+                                VinMedia.getInstance().getCurrentList().add(song1);
+                                EventBus.getDefault().post(new MessageEvent(context.getString(R.string.queueUpdated)));
                                 break;
                             case R.id.edit_info:
                                 Intent intent = new Intent(context.getApplicationContext(), MetaDataEditor.class);
@@ -154,6 +168,58 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
                                     Log.e("Ringdroid", "Couldn't start editor");
                                 }/*
                                 context.startActivity(new Intent(context.getApplicationContext(), RingdroidSelectActivity.class));*/
+                                break;
+
+                            case R.id.delete:
+
+                                final String filename1 = VinMediaLists.allSongs.get(position).get("data");
+
+                                new AlertDialog.Builder(context)
+                                        .setTitle("Confirm Delete")
+                                        .setMessage("Are you sure you want to delete this file?")
+                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                try {
+                                                    new AsyncTask<String,Void,String>(){
+                                                        @Override
+                                                        protected String doInBackground(String... params) {
+                                                            try {
+                                                                File file = new File(params[0]);
+                                                                file.delete();
+                                                                return "success";
+                                                            }catch (Exception e){
+                                                                return "failed";
+                                                            }
+                                                        }
+                                                        @Override
+                                                        protected void onPostExecute(String s) {
+                                                            context.sendBroadcast(new Intent(
+                                                                    Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+                                                                    Uri.fromFile(new File(filename1))));
+                                                            if(s.equals("success")) {
+                                                                VinMediaLists.allSongs.remove(position);
+                                                                Log.d("Delete","file deleted from allsongs");
+                                                            }
+                                                            EventBus.getDefault().post(
+                                                                    new MessageEvent(
+                                                                            context.getResources().getString(R.string.fileDeleted)));
+                                                        }
+                                                    }.execute(filename1);
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                    Log.e("All songs adapter", "Cannot Delete");
+                                                }
+                                            }
+                                        })
+                                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                // do nothing
+                                                dialog.dismiss();
+                                            }
+                                        })
+                                        .setIcon(android.R.drawable.ic_dialog_alert)
+                                        .show();
+                                /*context.startActivity(new Intent(context.getApplicationContext(), RingdroidSelectActivity.class));*/
                                 break;
                         }
                         return false;
@@ -205,4 +271,5 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
         }
 
     }
+
 }
