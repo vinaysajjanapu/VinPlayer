@@ -51,5 +51,6 @@ dependencies {
     //compile 'com.h6ah4i.android:openslmediaplayer:0.7.2'
     compile 'com.futuremind.recyclerfastscroll:fastscroll:0.2.5'
     compile 'com.android.support:percent:25.1.0'
-    compile 'com.android.volley:volley:1.0.0'
+    //compile 'com.android.volley:volley:1.0.0'
+    compile 'com.github.liuguangqiang.swipeback:library:1.0.2@aar'
 }

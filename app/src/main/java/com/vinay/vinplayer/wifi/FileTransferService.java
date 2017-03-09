@@ -11,6 +11,11 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.vinay.vinplayer.helpers.MessageEvent;
+import com.vinay.vinplayer.helpers.VinMedia;
+
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -67,6 +72,7 @@ public class FileTransferService extends IntentService {
         Context context = getApplicationContext();
         if (intent.getAction().equals(ACTION_SEND_FILE)) {
             String fileUri = intent.getExtras().getString(EXTRAS_FILE_PATH);
+            DeviceDetailFragment.path = fileUri;
             String host = intent.getExtras().getString(EXTRAS_GROUP_OWNER_ADDRESS);
             Socket socket = new Socket();
             int port = intent.getExtras().getInt(EXTRAS_GROUP_OWNER_PORT);
@@ -150,6 +156,7 @@ public class FileTransferService extends IntentService {
                 if(transObj == null) transObj = new WiFiTransferModal();
 
 
+                EventBus.getDefault().post(new MessageEvent("playnewsong"));
                 transObj = new WiFiTransferModal(command, (long) command.getBytes().length);
                 oos.writeObject(transObj);
                 is = new ByteArrayInputStream(command.getBytes("UTF-8"));

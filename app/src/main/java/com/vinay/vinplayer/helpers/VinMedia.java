@@ -792,15 +792,14 @@ public class VinMedia extends Service implements SensorEventListener,AudioManage
 
     @Override
     public void onAudioFocusChange(int focusChange) {
-
         if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
             if (VinMedia.getInstance().isPlaying()) {
-                VinMedia.getInstance().getInstance().pauseMusic(getApplicationContext());
-                setAudioFocus();
+               pauseMusic(getApplicationContext());
+               // setAudioFocus();
             }
         } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
             if (AudioFocus){
-                VinMedia.getInstance().resumeMusic(getApplicationContext());
+             //   VinMedia.getInstance().resumeMusic(getApplicationContext());
                 AudioFocus = false;
             }
         }

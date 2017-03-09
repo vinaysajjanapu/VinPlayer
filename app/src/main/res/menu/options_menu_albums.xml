@@ -19,12 +19,12 @@
         android:title="add to playlist" />
 
     <item
-        android:id="@+id/edit_albumart"
-        android:title="change albumart" />
+        android:id="@+id/edit_art"
+        android:title="change display art" />
 
     <item
         android:id="@+id/delete"
-        android:title="delete album" />
+        android:title="delete" />
 
 
 

@@ -61,6 +61,9 @@
             android:scaleType="fitXY"
             android:src="@drawable/icon_previous" />
 
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
         <ImageView
             android:id="@+id/player_play"
             android:layout_width="36dp"
@@ -69,8 +72,17 @@
             android:layout_marginRight="8dp"
             android:background="@android:color/transparent"
             android:scaleType="fitXY"
-            android:src="@drawable/icon_pause" />
-
+            android:src="@drawable/icon_play" />
+            <ImageView
+                android:id="@+id/player_pause"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@android:color/transparent"
+                android:scaleType="fitXY"
+                android:src="@drawable/icon_pause" />
+        </RelativeLayout>
 
         <ImageView
             android:id="@+id/player_next"

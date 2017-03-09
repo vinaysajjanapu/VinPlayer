@@ -11,7 +11,7 @@ import com.vinay.vinplayer.VinPlayer;
 
 public class VinPlayerReceiver extends BroadcastReceiver {
 
-	String LOGTAG = "Vinplayer Receiver";
+	String LOGTAG = "VinReceiver";
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		Log.d(LOGTAG,"intent recevied");

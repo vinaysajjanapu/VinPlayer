@@ -15,9 +15,10 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-feature android:name="android.hardware.camera" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
@@ -105,7 +106,7 @@
         </activity>
         <activity
             android:name=".activities.AlbumDetailsActivity"
-            android:theme="@style/Theme.AppCompat.NoActionBar" />
+            android:theme="@style/Theme.Swipe.Back" />
 
         <service
             android:name=".helpers.VinMedia"
@@ -119,6 +120,7 @@
                 <action android:name="musicplayer.next" />
                 <action android:name="musicplayer.play" />
                 <action android:name="musicplayer.previous" />
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
                 <action android:name="android.intent.action.SCREEN_OFF" />
                 <action android:name="android.intent.action.SCREEN_ON" />
@@ -154,7 +156,7 @@
         <activity
             android:name=".wifi.WiFiDirectActivity"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.Holo"></activity>
+            android:theme="@android:style/Theme.Holo" />
 
         <!-- Used for transferring files  after a successful connection -->
         <service
@@ -172,16 +174,18 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".activities.RandomAutoPlay" />
-        <activity android:name=".activities.WifiTest" />
-        <activity android:name=".activities.RandomAutoPlay" />
+        <activity android:name=".activities.RapidPlay" />
 
         <service android:name=".helpers.ArtistImageCacheService" />
 
-        <activity android:name=".wifi.WifiShareActivity"></activity>
+        <activity android:name=".wifi.WifiShareActivity" />
+
         <service android:name=".helpers.ArtistImageCacheService" />
 
-        <activity android:name=".activities.VisualizerFlashActivity"></activity>
+        <activity android:name=".activities.VisualizerFlashActivity" />
+        <activity android:name=".activities.settings.MainSettings" />
+        <activity android:name=".activities.settings.UI_Settings" />
+        <activity android:name=".activities.settings.PlayBackSettings"/>
     </application>
 
 </manifest>

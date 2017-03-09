@@ -37,5 +37,10 @@
 
     <dimen name="tablet_list_width">300dp</dimen>
     <dimen name="phone_list_height">200dp</dimen>
+    <dimen name="settingstextsize">18sp</dimen>
+    <dimen name="ui_settings_margin">10dp</dimen>
+    <dimen name="fontstye_demo_size">20sp</dimen>
+    <dimen name="font_style_margintop">20dp</dimen>
+    <dimen name="ui_settings_head_margin">10dp</dimen>
 
 </resources>

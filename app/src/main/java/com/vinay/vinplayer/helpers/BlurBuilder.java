@@ -5,18 +5,23 @@ package com.vinay.vinplayer.helpers;
  */
 
 import android.annotation.TargetApi;
+import android.content.ContentUris;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
+import android.os.ParcelFileDescriptor;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicBlur;
 
 import com.vinay.vinplayer.R;
+
+import java.io.FileDescriptor;
 
 public class BlurBuilder {
     private static final float BITMAP_SCALE = 0.1f;
@@ -74,4 +79,32 @@ public class BlurBuilder {
         return dr;
     }
 
+
+    public Drawable drawable_usingPath(String path,Context context) {
+        Bitmap default_bg;
+        try
+        {
+            final Uri uri = Uri.parse("file://"+path);
+            ParcelFileDescriptor pfd = context.getContentResolver()
+                    .openFileDescriptor(uri, "r");
+            if (pfd != null)
+            {
+                FileDescriptor fd = pfd.getFileDescriptor();
+                default_bg = BitmapFactory.decodeFileDescriptor(fd);
+            }else {
+                default_bg = BitmapFactory.decodeResource(context.getResources(),R.drawable.albumart_default);
+            }
+        } catch (Exception e) {
+            default_bg = BitmapFactory.decodeResource(context.getResources(),R.drawable.albumart_default);
+        }
+        Bitmap temp_input = default_bg.copy(Bitmap.Config.ARGB_4444, true);
+        Bitmap input_to_blur = Bitmap.createScaledBitmap(temp_input, 100, 100, false);
+        Bitmap blurredBitmap = blur_bitmap(context, input_to_blur);
+        Drawable dr = new BitmapDrawable(blurredBitmap);
+        default_bg= null;
+        blurredBitmap = null;
+        input_to_blur = null;
+        temp_input = null;
+        return dr;
+    }
 }

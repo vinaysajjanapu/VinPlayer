@@ -125,7 +125,7 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
                                 VinMedia.getInstance().getCurrentList().addAll(albumsongs);
                                 EventBus.getDefault().post(new MessageEvent(context.getString(R.string.queueUpdated)));
                                 break;
-                            case R.id.edit_info:
+                            case R.id.edit_art:/*
                                 Intent intent = new Intent(context.getApplicationContext(), MetaDataEditor.class);
                                 intent.putExtra("album_art_availalbe",
                                         VinMediaLists.getInstance().isAlbumArtAvailable(
@@ -138,7 +138,7 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
                                 intent.putExtra("album_id",VinMediaLists.allSongs.get(position).get("album_id"));
 
                                 context.startActivity(intent);
-                                break;
+                                */break;
 
                             case R.id.delete:
 

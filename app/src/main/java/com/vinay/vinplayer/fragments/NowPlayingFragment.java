@@ -154,7 +154,6 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
         albumArtPager = (ViewPager)view.findViewById(R.id.nowplaying_albumart_pager);
 
         albumArtPagerAdapter = new AlbumArtPagerAdapter(getActivity().getSupportFragmentManager());
-
         albumArtPager.setAdapter(albumArtPagerAdapter);
         albumArtPager.setPageTransformer(true,new AccordionTransformer());
 
@@ -233,59 +232,63 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
     }
     private void onMusicStopped(){
 
+
     }
 
     private void onqueueUpdated() {
-        albumArtPager.getAdapter().notifyDataSetChanged();
+        current_queue = VinMedia.getInstance().getCurrentList();
+       albumArtPager.getAdapter().notifyDataSetChanged();
     }
 
-    private void onNewSongLoaded(){
-        current_queue = VinMedia.getInstance().getCurrentList();
-        HashMap<String,String> songDetails = VinMedia.getInstance().getCurrentSongDetails();
-        Log.d("nowplaying fragment","on onew song loaded");
-        if (songDetails!=null) {
+    private void onNewSongLoaded() {
+        if (VinMedia.getInstance().getCurrentList() != null) {
+            current_queue = VinMedia.getInstance().getCurrentList();
+            HashMap<String, String> songDetails = VinMedia.getInstance().getCurrentSongDetails();
+            Log.d("nowplaying fragment", "on onew song loaded");
+            if (songDetails != null) {
 
-            nowPlayingSongTitle.setText(songDetails.get("title"));
-            nowPlayingSongDetails.setText(songDetails.get("album")+ "\t-\t" + songDetails.get("artist") );
+                nowPlayingSongTitle.setText(songDetails.get("title"));
+                nowPlayingSongDetails.setText(songDetails.get("album") + "\t-\t" + songDetails.get("artist"));
 
-            int duration = VinMedia.getInstance().getDuration() / 1000;
-            playerTotalDuration.setText(duration != 0 ? String.format(Locale.ENGLISH, "%d:%02d",
-                    duration / 60, duration % 60) : "-:--");
+                int duration = VinMedia.getInstance().getDuration() / 1000;
+                playerTotalDuration.setText(duration != 0 ? String.format(Locale.ENGLISH, "%d:%02d",
+                        duration / 60, duration % 60) : "-:--");
 
-            playerSeekbar.setMax(duration);
+                playerSeekbar.setMax(duration);
 
-            //albumArtPagerAdapter = new AlbumArtPagerAdapter(getActivity().getSupportFragmentManager());
-            albumArtPagerAdapter.notifyDataSetChanged();
-            albumArtPager.setAdapter(albumArtPagerAdapter);
-            albumArtPager.setCurrentItem(VinMedia.getInstance().getPosition());
+                albumArtPager.getAdapter().notifyDataSetChanged();
 
-            playerButtonPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
+                albumArtPager.setCurrentItem(VinMedia.getInstance().getPosition());
 
-            if (handler==null)
-            handler = new Handler(){
-                @Override
-                public void handleMessage(Message msg) {
-             //       Log.d("handler","running");
-                    if (!seekbarDragging)playerSeekbar.setProgress(VinMedia.getInstance().getAudioProgress());
-                }
-            };
-            if (timerRun==null)
-            timerRun = new Runnable() {
+                playerButtonPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
 
-                @Override
-                public void run() {
-                    while (true) {
-                        try {
-                            Thread.sleep(1000);
-                            handler.sendEmptyMessage(0);
-                        }catch (Exception e){
-
+                if (handler == null)
+                    handler = new Handler() {
+                        @Override
+                        public void handleMessage(Message msg) {
+                            //       Log.d("handler","running");
+                            if (!seekbarDragging)
+                                playerSeekbar.setProgress(VinMedia.getInstance().getAudioProgress());
                         }
-                    }
-                }
-            };
-            if (thread==null)thread = new Thread(timerRun);
-            if (!thread.isAlive())thread.start();
+                    };
+                if (timerRun == null)
+                    timerRun = new Runnable() {
+
+                        @Override
+                        public void run() {
+                            while (true) {
+                                try {
+                                    Thread.sleep(1000);
+                                    handler.sendEmptyMessage(0);
+                                } catch (Exception e) {
+
+                                }
+                            }
+                        }
+                    };
+                if (thread == null) thread = new Thread(timerRun);
+                if (!thread.isAlive()) thread.start();
+            }
         }
     }
 
@@ -293,7 +296,9 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
     class AlbumArtPagerAdapter extends FragmentStatePagerAdapter {
 
         AlbumArtFragment albumArtFragment;
-        public AlbumArtPagerAdapter(FragmentManager fm) {super(fm);}
+        public AlbumArtPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
         @Override
         public int getCount() {
             return (current_queue == null)? 1 :current_queue.size();
@@ -316,20 +321,6 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
                 album_id = current_queue.get(position).get("album_id");
             albumArtFragment = AlbumArtFragment.newInstance(position, getActivity(),album_id);
             return albumArtFragment;
-        }
-
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        if (thread!=null){
-            if (thread.isAlive())thread.interrupt();
         }
 
     }
@@ -416,22 +407,35 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
         }
     }
 
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnNowPlayingFragmentInteractionListener {
         // TODO: Update argument type and name
         void OnNowPlayingFragmentInteraction(int i);
 
     }
+
+    @Override
+    public void onResume() {
+        onNewSongLoaded();
+        if (!VinMedia.getInstance().isPlaying())
+            onSongPaused();
+        super.onResume();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+
+        super.onAttach(context);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (thread!=null){
+            if (thread.isAlive())thread.interrupt();
+        }
+
+    }
+
 
     @Override
     public void onStart() {
@@ -456,13 +460,17 @@ public class NowPlayingFragment extends Fragment implements View.OnClickListener
             }catch (Exception e){
 
             }
-        }else if (action.equals(getString(R.string.songPaused))){
+        }
+        if (action.equals(getString(R.string.songPaused))){
             onSongPaused();
-        }else if (action.equals(getString(R.string.songResumed))){
+        }
+        if (action.equals(getString(R.string.songResumed))){
             onSongResumed();
-        }else if (action.equals(getString(R.string.musicStopped))){
+        }
+        if (action.equals(getString(R.string.musicStopped))){
             onMusicStopped();
-        }else if (action.equals(getString(R.string.queueUpdated))){
+        }
+        if (action.equals(getString(R.string.queueUpdated))){
             onqueueUpdated();
         }
     }

@@ -1,10 +1,7 @@
 package com.vinay.vinplayer.fragments;
 
-import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,15 +16,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
-import com.vinay.vinplayer.database.RecentPlayTable;
-import com.vinay.vinplayer.database.RecommendedTable;
 import com.vinay.vinplayer.helpers.MessageEvent;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
@@ -47,12 +39,12 @@ import java.util.HashMap;
 
 public class NowPlayingDetailsFragment extends Fragment {
 
-    private LinearLayout npd_container;
-    private RecyclerView list1;
-    private TextView list_name;
-    private Button list_button;
-    private View scrollview;
-    private ArrayList<HashMap<String,String>> songsList;
+    LinearLayout npd_container;
+    RecyclerView albumsrecyclerview,artistrecyclerview;
+    TextView albumlist_name,artistlistname;
+    Button albumlist_button,artistlistbutton;
+    View scrollview;
+    ArrayList<HashMap<String,String>> albumsongslist,artistsongslist;
     public NowPlayingDetailsFragment() {
     }
 
@@ -77,49 +69,61 @@ public class NowPlayingDetailsFragment extends Fragment {
             npd_container = (LinearLayout) scrollview.findViewById(R.id.npdetails_container);
             final Context context = scrollview.getContext();
 
-            for (int i=0;i<2;i++) {
-                View view = inflater.inflate(R.layout.home_item, container, false);
-                if (view instanceof RelativeLayout){
-                    list1 = (RecyclerView) view.findViewById(R.id.list);
-                    list_name = (TextView) view.findViewById(R.id.list_name);
-                    list_button = (Button) view.findViewById(R.id.list_button);
-                    list_button.setText("");
-                    list_button.setTextColor(Color.WHITE);
+            albumsrecyclerview = (RecyclerView)scrollview.findViewById(R.id.albumsongslist);
+            albumlist_name = (TextView) scrollview.findViewById(R.id.list_name);
+            albumlist_button = (Button) scrollview.findViewById(R.id.list_button);
 
-                    LinearLayoutManager layoutManager = new LinearLayoutManager(context);
-                    layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-                    list1.setLayoutManager(layoutManager);
-                    if (VinMedia.getInstance().currentSongDetails!=null) {
-                        switch (i) {
-                            case 0:
-                                songsList = VinMediaLists.getInstance().getAlbumSongsList(
-                                        VinMedia.getInstance().currentSongDetails.get("album"), getActivity()
-                                );
-                                if (songsList.size() != 0)
-                                    list_name.setText("Songs from Album ");
-                                break;
-                            case 1:
-                                songsList = VinMediaLists.getInstance().getArtistSongsList(
-                                        VinMedia.getInstance().currentSongDetails.get("artist"), getActivity()
-                                );
-                                if (songsList.size() != 0)
-                                    list_name.setText("Songs from Artist");
-                                break;
-                        }
-                        final List1Adapter list1Adapter = new List1Adapter(context, songsList);
-                        list1.setAdapter(list1Adapter);
-                    }
-                }
-                npd_container.addView(view);
+            artistrecyclerview = (RecyclerView)scrollview.findViewById(R.id.artistsongslist);
+            artistlistname = (TextView) scrollview.findViewById(R.id.list_name1);
+            artistlistbutton = (Button) scrollview.findViewById(R.id.list_button1);
+
+            albumlist_name.setText("More from Album");
+            albumlist_name.setTextColor(Color.WHITE);
+
+            artistlistname.setText("More from Artist");
+            artistlistname.setTextColor(Color.WHITE);
+
+            LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+            layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+
+            LinearLayoutManager layoutManager1 = new LinearLayoutManager(context);
+            layoutManager1.setOrientation(LinearLayoutManager.HORIZONTAL);
+
+            albumsrecyclerview.setLayoutManager(layoutManager);
+            artistrecyclerview.setLayoutManager(layoutManager1);
+
+            if (VinMedia.getInstance().currentSongDetails!=null) {
+                albumsongslist = VinMediaLists.getInstance().getAlbumSongsList(
+                        VinMedia.getInstance().currentSongDetails.get("album"), getActivity()
+                );
+
+                artistsongslist = VinMediaLists.getInstance().getArtistSongsList(
+                        VinMedia.getInstance().currentSongDetails.get("artist"), getActivity()
+                );
+                List1Adapter albumsongsAdapter = new List1Adapter(context, albumsongslist);
+                List1Adapter artistsongsAdapter = new List1Adapter(context, artistsongslist);
+
+                albumsrecyclerview.setAdapter(albumsongsAdapter);
+                artistrecyclerview.setAdapter(artistsongsAdapter);
             }
-
         }
         return scrollview;
     }
 
     private void newSongLoaded() {
+        if (VinMedia.getInstance().currentSongDetails!=null) {
+            albumsongslist = VinMediaLists.getInstance().getAlbumSongsList(
+                    VinMedia.getInstance().currentSongDetails.get("album"), getActivity()
+            );
+            List1Adapter albumsongsAdapter = new List1Adapter(getActivity(), albumsongslist);
+            albumsrecyclerview.setAdapter(albumsongsAdapter);
 
-        Log.d("nwertyu","dxhfgcjhkjbluytydjgcv");
+            artistsongslist = VinMediaLists.getInstance().getArtistSongsList(
+                    VinMedia.getInstance().currentSongDetails.get("artist"), getActivity()
+            );
+            List1Adapter artistsadapter = new List1Adapter(getActivity(), artistsongslist);
+            artistrecyclerview.setAdapter(artistsadapter);
+        }
     }
 
     private void queueUpdated() {
@@ -130,14 +134,16 @@ public class NowPlayingDetailsFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        EventBus.getDefault().register(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        EventBus.getDefault().unregister(this);
     }
 
-    // This method will be called when a MessageEvent is posted (in the UI thread for Toast)
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
         //Toast.makeText(getActivity(), event.message, Toast.LENGTH_SHORT).show();
@@ -147,18 +153,6 @@ public class NowPlayingDetailsFragment extends Fragment {
         if(event.message.equals(getString(R.string.newSongLoaded))){
             newSongLoaded();
         }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onStop() {
-        EventBus.getDefault().unregister(this);
-        super.onStop();
     }
 
     private class List1Adapter extends RecyclerView.Adapter<List1Adapter.ViewHolder>{

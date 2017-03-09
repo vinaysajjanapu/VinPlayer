@@ -18,6 +18,8 @@ public class VinPlayer extends Application {
     public static volatile Handler applicationHandler = null;
     public static String default_art = "drawable://"+R.drawable.albumart_default;
 
+    public static String playpath = "";
+
     @Override
     public void onCreate() {
         super.onCreate();

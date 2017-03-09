@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.vinay.vinplayer.activities.RandomAutoPlay">
+    tools:context="com.vinay.vinplayer.activities.RapidPlay">
 
     <RelativeLayout
         android:id="@+id/rl1"
@@ -61,6 +61,14 @@
         >
 
     </android.support.v7.widget.RecyclerView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/icon_play"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="25dp"/>
 
     <Button
         android:layout_below="@id/random_list"

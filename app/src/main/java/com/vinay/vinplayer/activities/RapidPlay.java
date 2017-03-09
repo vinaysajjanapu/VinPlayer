@@ -20,17 +20,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
-import com.vinay.vinplayer.adapters.AllSongsAdapter;
 import com.vinay.vinplayer.helpers.BlurBuilder;
 import com.vinay.vinplayer.helpers.MessageEvent;
 import com.vinay.vinplayer.helpers.VinMedia;
@@ -45,7 +41,7 @@ import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class RandomAutoPlay extends AppCompatActivity implements View.OnClickListener {
+public class RapidPlay extends AppCompatActivity implements View.OnClickListener {
 
     Button play_random, stop_random;
     RecyclerView randomList;
@@ -60,7 +56,7 @@ public class RandomAutoPlay extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        setContentView(R.layout.activity_random_auto_play);
+        setContentView(R.layout.activity_rapidplay);
         getSupportActionBar().hide();
 
         getWindow().getDecorView().setSystemUiVisibility(
@@ -73,7 +69,7 @@ public class RandomAutoPlay extends AppCompatActivity implements View.OnClickLis
         isStartAtBegin = false;
 
         activity = (PercentRelativeLayout) findViewById(R.id.activity_random_auto_play);
-        //activity = (PercentRelativeLayout)findViewById(R.id.activity_random_auto_play);
+        //activity = (PercentRelativeLayout)findViewById(R.id.activity_rapidplay);
         play_random = (Button) findViewById(R.id.playRandom);
         stop_random = (Button) findViewById(R.id.stopRandom);
         songList = new ArrayList<>();

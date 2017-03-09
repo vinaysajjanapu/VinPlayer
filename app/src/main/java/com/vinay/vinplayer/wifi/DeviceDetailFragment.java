@@ -29,8 +29,12 @@ import android.widget.Toast;
 
 import com.vinay.vinplayer.R;
 import com.vinay.vinplayer.VinPlayer;
+import com.vinay.vinplayer.helpers.MessageEvent;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -61,7 +65,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 	static int Percentage = 0;
 	public static String FolderName = "VinPlayer";
 
-	static String path;
+	public static String path;
 
 	Button button;
 	
@@ -70,7 +74,26 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         super.onActivityCreated(savedInstanceState);
     }
 
-    @Override
+	@Override
+	public void onAttach(Context context) {
+		EventBus.getDefault().register(this);
+		super.onAttach(context);
+	}
+
+	@Override
+	public void onDetach() {
+		EventBus.getDefault().unregister(this);
+		super.onDetach();
+	}
+
+	@Subscribe
+	public void onMesage(MessageEvent event){
+		if (event.message.equals("playnewsong")){
+			playmusic(path);
+		}
+	}
+
+	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         mContentView = inflater.inflate(R.layout.device_detail, null);
@@ -657,19 +680,9 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 					Toast.makeText(VinPlayer.applicationContext,"asdfghjkl;",Toast.LENGTH_SHORT).show();
 					FileServerAsyncTask FileServerobj = new
 							FileServerAsyncTask(mFilecontext,FileTransferService.PORT);
-
-					if(path!=null) {
-						MediaPlayer mediaPlayer = new MediaPlayer();
-						mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-							try {
-								mediaPlayer.setDataSource(path);
-								mediaPlayer.prepare();
-								mediaPlayer.start();
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-
-					}
+/*
+					*/
+					EventBus.getDefault().post(new MessageEvent("playnewsong"));
 
 
 					if(FileServerobj != null) {
@@ -683,11 +696,11 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 				}
 				else if(!result.equalsIgnoreCase("Demo")){
 
-					path = result;/*
+					path = result;
 					Intent intent = new Intent();
 					intent.setAction(Intent.ACTION_VIEW);
-					intent.setDataAndType(Uri.parse("file://" + result), "audio*//*");
-					mFilecontext.startActivity(intent);*/
+					intent.setDataAndType(Uri.parse("file://" + result), "audio/*");
+					mFilecontext.startActivity(intent);
 				}
             	else{
             		/*
@@ -723,6 +736,20 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         }
 
     }
+
+	public void playmusic(String path){
+		if(path!=null) {
+			MediaPlayer mediaPlayer = new MediaPlayer();
+			mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+			try {
+				mediaPlayer.setDataSource(path);
+				mediaPlayer.prepare();
+				mediaPlayer.start();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
     public static boolean copyFile(InputStream inputStream, OutputStream out) {
     	long total = 0;

@@ -39,30 +39,73 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:background="@android:color/white">
-                    <Button
+                android:background="@color/transparentDarkBlack">
+
+                <Button
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="?actionBarSize"
-                    android:text="Rapid Play Mode"
+                    android:text="@string/library"
                     android:textColor="@android:color/white"
-                    android:background="@android:color/black"
+                    android:layout_gravity="center_vertical"
+                    android:background="@android:drawable/list_selector_background"
+                    android:id="@+id/library"/>
+
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/now_playing"
+                    android:textColor="@android:color/white"
+                    android:background="@android:drawable/list_selector_background"
+                    android:id="@+id/now_playing"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/rapid_play_mode"
+                    android:textColor="@android:color/white"
+                    android:background="@android:drawable/list_selector_background"
                     android:id="@+id/randomPlay"/>
 
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Flash"
-                        android:textColor="@android:color/white"
-                        android:background="@android:color/black"
-                        android:id="@+id/flashVisualizer"/>
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="wifi"
-                        android:textColor="@android:color/white"
-                        android:background="@android:color/black"
-                        android:id="@+id/wifi"/>
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/timer"
+                    android:textColor="@android:color/white"
+                    android:background="@android:drawable/list_selector_background"
+                    android:id="@+id/timer"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/flash"
+                    android:textColor="@android:color/white"
+                    android:background="@android:drawable/list_selector_background"
+                    android:id="@+id/flashVisualizer"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/wifi"
+                    android:textColor="@android:color/white"
+                    android:background="@android:drawable/list_selector_background"
+                    android:id="@+id/wifi"/>
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings"
+                    android:textColor="@android:color/white"
+                    android:background="@android:drawable/list_selector_background"
+                    android:id="@+id/settings"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/switch_to_minimal_mode"
+                    android:textColor="@android:color/white"
+                    android:background="@android:drawable/list_selector_background"
+                    android:id="@+id/minimal_switch"/>
             </LinearLayout>
         </FrameLayout>
 

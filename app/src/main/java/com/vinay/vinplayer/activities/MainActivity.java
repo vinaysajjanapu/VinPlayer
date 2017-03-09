@@ -1,6 +1,5 @@
 package com.vinay.vinplayer.activities;
 
-import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -36,10 +35,11 @@ import android.widget.Toast;
 
 
 import com.gordonwong.materialsheetfab.MaterialSheetFab;
-import com.readystatesoftware.systembartint.SystemBarTintManager;
+import com.mxn.soul.flowingdrawer_core.FlowingMenuLayout;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
+import com.vinay.vinplayer.activities.settings.MainSettings;
 import com.vinay.vinplayer.anim.AccordionTransformer;
 import com.vinay.vinplayer.database.LastPlayTable;
 import com.vinay.vinplayer.database.RecommendedTable;
@@ -102,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements
     TextView sliderPlayer_songtitle;
     TextView sliderPlayer_songdetails;
     ImageButton sliderPlayer_playpause;
+    FlowingMenuLayout menuLayout;
 
     RelativeLayout sliderDragger, nowPlaying_statusBar;
 
@@ -114,9 +115,7 @@ public class MainActivity extends AppCompatActivity implements
     NowPlayingPagerAdapter nowPlayingPagerAdapter;
     List<Fragment> NowPlayingFragments = new ArrayList<>();
 
-
     Button wifi;
-    SystemBarTintManager tintManager;
 
     RelativeLayout.LayoutParams lp_now, lp_que;
     Handler handler;
@@ -125,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements
     SharedPreferences media_settings;
     SharedPreferences.Editor editor;
 
-    Button drawer_random_play_button;
+    Button drawer_random_play_button,drawer_flash_button,drawer_settings_button;
 
 
     String LOGTAG = "MainActivity";
@@ -143,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements
         VinPlayerReceiver mMediaButtonReceiver = new VinPlayerReceiver();
         IntentFilter mediaFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
         mediaFilter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
-        registerReceiver(mMediaButtonReceiver, mediaFilter);
+//        registerReceiver(mMediaButtonReceiver, mediaFilter);
 
         startService(new Intent(this, HeadPhoneDetectService.class));
 
@@ -172,7 +171,6 @@ public class MainActivity extends AppCompatActivity implements
         setupLibraryViewPager();
         setupSlidingPanelLayout();
         setupNowPlayingPager();
-        //setupBroadCastReceiver();
         slider.setBackground(BlurBuilder.getInstance().drawable_img("null", this));
 
 
@@ -185,12 +183,6 @@ public class MainActivity extends AppCompatActivity implements
         filter.setPriority(1000);
 
         startService(new Intent(this, ArtistImageCacheService.class));
-
-      //  registerReceiver(r, filter);
-
-     //   VinMedia.getInstance().RandomPlay(this,VinMediaLists.allSongs,false,5000);
-
-      //      startService(new Intent(this, ImageDownloadService.class));
 
     }
 
@@ -299,7 +291,6 @@ public class MainActivity extends AppCompatActivity implements
         tabLayout.setViewPager(librayViewPager);
         // set transitions
         librayViewPager.setPageTransformer(true, new AccordionTransformer());
-
     }
 
 
@@ -331,9 +322,11 @@ public class MainActivity extends AppCompatActivity implements
 
     private void setupSlidingPanelLayout() {
 
+        menuLayout = (FlowingMenuLayout)findViewById(R.id.menulayout);
         drawer_random_play_button = (Button) findViewById(R.id.randomPlay);
         wifi= (Button) findViewById(R.id.wifi);
-        //drawer_flash_button = (Button)findViewById(R.id.flashVisualizer);
+        drawer_flash_button = (Button)findViewById(R.id.flashVisualizer);
+        drawer_settings_button = (Button)findViewById(R.id.settings);
         slidingUpPanelLayout = (SlidingUpPanelLayout) findViewById(R.id.slidingpanel_layout);
         sliderPlayer = (RelativeLayout) findViewById(R.id.slider_playingdetails);
         sliderPlayer_progressBar = (ProgressBar) findViewById(R.id.slider_progressBar);
@@ -357,8 +350,6 @@ public class MainActivity extends AppCompatActivity implements
         }
         lp_que = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 actionBarHeight);
-
-
 
 
         slidingUpPanelLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
@@ -414,15 +405,15 @@ public class MainActivity extends AppCompatActivity implements
 
 
         drawer_random_play_button.setOnClickListener(this);
-
+        drawer_flash_button.setOnClickListener(this);
         wifi.setOnClickListener(this);
+        drawer_settings_button.setOnClickListener(this);
 
     }
 
     private void setupNowPlayingPager() {
 
         nowPlayingPager = (ViewPager) findViewById(R.id.nowplaying_pager);
-        nowPlayingPager.setOffscreenPageLimit(0);
         nowPlayingPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -482,13 +473,20 @@ public class MainActivity extends AppCompatActivity implements
                 slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
                 break;
             case R.id.randomPlay:
-                startActivity(new Intent(this,RandomAutoPlay.class));
+                startActivity(new Intent(this,RapidPlay.class));
+                overridePendingTransition(0,0);
                 break;
             case R.id.wifi:
                 startActivity(new Intent(this,WiFiDirectActivity.class));
+                overridePendingTransition(0,0);
                 break;
             case R.id.flashVisualizer:
                 startActivity(new Intent(this,VisualizerFlashActivity.class));
+                overridePendingTransition(0,0);
+                break;
+            case R.id.settings:
+                startActivity(new Intent(this,MainSettings.class));
+                overridePendingTransition(0,0);
                 break;
             default:
                 break;
@@ -500,21 +498,22 @@ public class MainActivity extends AppCompatActivity implements
         super.onResume();
         getIntentData();
         loadAlreadyPlaying();
-        //vm.VinMediaInitialize();
-        //sendBroadcast(new Intent().setAction(getString(R.string.newSongLoaded)));
-        EventBus.getDefault().post(new MessageEvent(getString(R.string.newSongLoaded)));
-        //registerReceiver(broadcastReceiver, intentFilter);
-        //sendBroadcast(new Intent().setAction(getString(R.string.newSongLoaded)));
-//        registerReceiver(broadcastReceiver, intentFilter);
     }
 
     private void loadAlreadyPlaying() {
         ArrayList<HashMap<String,String>> lastplay = new ArrayList<>();
         lastplay = LastPlayTable.getInstance(this).getLastPlayQueue();
         if (lastplay!=null && lastplay.size()>0){
-            VinMedia.getInstance().updateTempQueue(lastplay,this);
-            VinMedia.getInstance().updateQueue(false,this);
-            VinMedia.getInstance().setPosition(Integer.parseInt(lastplay.get(0).get("position")));
+            if (VinMedia.getInstance().getCurrentList()==null) {
+                VinMedia.getInstance().updateTempQueue(lastplay, this);
+                VinMedia.getInstance().updateQueue(false, this);
+                VinMedia.getInstance().setPosition(Integer.parseInt(lastplay.get(0).get("position")));
+            }else {
+                EventBus.getDefault().post(new MessageEvent(getString(R.string.queueUpdated)));
+            }
+                onNewSongLoaded();
+                onSongPaused();
+
         }
     }
     @Override
@@ -525,15 +524,12 @@ public class MainActivity extends AppCompatActivity implements
                 VinMedia.getInstance().getPosition());
     }
 
-
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (!VinMedia.getInstance().isPlaying()){
             stopService(new Intent(this,VinMedia.class));
         }
-        // VinMedia.getInstance().releasePlayer();
     }
 
     @Override
@@ -564,7 +560,6 @@ public class MainActivity extends AppCompatActivity implements
             VinMedia.getInstance().resetPlayer(VinMedia.getInstance().getMediaPlayer());
         }
         VinMedia.getInstance().updateQueue(true, this);
-        //sendBroadcast(new Intent().setAction(getString(R.string.queueUpdated)));
         EventBus.getDefault().post(new MessageEvent(getString(R.string.queueUpdated)));
         playPauseAction(p);
     }
@@ -587,27 +582,29 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void OnAlbumFragmentInteraction(int pos) {
-
+        String album = VinMediaLists.getInstance().getAlbumsList(this).get(pos).get("album");
         VinMedia.getInstance().updateTempQueue(VinMediaLists.getInstance()
-                .getAlbumSongsList(VinMediaLists.getInstance().getAlbumsList(this)
-                        .get(pos).get("album"), this), this);
-
-        startActivity(new Intent(getApplicationContext(), AlbumDetailsActivity.class).putExtra("list",
-                VinMediaLists.getInstance().getAlbumSongsList((VinMediaLists.allAlbums.get(pos).get("album")), this)));
+                .getAlbumSongsList(album, this), this);
+        Intent intent = new Intent(getApplicationContext(), AlbumDetailsActivity.class);
+        intent.putExtra("list",VinMediaLists.getInstance().getAlbumSongsList(album, this));
+        intent.putExtra("type","album");
+        intent.putExtra("title",album);
+        startActivity(intent);
         overridePendingTransition(0,0);
     }
 
     @Override
     public void OnArtistFragmentInteraction(int pos) {
 
+        String artist = VinMediaLists.getInstance().getArtistsList(this).get(pos).get("artist") ;
         VinMedia.getInstance().updateTempQueue(VinMediaLists.getInstance()
-                .getArtistSongsList(VinMediaLists.getInstance().getArtistsList(this)
-                        .get(pos).get("artist"), this), this);
-
-        startActivity(new Intent(getApplicationContext(), AlbumDetailsActivity.class).putExtra("list",
-                VinMediaLists.getInstance().getArtistSongsList((VinMediaLists.allArtists.get(pos).get("artist")), this)));
+                .getArtistSongsList(artist, this), this);
+        Intent intent = new Intent(getApplicationContext(), AlbumDetailsActivity.class);
+        intent.putExtra("list",VinMediaLists.getInstance().getArtistSongsList(artist, this));
+        intent.putExtra("type","artist");
+        intent.putExtra("title",artist);
+        startActivity(intent);
         overridePendingTransition(0,0);
-
     }
 
     @Override
@@ -624,11 +621,11 @@ public class MainActivity extends AppCompatActivity implements
     public void OnGenreFragmentInteraction(int pos) {
         VinMedia.getInstance().updateTempQueue(VinMediaLists.getInstance()
                 .getGenreSongsList(pos, this), this);
-
-        FragmentManager fm = getSupportFragmentManager();
-        ArrayList<HashMap<String,String>> list = VinMediaLists.getInstance().getGenreSongsList(pos, this);
-        startActivity(new Intent(getApplicationContext(), AlbumDetailsActivity.class).putExtra("list",
-                VinMediaLists.getInstance().getGenreSongsList(pos, this)));
+        Intent intent = new Intent(getApplicationContext(), AlbumDetailsActivity.class);
+        intent.putExtra("list",VinMediaLists.getInstance().getGenreSongsList(pos, this));
+        intent.putExtra("type","genre");
+        intent.putExtra("title",VinMediaLists.allgenres.get(pos).get("genre"));
+        startActivity(intent);
         overridePendingTransition(0,0);
     }
 

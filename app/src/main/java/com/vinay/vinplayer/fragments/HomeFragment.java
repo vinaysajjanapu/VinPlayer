@@ -40,6 +40,7 @@ import com.vinay.vinplayer.helpers.MessageEvent;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -77,10 +78,19 @@ public class HomeFragment extends Fragment {
     }
 
     private void newSongLoaded(){
-            songsList = RecentPlayTable.getInstance(getActivity()).getRecentPlayList();
-            List1Adapter list1Adapter = new List1Adapter(getActivity(), songsList);
-            list1[1].setAdapter(list1Adapter);
-        onCreateView(inflater1,container1,savedInstanceState1);
+        for (int i=1; i<3;i++) {
+            switch (i){
+                case 1:
+                    songsList = RecentPlayTable.getInstance(getActivity()).getRecentPlayList();
+                    break;
+                case 2:
+                    songsList = UsageDataTable.getInstance(getActivity()).getMostPlayedList();
+                    break;
+            }
+            List1Adapter list1Adapter = new List1Adapter(getActivity(),songsList);
+            list1[i].setAdapter(list1Adapter);
+        }
+      //  onCreateView(inflater1,container1,savedInstanceState1);
     }
 
     @Override
@@ -131,7 +141,7 @@ public class HomeFragment extends Fragment {
                             list1[0].setVisibility(View.GONE);
                             songsList = RecommendedTable.getInstance(context).getRecommendedList();
                             if (songsList.size()!=0)
-                                list_name[i].setText("Recommended");
+                                list_name[0].setText("Recommended");
                             break;
                         case 1:
                             list1[1].setVisibility(View.VISIBLE);
@@ -164,7 +174,7 @@ public class HomeFragment extends Fragment {
                                 list_name[i].setText("PlayList");
                             break;
                     }
-                    final List1Adapter list1Adapter = new List1Adapter(context, songsList);
+                    List1Adapter list1Adapter = new List1Adapter(context, songsList);
                     list1[i].setAdapter(list1Adapter);
                     list_button.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -187,12 +197,14 @@ public class HomeFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        EventBus.getDefault().register(this);
     }
 
 
     @Override
     public void onDetach() {
         super.onDetach();
+        EventBus.getDefault().unregister(this);
     }
 
     private class List1Adapter extends RecyclerView.Adapter<List1Adapter.ViewHolder>{
@@ -319,7 +331,6 @@ public class HomeFragment extends Fragment {
     // This method will be called when a MessageEvent is posted (in the UI thread for Toast)
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
-        Toast.makeText(getActivity(), event.message, Toast.LENGTH_SHORT).show();
         String action = event.message;
         if (action.equals(getString(R.string.newSongLoaded))){
             newSongLoaded();

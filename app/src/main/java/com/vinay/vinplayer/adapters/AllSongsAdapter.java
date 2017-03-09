@@ -26,6 +26,7 @@ import android.widget.TextView;
 import com.futuremind.recyclerviewfastscroll.SectionTitleProvider;
 import com.squareup.picasso.Picasso;
 import com.vinay.vinplayer.R;
+import com.vinay.vinplayer.VinPlayer;
 import com.vinay.vinplayer.activities.MainActivity;
 import com.vinay.vinplayer.fragments.AllSongsFragment.OnListFragmentInteractionListener;
 import com.vinay.vinplayer.helpers.Delete;
@@ -33,6 +34,8 @@ import com.vinay.vinplayer.helpers.MessageEvent;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
 import com.vinay.vinplayer.activities.MetaDataEditor;
+import com.vinay.vinplayer.wifi.DeviceDetailFragment;
+import com.vinay.vinplayer.wifi.WiFiDirectActivity;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -220,6 +223,10 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
                                         .setIcon(android.R.drawable.ic_dialog_alert)
                                         .show();
                                 /*context.startActivity(new Intent(context.getApplicationContext(), RingdroidSelectActivity.class));*/
+                                break;
+                            case R.id.wifiplay:
+                                VinPlayer.playpath = VinMediaLists.allSongs.get(position).get("data");
+                                context.startActivity(new Intent(VinPlayer.applicationContext,WiFiDirectActivity.class));
                                 break;
                         }
                         return false;

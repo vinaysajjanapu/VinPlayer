@@ -23,6 +23,7 @@ import com.vinay.vinplayer.helpers.VinMedia;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,7 +35,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.ViewHolder> {
 
-    private final List<HashMap<String,String>> mValues;
+    private final ArrayList<HashMap<String,String>> mValues;
 
     Context context;
     private BroadcastReceiver broadcastReceiver;
@@ -42,7 +43,7 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
     static int pos1=0,pos2=0;
     static int gp;
 
-    public AlbumSongsAdapter(Context context, List<HashMap<String,String>> items) {
+    public AlbumSongsAdapter(Context context, ArrayList<HashMap<String,String>> items) {
         mValues = items;
         this.context=context;
     }
@@ -54,34 +55,30 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
         if(EventBus.getDefault().isRegistered(MessageEvent.class)){
             EventBus.getDefault().unregister(this);
         }
-        //EventBus.getDefault().register(this);
         return new AlbumSongsAdapter.ViewHolder(view);
     }
     @Override
     public void onBindViewHolder(final AlbumSongsAdapter.ViewHolder holder, final int position) {
 
         String title = mValues.get(position).get("title");
-
         holder.mItem = mValues.get(position);
         holder.songname.setText(title);
         holder.ArtisName_duration.setText(
                 mValues.get(position).get("album") + "\t-\t"+ mValues.get(position).get("artist") + ""
         );
 
+        holder.img_playindic.setVisibility(View.GONE);
+        holder.mView.setBackgroundColor(Color.TRANSPARENT);
+
         if (VinMedia.getInstance().getCurrentSongDetails()!=null) {
             if (VinMedia.getInstance().getCurrentSongDetails().get("title").equals(title)){
-                holder.img_playindic.setVisibility(View.VISIBLE);/*
-                holder.songname.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-                holder.ArtisName_duration.setTypeface(Typeface.DEFAULT, Typeface.BOLD);*/
+                holder.img_playindic.setVisibility(View.VISIBLE);
                 holder.ArtisName_duration.setTextColor(Color.WHITE);
                 holder.mView.setBackgroundColor(context.getResources().getColor(R.color.transparentLightBlack));
             }
         }
 
-        holder.img_playindic.setVisibility(View.GONE);
-        holder.mView.setBackgroundColor(Color.TRANSPARENT);
         try {
-            Log.d("albumsonsrecycler","set image");
             final Uri sArtworkUri = Uri
                     .parse("content://media/external/audio/albumart");
             Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(mValues.get(position).get("album_id")));
@@ -95,31 +92,12 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (VinMedia.getInstance().isPlaying()) {
-                    VinMedia.getInstance().resetPlayer(VinMedia.getInstance().getMediaPlayer());
-                }
+                VinMedia.getInstance().updateTempQueue(mValues,context);
                 VinMedia.getInstance().updateQueue(false,context);
-                EventBus.getDefault().post(new MessageEvent(context.getString(R.string.queueUpdated)));
-                playPauseAction(position);
+                VinMedia.getInstance().startMusic(position,context);
             }
         });
     }
-    private void playPauseAction(int position) {
-
-        VinMedia.getInstance().setPosition(position);
-        if (VinMedia.getInstance().isPlaying() || !VinMedia.getInstance().isClean()) {
-            VinMedia.getInstance().resetPlayer(VinMedia.getInstance().getMediaPlayer());
-            VinMedia.getInstance().startMusic(position,context);
-        } else {
-            VinMedia.getInstance().startMusic(position,context);
-        }
-    }
-
-
-    private void onNewSongLoaded( ){
-
-    }
-
 
     @Override
     public int getItemCount() {
@@ -148,18 +126,7 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
             more_icon.setVisibility(View.INVISIBLE);
             songname.setTextColor(Color.WHITE);
             ArtisName_duration.setTextColor(Color.WHITE);
-            img_playindic.setColorFilter(Color.BLACK);
-        }
-
-
-    }
-
-    @Subscribe
-    public void onEvent(MessageEvent event) {
-        Log.e("Test event 2 ", event.message);
-        String action = event.message;
-        if(action.equals(context.getString(R.string.newSongLoaded))){
-            onNewSongLoaded();
+            img_playindic.setColorFilter(Color.GREEN);
         }
     }
 
