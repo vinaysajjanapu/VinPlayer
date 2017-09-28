@@ -34,7 +34,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:src="@android:drawable/ic_menu_search"
-            android:id="@+id/iv_search"/>
+            android:id="@+id/iv_search"
+            android:layout_alignParentRight="true" />
 
     </RelativeLayout>
 
@@ -54,7 +55,7 @@
     <com.vinay.vinplayer.springtablayout.SpringIndicator
 
     android:id="@+id/tabs"
-        android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="70dp"
     app:defaultMargin="30dp"
     app:endMargin="30dp"

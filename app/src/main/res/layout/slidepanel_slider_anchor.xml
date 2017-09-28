@@ -28,13 +28,13 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:text="Select a song to Play"
                     android:id="@+id/slider_playingsong_songname"
-                    android:layout_width="match_parent"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:textColor="@android:color/white"
                     android:singleLine="true"
-                    android:text="Select a song to Play"
                     android:ellipsize="marquee"
                     android:marqueeRepeatLimit="marquee_forever"
                     android:scrollHorizontally="true"
@@ -52,6 +52,7 @@
                     android:layout_marginTop="4dp"
                     android:textColor="@android:color/white"
                     android:singleLine="true"
+                    android:ellipsize="middle"
                     android:text=""
                     android:textSize="12sp" />
             </LinearLayout>

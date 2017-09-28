@@ -33,7 +33,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.gordonwong.materialsheetfab.MaterialSheetFab;
 import com.mxn.soul.flowingdrawer_core.FlowingMenuLayout;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
@@ -56,7 +55,6 @@ import com.vinay.vinplayer.fragments.QueueFragment;
 import com.vinay.vinplayer.helpers.ArtistImageCacheService;
 import com.vinay.vinplayer.helpers.BlurBuilder;
 import com.vinay.vinplayer.helpers.HeadPhoneDetectService;
-//import com.vinay.vinplayer.helpers.ImageDownloadService;
 import com.vinay.vinplayer.helpers.MessageEvent;
 import com.vinay.vinplayer.helpers.VinMedia;
 import com.vinay.vinplayer.helpers.VinMediaLists;
@@ -75,7 +73,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-//import com.vinay.vinplayer.helpers.ImageDownloadService;
+
 public class MainActivity extends AppCompatActivity implements
         AllSongsFragment.OnListFragmentInteractionListener,
         AlbumsFragment.OnAlbumFragmentInteractionListner, ArtistsFragment.OnArtistFragmentInteractionListner,
@@ -332,7 +330,9 @@ public class MainActivity extends AppCompatActivity implements
         sliderPlayer_progressBar = (ProgressBar) findViewById(R.id.slider_progressBar);
         sliderPlayer_albumart = (CircleImageView) findViewById(R.id.albumart_slider_playingsong);
         sliderPlayer_songtitle = (TextView) findViewById(R.id.slider_playingsong_songname);
+        sliderPlayer_songtitle.setSelected(true);
         sliderPlayer_songdetails = (TextView) findViewById(R.id.slider_playing_songdetails);
+        sliderPlayer_songdetails.setSelected(true);
         sliderPlayer_playpause = (ImageButton) findViewById(R.id.slider_playing_button_playpause);
         nowPlaying_statusBar = (RelativeLayout) findViewById(R.id.nowplaying_status_bar);
         nowPlaying_statusBar.setVisibility(View.INVISIBLE);
